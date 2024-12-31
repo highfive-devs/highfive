@@ -85,7 +85,7 @@ inline haddr_t h5d_get_offset(hid_t dset_id) {
 
 inline herr_t h5d_set_extent(hid_t dset_id, const hsize_t size[]) {
     herr_t err = H5Dset_extent(dset_id, size);
-    if (H5Dset_extent(dset_id, size) < 0) {
+    if (err < 0) {
         HDF5ErrMapper::ToException<DataSetException>("Could not resize dataset.");
     }
 
