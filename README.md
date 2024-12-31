@@ -1,3 +1,9 @@
+> [NOTE]
+> HighFive was orignally developed and maintained at
+> https://github.com/BlueBrain/HighFive. To continue maintenance of HighFive as
+> an independent open-source code without support from BBP or EPFL, some (one)
+> of the developers decided to create this repository.
+
 *Note:* In preparation of `v3` of HighFive, we've started merging breaking
 changes into the main branch. More information and opportunity to comment can
 be found at:
