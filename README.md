@@ -5,8 +5,7 @@
 > of the developers decided to create this repository.
 
 *Note:* In preparation of `v3` of HighFive, we've started merging breaking
-changes into the main branch. More information and opportunity to comment can
-be found at:
+changes into the main branch. More information can be found at:
 https://github.com/BlueBrain/HighFive/issues/864
 
 # HighFive - HDF5 header-only C++ Library
