@@ -5,7 +5,7 @@ https://github.com/BlueBrain/HighFive/issues/864
 
 # HighFive - HDF5 header-only C++ Library
 
-[![Doxygen -> gh-pages](https://github.com/BlueBrain/HighFive/workflows/gh-pages/badge.svg?branch=master)](https://BlueBrain.github.io/HighFive/actions/workflows/gh-pages.yml?query=branch%3Amaster)
+[![Doxygen -> gh-pages](https://github.com/highfive-devs/highfive/workflows/gh-pages/badge.svg?branch=master)](https://BlueBrain.github.io/HighFive/actions/workflows/gh-pages.yml?query=branch%3Amaster)
 [![codecov](https://codecov.io/gh/BlueBrain/HighFive/branch/master/graph/badge.svg?token=UBKxHEn7RS)](https://codecov.io/gh/BlueBrain/HighFive)
 [![HighFive_Integration_tests](https://github.com/BlueBrain/HighFive-testing/actions/workflows/integration.yml/badge.svg)](https://github.com/BlueBrain/HighFive-testing/actions/workflows/integration.yml)
 [![Zenodo](https://zenodo.org/badge/47755262.svg)](https://zenodo.org/doi/10.5281/zenodo.10679422)
@@ -118,23 +118,23 @@ dataset over the course of a simulation.
 
 #### Write a 2 dimensional C double float array to a 2D HDF5 dataset
 
-See [create_dataset_double.cpp](https://github.com/BlueBrain/HighFive/blob/master/src/examples/create_dataset_double.cpp)
+See [create_dataset_double.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/create_dataset_double.cpp)
 
 #### Write and read a matrix of double float (boost::ublas) to a 2D HDF5 dataset
 
-See [boost_ublas_double.cpp](https://github.com/BlueBrain/HighFive/blob/master/src/examples/boost_ublas_double.cpp)
+See [boost_ublas_double.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/boost_ublas_double.cpp)
 
 #### Write and read a subset of a 2D double dataset
 
-See [select_partial_dataset_cpp11.cpp](https://github.com/BlueBrain/HighFive/blob/master/src/examples/select_partial_dataset_cpp11.cpp)
+See [select_partial_dataset_cpp11.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/select_partial_dataset_cpp11.cpp)
 
 #### Create, write and list HDF5 attributes
 
-See [create_attribute_string_integer.cpp](https://github.com/BlueBrain/HighFive/blob/master/src/examples/create_attribute_string_integer.cpp)
+See [create_attribute_string_integer.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/create_attribute_string_integer.cpp)
 
 #### And others
 
-See [src/examples/](https://github.com/BlueBrain/HighFive/blob/master/src/examples/) subdirectory for more info.
+See [src/examples/](https://github.com/highfive-devs/highfive/blob/master/src/examples/) subdirectory for more info.
 
 
 ### H5Easy
@@ -263,23 +263,39 @@ target_link_libraries(foo PUBLIC Boost::headers)
 
 # Questions?
 
+Please first check if your question/issue has been answered/reported at
+[BlueBrain/HighFive](https://github.com/BlueBrain/HighFive).
+
 Do you have questions on how to use HighFive? Would you like to share an interesting example or
-discuss HighFive features? Head over to the [Discussions](https://github.com/BlueBrain/HighFive/discussions)
+discuss HighFive features? Head over to the [Discussions](https://github.com/highfive-devs/highfive/discussions)
 forum and join the community.
 
-For bugs and issues please use [Issues](https://github.com/BlueBrain/HighFive/issues).
+For bugs and issues please use [Issues](https://github.com/highfive-devs/highfive/issues).
 
 # Funding & Acknowledgment
- 
-The development of this software was supported by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government's ETH Board of the Swiss Federal Institutes of Technology.
 
 HighFive releases are uploaded to Zenodo. If you wish to cite HighFive in a
 scientific publication you can use the DOIs for the
 [Zenodo records](https://zenodo.org/doi/10.5281/zenodo.10679422).
- 
-Copyright © 2015-2022 Blue Brain Project/EPFL
 
+## Blue Brain Project Era: 2015 - 2024
 
-### License
+HighFive was created and maintained as part of the BBP from 2015 until Dec 2024
+(when BBP closed) at [BlueBrain/HighFive](https://github.com/BlueBrain/HighFive).
+
+Please consult its README for funding information by the Blue Brain Project or EPFL.
+
+## Post Blue Brain Project: 2025 - present
+
+One of the main contributors to
+[BlueBrain/HighFive](https://github.com/BlueBrain/HighFive) wanted to keep the
+project alive past the end of BBP. This repository was created to provide a
+seemless continuation of HighFive; and prevent fracturing or capturing of the
+project.
+
+This repository is not supported by the Blue Brain Project or EPFL.
+
+# License & Copyright
 
 Boost Software License 1.0
+Copyright © 2015-2024 Blue Brain Project/EPFL
