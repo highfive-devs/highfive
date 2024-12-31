@@ -1,4 +1,4 @@
-> [NOTE]
+> [!NOTE]
 > HighFive was orignally developed and maintained at
 > https://github.com/BlueBrain/HighFive. To continue maintenance of HighFive as
 > an independent open-source code without support from BBP or EPFL, some (one)
