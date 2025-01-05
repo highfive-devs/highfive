@@ -2,6 +2,8 @@ name: Integration Test Trigger
 on:
   pull_request:
     types: [closed]
+  workflow_dispatch:
+
 jobs:
   merge-PR:
     if: github.event.pull_request.merged == true
@@ -9,7 +11,7 @@ jobs:
     steps:
       - name: Trigger integration tests on highfive-devs/bbp-integration
         run: |
-          curl -X POST https://api.github.com/repos/highfive-devs/bbp-integration/dispatches \
+          curl -X POST "https://api.github.com/repos/highfive-devs/bbp-integration/dispatches" \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{"event_type": "merge", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
