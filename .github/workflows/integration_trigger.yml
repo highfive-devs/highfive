@@ -1,8 +1,13 @@
 name: Integration Test Trigger
+
 on:
+  push:
+    branches:
+      - main
+      - v2.x
   pull_request:
-    types: [closed]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   merge-PR:
