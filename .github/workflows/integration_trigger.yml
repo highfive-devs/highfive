@@ -17,6 +17,6 @@ jobs:
         run: |
           curl -X POST "https://api.github.com/repos/highfive-devs/bbp-integration/dispatches" \
           -H 'Accept: application/vnd.github.everest-preview+json' \
-          -H "Authorization: Bearer ${{ secrets.BBP_INTEGRATION_TRIGGER }} \
+          -H "Authorization: Bearer ${{ secrets.BBP_INTEGRATION_TRIGGER }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           --data '{"event_type": "merge", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
