@@ -3,6 +3,7 @@ name: Integration Test Trigger
 on:
   push:
     branches:
+      - main
       - v2.x
 
 jobs:
