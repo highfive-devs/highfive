@@ -1,15 +1,19 @@
 name: Integration Test Trigger
+
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches:
+      - main
+      - v2.x
+
 jobs:
   merge-PR:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Trigger integration tests on highfive-devs/bbp-integration
         run: |
-          curl -X POST https://api.github.com/repos/highfive-devs/bbp-integration/dispatches \
+          curl -X POST "https://api.github.com/repos/highfive-devs/bbp-integration/dispatches" \
           -H 'Accept: application/vnd.github.everest-preview+json' \
-          -u ${{ secrets.ACCESS_TOKEN }} \
+          -H "Authorization: Bearer ${{ secrets.BBP_INTEGRATION_TRIGGER }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
           --data '{"event_type": "merge", "client_payload": { "repository": "'"$GITHUB_REPOSITORY"'" }}'
