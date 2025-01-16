@@ -45,6 +45,14 @@ using namespace HighFive;
 using Catch::Matchers::Equals;
 
 TEST_CASE("Basic HighFive tests") {
+    File file(file_name, File::ReadWrite | File::Create | File::Truncate);
+    auto data = std::array{1, 1, 1};
+    file.createDataSet("/nested/group/data", data);
+    CHECK(file.exist("nested/group"));
+    CHECK(file.exist("nested/group/"));
+}
+
+TEST_CASE("Basic HighFive tests") {
     const std::string file_name("h5tutr_dset.h5");
     const std::string dataset_name("dset");
 
