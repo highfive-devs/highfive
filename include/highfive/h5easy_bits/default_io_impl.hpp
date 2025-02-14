@@ -57,9 +57,11 @@ struct default_io_impl {
     inline static T loadAttribute(const File& file,
                                   const std::string& path,
                                   const std::string& key) {
-        DataSet dataset = file.getDataSet(path);
-        Attribute attribute = dataset.getAttribute(key);
-        return attribute.read<T>();
+        auto read_attribute = [&key](const auto& obj) {
+            return obj.getAttribute(key).template read<T>();
+        };
+
+        return apply_attr_func(file, path, read_attribute);
     }
 };
 

@@ -166,27 +166,49 @@ TEST_CASE("H5Easy_vector3d") {
     CHECK(a == a_r);
 }
 
-TEST_CASE("H5Easy_Attribute_scalar") {
-    H5Easy::File file("h5easy_attribute_scalar.h5", H5Easy::File::Overwrite);
-
+void check_attribute(H5Easy::File& file, const std::string& path) {
     double a = 1.2345;
     int b = 12345;
     std::string c = "12345";
+    std::vector<double> d = {1.1, 2.2, 3.3};
 
-    H5Easy::dump(file, "/path/to/a", a);
-    H5Easy::dumpAttribute(file, "/path/to/a", "a", a);
-    H5Easy::dumpAttribute(file, "/path/to/a", "a", a, H5Easy::DumpMode::Overwrite);
-    H5Easy::dumpAttribute(file, "/path/to/a", "b", b);
-    H5Easy::dumpAttribute(file, "/path/to/a", "c", c);
+    H5Easy::dumpAttribute(file, path, "a", -a);
+    H5Easy::dumpAttribute(file, path, "a", a, H5Easy::DumpMode::Overwrite);
+    H5Easy::dumpAttribute(file, path, "b", b);
+    H5Easy::dumpAttribute(file, path, "c", c);
+    H5Easy::dumpAttribute(file, path, "d", d);
 
-    double a_r = H5Easy::loadAttribute<double>(file, "/path/to/a", "a");
-    int b_r = H5Easy::loadAttribute<int>(file, "/path/to/a", "b");
-    std::string c_r = H5Easy::loadAttribute<std::string>(file, "/path/to/a", "c");
+    double a_r = H5Easy::loadAttribute<double>(file, path, "a");
+    int b_r = H5Easy::loadAttribute<int>(file, path, "b");
+    std::string c_r = H5Easy::loadAttribute<std::string>(file, path, "c");
+    std::vector<double> d_r = H5Easy::loadAttribute<std::vector<double>>(file, path, "d");
 
     CHECK(a == a_r);
     CHECK(b == b_r);
     CHECK(c == c_r);
+    REQUIRE(d.size() == d_r.size());
+    for (size_t i = 0; i < d.size(); ++i) {
+        REQUIRE(d[i] == d_r[i]);
+    }
 }
+
+TEST_CASE("H5Easy_Attribute_scalar") {
+    H5Easy::File file("h5easy_attribute_scalar.h5", H5Easy::File::Overwrite);
+
+    std::string path = "/path/to/x";
+    H5Easy::dump(file, path, 1.0);
+
+    SECTION("dataset") {
+        check_attribute(file, path);
+    }
+    SECTION("group") {
+        check_attribute(file, "/path");
+    }
+    SECTION("root") {
+        check_attribute(file, "/");
+    }
+}
+
 
 #ifdef HIGHFIVE_TEST_XTENSOR
 TEST_CASE("H5Easy_extend1d") {

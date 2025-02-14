@@ -91,6 +91,30 @@ inline DataSet initScalarDataset(File& file,
     throw dump_error(file, path);
 }
 
+template <class File, class F>
+auto apply_attr_func_impl(File& file, const std::string& path, F f) {
+    auto type = file.getObjectType(path);
+    if (type == ObjectType::Group) {
+        auto group = file.getGroup(path);
+        return f(group);
+    } else if (type == ObjectType::Dataset) {
+        auto dataset = file.getDataSet(path);
+        return f(dataset);
+    } else {
+        throw error(file, path, "path is not the root, a group or a dataset.");
+    }
+}
+
+template <class F>
+auto apply_attr_func(const H5Easy::File& file, const std::string& path, F f) {
+    return apply_attr_func_impl(file, path, f);
+}
+
+template <class F>
+auto apply_attr_func(H5Easy::File& file, const std::string& path, F f) {
+    return apply_attr_func_impl(file, path, f);
+}
+
 // get a opened Attribute: nd-array
 template <class T>
 inline Attribute initAttribute(File& file,
@@ -98,26 +122,27 @@ inline Attribute initAttribute(File& file,
                                const std::string& key,
                                const std::vector<size_t>& shape,
                                const DumpOptions& options) {
-    if (!file.exist(path)) {
-        throw error(file, path, "H5Easy::dumpAttribute: DataSet does not exist");
-    }
-    if (file.getObjectType(path) != ObjectType::Dataset) {
-        throw error(file, path, "H5Easy::dumpAttribute: path not a DataSet");
-    }
-    DataSet dataset = file.getDataSet(path);
-    if (!dataset.hasAttribute(key)) {
-        return dataset.createAttribute<T>(key, DataSpace(shape));
-    } else if (options.overwrite()) {
-        Attribute attribute = dataset.getAttribute(key);
-        DataSpace dataspace = attribute.getSpace();
-        if (dataspace.getDimensions() != shape) {
-            throw error(file, path, "H5Easy::dumpAttribute: Inconsistent dimensions");
+    auto get_attribute = [&](auto& obj) {
+        if (!obj.hasAttribute(key)) {
+            return obj.template createAttribute<T>(key, DataSpace(shape));
+        } else if (options.overwrite()) {
+            Attribute attribute = obj.getAttribute(key);
+            DataSpace dataspace = attribute.getSpace();
+            if (dataspace.getDimensions() != shape) {
+                throw error(file, path, "H5Easy::dumpAttribute: Inconsistent dimensions");
+            }
+            return attribute;
         }
-        return attribute;
+        throw error(file,
+                    path,
+                    "H5Easy: Attribute exists, overwrite with H5Easy::DumpMode::Overwrite.");
+    };
+
+    if (!file.exist(path)) {
+        throw error(file, path, "H5Easy::dumpAttribute: path does not exist");
     }
-    throw error(file,
-                path,
-                "H5Easy: Attribute exists, overwrite with H5Easy::DumpMode::Overwrite.");
+
+    return apply_attr_func(file, path, get_attribute);
 }
 
 // get a opened Attribute: scalar
@@ -127,26 +152,27 @@ inline Attribute initScalarAttribute(File& file,
                                      const std::string& key,
                                      const T& data,
                                      const DumpOptions& options) {
-    if (!file.exist(path)) {
-        throw error(file, path, "H5Easy::dumpAttribute: DataSet does not exist");
-    }
-    if (file.getObjectType(path) != ObjectType::Dataset) {
-        throw error(file, path, "H5Easy::dumpAttribute: path not a DataSet");
-    }
-    DataSet dataset = file.getDataSet(path);
-    if (!dataset.hasAttribute(key)) {
-        return dataset.createAttribute<T>(key, DataSpace::From(data));
-    } else if (options.overwrite()) {
-        Attribute attribute = dataset.getAttribute(key);
-        DataSpace dataspace = attribute.getSpace();
-        if (dataspace.getElementCount() != 1) {
-            throw error(file, path, "H5Easy::dumpAttribute: Existing field not a scalar");
+    auto get_attribute = [&](auto& obj) {
+        if (!obj.hasAttribute(key)) {
+            return obj.template createAttribute<T>(key, DataSpace::From(data));
+        } else if (options.overwrite()) {
+            Attribute attribute = obj.getAttribute(key);
+            DataSpace dataspace = attribute.getSpace();
+            if (dataspace.getElementCount() != 1) {
+                throw error(file, path, "H5Easy::dumpAttribute: Existing field not a scalar");
+            }
+            return attribute;
         }
-        return attribute;
+        throw error(file,
+                    path,
+                    "H5Easy: Attribute exists, overwrite with H5Easy::DumpMode::Overwrite.");
+    };
+
+    if (!file.exist(path)) {
+        throw error(file, path, "H5Easy::dumpAttribute: path does not exist");
     }
-    throw error(file,
-                path,
-                "H5Easy: Attribute exists, overwrite with H5Easy::DumpMode::Overwrite.");
+
+    apply_attr_func(file, path, get_attribute);
 }
 
 }  // namespace detail
