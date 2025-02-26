@@ -257,6 +257,12 @@ inline Selection SliceTraits<Derivate>::select(const std::vector<size_t>& column
     const DataSpace& space = slice.getSpace();
     std::vector<size_t> dims = space.getDimensions();
 
+    if (dims.empty()) {
+        throw DataSpaceException(
+            "Invalid, zero-dimensional (scalar) dataspace encountered when "
+            "selecting columns; must be atleast 1-dimensional.");
+    }
+
     std::vector<size_t> counts = dims;
     counts.back() = 1;
 
