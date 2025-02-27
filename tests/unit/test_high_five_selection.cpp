@@ -173,7 +173,7 @@ void check_column_selection_values(const Container& selected,
 }
 
 template <typename Container>
-void check_column_selection_generic() {
+void check_column_selection() {
     using generator = testing::DataGenerator<Container>;
     using T = typename generator::base_type;
     auto rank = generator::rank;
@@ -196,15 +196,15 @@ void check_column_selection_generic() {
 }
 
 TEST_CASE("columnSelectionVectorDouble", "[template]") {
-    check_column_selection_generic<std::vector<double>>();
+    check_column_selection<std::vector<double>>();
 }
 
 TEST_CASE("columnSelectionVector2DDouble", "[template]") {
-    check_column_selection_generic<std::vector<std::vector<double>>>();
+    check_column_selection<std::vector<std::vector<double>>>();
 }
 
 TEST_CASE("columnSelectionVector3DDouble", "[template]") {
-    check_column_selection_generic<std::vector<std::vector<std::vector<double>>>>();
+    check_column_selection<std::vector<std::vector<std::vector<double>>>>();
 }
 
 std::vector<std::array<size_t, 2>> global_indices_2d(const std::vector<size_t>& offset,
