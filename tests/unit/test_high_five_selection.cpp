@@ -191,6 +191,12 @@ void check_column_selection() {
     std::vector<size_t> columns{1, 3};
     Selection slice = dataset.select(columns);
 
+    auto expected_mem_dims = std::vector<size_t>(dims.begin(), dims.begin() + (int(rank) - 1));
+    expected_mem_dims.push_back(columns.size());
+
+    REQUIRE(slice.getMemSpace().getDimensions() == expected_mem_dims);
+    REQUIRE(slice.getSpace().getDimensions() == dims);
+
     auto result = slice.read<Container>();
     check_column_selection_values(result, values, dims, columns);
 }
