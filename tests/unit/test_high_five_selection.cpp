@@ -213,6 +213,17 @@ TEST_CASE("columnSelectionVector3DDouble", "[selection]") {
     check_column_selection<std::vector<std::vector<std::vector<double>>>>();
 }
 
+TEST_CASE("scalarColumnSelection", "[selection]") {
+    const std::string dataset_name = "dset";
+    std::string filename = "h5_rw_select_scalar_column_test_test.h5";
+
+    File file(filename, File::Truncate);
+    auto dset = file.createDataSet("dset", 42.0);
+
+    std::vector<size_t> columns{};
+    REQUIRE_THROWS(dset.select(columns));
+}
+
 std::vector<std::array<size_t, 2>> global_indices_2d(const std::vector<size_t>& offset,
                                                      const std::vector<size_t>& count) {
     std::vector<std::array<size_t, 2>> indices;
