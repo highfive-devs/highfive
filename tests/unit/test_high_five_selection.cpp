@@ -147,7 +147,7 @@ void check_column_selection_values(double,
                                    double,
                                    const std::vector<size_t>&,
                                    const std::vector<size_t>&) {
-    // This function mearly apeases the compiler, it's a basecase that needed for compilation, but
+    // This function merely appeases the compiler, it's a base case that's needed for compilation, but
     // should never actually run.
     throw std::logic_error("Broken test logic.");
 }
