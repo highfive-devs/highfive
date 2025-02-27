@@ -181,9 +181,11 @@ void check_column_selection() {
     CHECK(slice.getSpace().getDimensions()[0] == x_size);
     CHECK(slice.getMemSpace().getDimensions()[0] == x_size);
 
-    for (size_t i = 0; i < 3; ++i)
-        for (size_t j = 0; j < x_size; ++j)
+    for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; j < x_size; ++j) {
             REQUIRE(result[j][i] == values[j][columns[i]]);
+        }
+    }
 }
 
 TEMPLATE_LIST_TEST_CASE("columnSelection", "[template]", numerical_test_types) {
