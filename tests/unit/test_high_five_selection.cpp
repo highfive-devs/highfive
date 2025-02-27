@@ -144,7 +144,7 @@ TEST_CASE("selectionByElementMultiDim") {
 }
 
 template <typename T>
-void columnSelectionTest() {
+void check_column_selection() {
     std::ostringstream filename;
     filename << "h5_rw_select_column_test_" << typeNameHelper<T>() << "_test.h5";
 
@@ -187,7 +187,7 @@ void columnSelectionTest() {
 }
 
 TEMPLATE_LIST_TEST_CASE("columnSelection", "[template]", numerical_test_types) {
-    columnSelectionTest<TestType>();
+    check_column_selection<TestType>();
 }
 
 std::vector<std::array<size_t, 2>> global_indices_2d(const std::vector<size_t>& offset,
