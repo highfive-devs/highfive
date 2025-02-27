@@ -143,11 +143,73 @@ TEST_CASE("selectionByElementMultiDim") {
     }
 }
 
+void check_column_selection_values(double,
+                                   double,
+                                   const std::vector<size_t>&,
+                                   const std::vector<size_t>&) {
+    // This function mearly apeases the compiler, it's a basecase that needed for compilation, but
+    // should never actually run.
+    throw std::logic_error("Broken test logic.");
+}
+
+
+template <typename Container>
+void check_column_selection_values(const Container& selected,
+                                   const Container& values,
+                                   const std::vector<size_t>& dims,
+                                   const std::vector<size_t>& columns) {
+    if (dims.size() > 1) {
+        // For multi-dimensional arrays, recurse into each dimension
+        auto subdims = std::vector<size_t>(dims.begin() + 1, dims.end());
+        for (size_t i = 0; i < dims[0]; ++i) {
+            check_column_selection_values(selected[i], values[i], subdims, columns);
+        }
+    } else {
+        // Base case: 1D array, check selected columns match
+        for (size_t i = 0; i < columns.size(); ++i) {
+            REQUIRE(selected[i] == values[columns[i]]);
+        }
+    }
+}
+
+template <typename Container>
+void check_column_selection_generic() {
+    using generator = testing::DataGenerator<Container>;
+    using T = typename generator::base_type;
+    auto rank = generator::rank;
+
+    const std::string dataset_name = "dset";
+    std::string filename = "h5_rw_select_column_test_" + typeNameHelper<T>() + "_" +
+                           std::to_string(rank) + "d_test.h5";
+    File file(filename, File::Truncate);
+
+    auto dims = std::vector<size_t>(rank, 5);
+    auto values = generator::create(dims);
+
+    auto dataset = file.createDataSet(dataset_name, values);
+
+    std::vector<size_t> columns{1, 3};
+    Selection slice = dataset.select(columns);
+
+    auto result = slice.read<Container>();
+    check_column_selection_values(result, values, dims, columns);
+}
+
+TEST_CASE("columnSelectionVectorDouble", "[template]") {
+    check_column_selection_generic<std::vector<double>>();
+}
+
+TEST_CASE("columnSelectionVector2DDouble", "[template]") {
+    check_column_selection_generic<std::vector<std::vector<double>>>();
+}
+
+TEST_CASE("columnSelectionVector3DDouble", "[template]") {
+    check_column_selection_generic<std::vector<std::vector<std::vector<double>>>>();
+}
+
+
 template <typename T>
 void check_column_selection() {
-    std::ostringstream filename;
-    filename << "h5_rw_select_column_test_" << typeNameHelper<T>() << "_test.h5";
-
     const size_t x_size = 10;
     const size_t y_size = 7;
 
@@ -158,8 +220,8 @@ void check_column_selection() {
     ContentGenerate<T> generator;
     generate2D(values, x_size, y_size, generator);
 
-    // Create a new file using the default property lists.
-    File file(filename.str(), File::ReadWrite | File::Create | File::Truncate);
+    std::string filename = "h5_rw_select_column_test_" + typeNameHelper<T>() + "_test.h5";
+    File file(filename, File::Truncate);
 
     // Create the data space for the dataset.
     std::vector<size_t> dims{x_size, y_size};
