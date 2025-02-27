@@ -207,53 +207,6 @@ TEST_CASE("columnSelectionVector3DDouble", "[template]") {
     check_column_selection_generic<std::vector<std::vector<std::vector<double>>>>();
 }
 
-
-template <typename T>
-void check_column_selection() {
-    const size_t x_size = 10;
-    const size_t y_size = 7;
-
-    const std::string dataset_name("dset");
-
-    T values[x_size][y_size];
-
-    ContentGenerate<T> generator;
-    generate2D(values, x_size, y_size, generator);
-
-    std::string filename = "h5_rw_select_column_test_" + typeNameHelper<T>() + "_test.h5";
-    File file(filename, File::Truncate);
-
-    // Create the data space for the dataset.
-    std::vector<size_t> dims{x_size, y_size};
-
-    DataSpace dataspace(dims);
-    // Create a dataset with arbitrary type
-    DataSet dataset = file.createDataSet<T>(dataset_name, dataspace);
-
-    dataset.write(values);
-
-    file.flush();
-
-    std::vector<size_t> columns{1, 3, 5};
-
-    Selection slice = dataset.select(columns);
-    T result[x_size][3];
-    slice.read(result);
-
-    CHECK(slice.getSpace().getDimensions()[0] == x_size);
-    CHECK(slice.getMemSpace().getDimensions()[0] == x_size);
-
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < x_size; ++j) {
-            REQUIRE(result[j][i] == values[j][columns[i]]);
-        }
-    }
-}
-
-TEMPLATE_LIST_TEST_CASE("columnSelection", "[template]", numerical_test_types) {
-    check_column_selection<TestType>();
-}
-
 std::vector<std::array<size_t, 2>> global_indices_2d(const std::vector<size_t>& offset,
                                                      const std::vector<size_t>& count) {
     std::vector<std::array<size_t, 2>> indices;
