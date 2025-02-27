@@ -195,15 +195,15 @@ void check_column_selection() {
     check_column_selection_values(result, values, dims, columns);
 }
 
-TEST_CASE("columnSelectionVectorDouble", "[template]") {
+TEST_CASE("columnSelectionVectorDouble", "[selection]") {
     check_column_selection<std::vector<double>>();
 }
 
-TEST_CASE("columnSelectionVector2DDouble", "[template]") {
+TEST_CASE("columnSelectionVector2DDouble", "[selection]") {
     check_column_selection<std::vector<std::vector<double>>>();
 }
 
-TEST_CASE("columnSelectionVector3DDouble", "[template]") {
+TEST_CASE("columnSelectionVector3DDouble", "[selection]") {
     check_column_selection<std::vector<std::vector<std::vector<double>>>>();
 }
 
