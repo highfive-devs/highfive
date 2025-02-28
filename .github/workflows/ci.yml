@@ -149,9 +149,9 @@ jobs:
       matrix:
         os: [ "ubuntu-24.04" ]
         env: [
-          {CC: clang-18, CXX: clang++-18, COMPILER_DEPS: "clang-18"},
-          {CC: gcc-9, CXX: g++-9, COMPILER_DEPS: "gcc-9 g++-9"},
-          {CC: gcc-14, CXX: g++-14, COMPILER_DEPS: "gcc-14 g++-14"},
+          {CC: clang-18, CXX: clang++-18, pkgs: "clang-18"},
+          {CC: gcc-9, CXX: g++-9, pkgs: "gcc-9 g++-9"},
+          {CC: gcc-14, CXX: g++-14, pkgs: "gcc-14 g++-14"},
         ]
 
         include:
@@ -159,7 +159,7 @@ jobs:
             env:
               CC: clang-11
               CXX: clang++-11
-              COMPILER_DEPS: clang-11
+              pkgs: clang-11
 
 
     steps:
@@ -170,7 +170,7 @@ jobs:
     - name: "Install libraries"
       run: |
         sudo apt-get -qq update
-        sudo apt-get -qq install ${COMPILER_DEPS}
+        sudo apt-get -qq install ${pkgs}
         sudo apt-get -qq install libboost-all-dev libhdf5-dev libsz2 ninja-build
 
     - name: Build
