@@ -53,7 +53,6 @@ jobs:
           -DHIGHFIVE_TEST_XTENSOR:BOOL=ON
           -DHIGHFIVE_TEST_SINGLE_INCLUDES=ON
           -DHIGHFIVE_BUILD_DOCS:BOOL=FALSE
-          -DHIGHFIVE_HAS_WERROR=Off
           -DCMAKE_CXX_FLAGS="-coverage -O0"
         )
         source $GITHUB_WORKSPACE/.github/build.sh
