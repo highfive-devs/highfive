@@ -9,7 +9,7 @@
 
 ## Version 3.0.0-beta1 - 2024-07-16
 This version is a major one and is breaking some usage compare to v2.
-Read the migration guide from the documentation: https://bluebrain.github.io/HighFive/md__2home_2runner_2work_2_high_five_2_high_five_2doc_2migration__guide.html
+Read the migration guide from the documentation: https://highfive-devs.github.io/highfive/md__2home_2runner_2work_2_high_five_2_high_five_2doc_2migration__guide.html
 
 The minimum version for C++ has been moved to `C++14`.
 
