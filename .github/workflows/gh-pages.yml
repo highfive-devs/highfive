@@ -1,4 +1,4 @@
-name: gh-pages
+name: Documentation
 
 on:
   push:
@@ -10,43 +10,64 @@ on:
       - master
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-
-  publish:
-
+  build:
+    name: Build Documentation
     runs-on: ubuntu-latest
-
     defaults:
       run:
         shell: bash -l {0}
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
 
-    - uses: actions/checkout@v3
-      with:
-        submodules: 'recursive'
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: doc/environment.yaml
+          environment-name: doc-build
+          cache-environment: true
+          cache-downloads: true
 
-    - uses: mamba-org/setup-micromamba@v1
-      with:
-        environment-file: doc/environment.yaml
-        environment-name: doc-build
+      - name: Build documentation with CMake
+        run: |
+          CMAKE_OPTIONS=(
+            -DHIGHFIVE_UNIT_TESTS=OFF
+          )
+          cmake -B build -S . "${CMAKE_OPTIONS[@]}"
+          cmake --build build --target doc
+          cp -r doc/poster build/doc/html/
 
-    - name: Run doxygen
-      run: |
-        CMAKE_OPTIONS=(
-          -DHIGHFIVE_UNIT_TESTS=OFF
-        )
-        cmake -B build -S . "${CMAKE_OPTIONS[@]}"
-        cmake --build build --target doc
-        cp -r doc/poster build/doc/html/
+      - name: Upload artifact
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/doc/html
 
-    - name: Deploy to GitHub Pages
-      if: ${{ success() && github.ref == 'refs/heads/v2.x' && github.event_name == 'push' }}
-      uses: crazy-max/ghaction-github-pages@v2
-      with:
-        target_branch: gh-pages
-        build_dir: build/doc/html
-        jekyll: false
-        keep_history: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
