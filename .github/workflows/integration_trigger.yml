@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - v2.x
+  pull_request:
+    branches:
+      - main
 
 jobs:
   merge-PR:
