@@ -362,7 +362,7 @@ jobs:
 
     - uses: mamba-org/setup-micromamba@v1
       with:
-        environment-file: doc/environment.yaml
+        environment-file: .github/mamba_env.yaml
         environment-name: win-test
 
     - name: Build
