@@ -34,13 +34,19 @@ jobs:
           submodules: 'recursive'
           fetch-depth: 0
 
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v1
-        with:
-          environment-file: doc/environment.yaml
-          environment-name: doc-build
-          cache-environment: true
-          cache-downloads: true
+      - name: Install dependencies
+        run: |
+          pkgs=(
+            doxygen
+            graphviz
+            libhdf5-dev
+            libboost-all-dev
+            libeigen3-dev
+            libxtensor-dev
+          )
+
+          sudo apt-get update
+          sudo apt-get install -y ${pkgs[@]}
 
       - name: Build documentation with CMake
         run: |
