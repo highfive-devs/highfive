@@ -1,0 +1,72 @@
+name: Coverage
+
+concurrency:
+  group: ${{ github.workflow }}#${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - v2.x
+  pull_request:
+    branches:
+      - master
+      - main
+      - v2.x
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - 'doc/**'
+
+env:
+  BUILD_TYPE: RelWithDebInfo
+  INSTALL_DIR: install
+
+jobs:
+  # Job producing code coverage report
+  # ==================================
+  Code_coverage:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: "Install libraries"
+      run: |
+        sudo apt-get update
+        sudo apt-get install ninja-build lcov
+        sudo apt-get install libhdf5-dev libsz2 libboost-all-dev libeigen3-dev libopencv-dev
+        sudo apt-get install libxtensor-dev
+
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
+        submodules: true
+
+    - name: Build for code coverage
+      run: |
+        CMAKE_OPTIONS=(
+          -GNinja
+          -DHIGHFIVE_TEST_BOOST:BOOL=ON
+          -DHIGHFIVE_TEST_EIGEN:BOOL=ON
+          -DHIGHFIVE_TEST_OPENCV:BOOL=ON
+          -DHIGHFIVE_TEST_XTENSOR:BOOL=ON
+          -DHIGHFIVE_TEST_SINGLE_INCLUDES=ON
+          -DHIGHFIVE_BUILD_DOCS:BOOL=FALSE
+          -DCMAKE_CXX_FLAGS="-coverage -O0"
+        )
+        source $GITHUB_WORKSPACE/.github/build.sh
+
+    - name: Test for code coverage
+      run: |
+        lcov --capture  --initial --directory . --no-external --output-file build/coverage-base.info
+        (cd build; cmake --build . --target test)
+        lcov --capture  --directory . --no-external --output-file build/coverage-run.info
+        (cd build; lcov --add-tracefile coverage-base.info --add-tracefile coverage-run.info --output-file coverage-combined.info)
+
+    - uses: codecov/codecov-action@v3
+      with:
+        files: ./build/coverage-combined.info
+        fail_ci_if_error: false
+        verbose: true
+        token: ${{ secrets.CODECOV_TOKEN }}

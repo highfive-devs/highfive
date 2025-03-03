@@ -1,0 +1,20 @@
+name: Auto-update doxygen-awesome
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: 0 2 * * 1
+
+jobs:
+  check-for-updates:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Open PR if doxygen-awesome outdated.
+        run: |
+
+          VERSION=$(doc/doxygen-awesome-css/update_doxygen_awesome.sh "$(mktemp -d)")
+          .github/create_submodule_update_pr.sh doxygen-awesome ${VERSION}
