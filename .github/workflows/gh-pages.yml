@@ -3,11 +3,10 @@ name: Documentation
 on:
   push:
     branches:
-      - v2.x
+      - main
   pull_request:
     branches:
       - v2.x
-      - master
       - main
 
 permissions:
