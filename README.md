@@ -11,7 +11,7 @@ https://github.com/BlueBrain/HighFive/issues/864
 # HighFive - HDF5 header-only C++ Library
 
 [![Doxygen -> gh-pages](https://github.com/highfive-devs/highfive/actions/workflows/gh-pages.yml/badge.svg?branch=main)](https://highfive-devs.github.io/highfive)
-[![codecov](https://codecov.io/gh/BlueBrain/HighFive/branch/master/graph/badge.svg?token=UBKxHEn7RS)](https://codecov.io/gh/BlueBrain/HighFive)
+[![codecov](https://codecov.io/gh/highfive-devs/highfive/branch/master/graph/badge.svg?token=UBKxHEn7RS)](https://codecov.io/gh/highfive-devs/highfive)
 [![Integration Tests](https://github.com/highfive-devs/bbp-integration/actions/workflows/integration.yml/badge.svg)](https://github.com/highfive-devs/bbp-integration/actions/workflows/integration.yml)
 [![Zenodo](https://zenodo.org/badge/47755262.svg)](https://zenodo.org/doi/10.5281/zenodo.10679422)
 
