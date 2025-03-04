@@ -1,4 +1,4 @@
-name: HighFive_CI
+name: Unit Tests
 
 concurrency:
   group: ${{ github.workflow }}#${{ github.ref }}
