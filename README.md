@@ -11,8 +11,6 @@
 [![Doxygen -> gh-pages](https://github.com/highfive-devs/highfive/actions/workflows/gh-pages.yml/badge.svg?branch=main)](https://highfive-devs.github.io/highfive)
 [![Zenodo](https://zenodo.org/badge/47755262.svg)](https://zenodo.org/doi/10.5281/zenodo.10679422)
 
-## Brief
-
 HighFive is a modern, user-friendly, header-only, C++14 interface for libhdf5.
 ```c++
 #include <highfive/highfive.hpp>
@@ -52,11 +50,10 @@ target_link_libraries(foo HighFive::HighFive)
 - automatic memory management / ref counting
 - automatic conversion (serialization) of STL, Boost, Eigen and XTensor containers from/to any dataset
 - automatic conversion of `std::string` to/from variable- or fixed-length string dataset
-- selection with simplified APIs for common cases, and fully support of (irregular) HyperSlabs
+- simplified APIs for common selections and full support of (irregular) HyperSlabs
 - parallel HDF5 using MPI
 - Advanced types: Compound, Enum, Arrays of Fixed-length strings, References
 - half-precision (16-bit) floating-point datasets
-- `std::byte` in C++17 mode (with `-DCMAKE_CXX_STANDARD=17` or higher)
 - etc... (see [ChangeLog](./CHANGELOG.md))
 
 ### Known flaws
@@ -105,7 +102,7 @@ everything HighFive. Prior to 2.8.0 one would include `highfive/H5File.hpp`.
 writing to it. This is common in MPI-IO related patterns, or when growing a
 dataset over the course of a simulation.
 
-### And Many More!
+### And Many More Examples!
 We strive to have one example per usecase or feature of HighFive,
 see [src/examples/](https://github.com/highfive-devs/highfive/blob/master/src/examples/)
 for more examples.
