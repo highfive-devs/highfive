@@ -4,10 +4,6 @@
 > an independent open-source code without support from BBP or EPFL, some (one)
 > of the developers decided to create this repository.
 
-*Note:* In preparation of `v3` of HighFive, we've started merging breaking
-changes into the main branch. More information can be found at:
-https://github.com/BlueBrain/HighFive/issues/864
-
 # HighFive - HDF5 header-only C++ Library
 
 [![Tests](https://github.com/highfive-devs/highfive/actions/workflows/ci.yml/badge.svg)](https://github.com/highfive-devs/highfive/actions/workflows/ci.yml)
@@ -15,63 +11,53 @@ https://github.com/BlueBrain/HighFive/issues/864
 [![Doxygen -> gh-pages](https://github.com/highfive-devs/highfive/actions/workflows/gh-pages.yml/badge.svg?branch=main)](https://highfive-devs.github.io/highfive)
 [![Zenodo](https://zenodo.org/badge/47755262.svg)](https://zenodo.org/doi/10.5281/zenodo.10679422)
 
-Documentation: https://highfive-devs.github.io/highfive/
-
 ## Brief
 
-HighFive is a modern header-only C++14 friendly interface for libhdf5.
+HighFive is a modern, user-friendly, header-only, C++14 interface for libhdf5.
+```c++
+#include <highfive/highfive.hpp>
+using namespace HighFive;
 
-HighFive supports STL vector/string, Boost::UBLAS, Boost::Multi-array and Xtensor. It handles C++ from/to HDF5 with automatic type mapping.
-HighFive does not require additional libraries (see dependencies).
+{
+    // We create an empty HDF55 file, choosing to truncate
+    // an existing file:
+    File file(filename, File::Truncate);
 
-It integrates nicely with other CMake projects by defining (and exporting) a HighFive target.
+    // ... write the data to disk
+    std::vector<int> data(50, 1);
+    auto dataset = file.createDataSet("grp/data", data);
+
+    // ... and read it back, automatically allocating memory:
+    data = dataset.read<std::vector<int>>();
+}
+```
+
+It integrates nicely with other CMake projects through CMake targets:
+```cmake
+find_package(HighFive REQUIRED)
+target_link_libraries(foo HighFive::HighFive)
+```
 
 ### Design
-- Simple C++-ish minimalist interface
-- Only hard dependency is libhdf5
-- Zero/low overhead, when possible
+- User-friendly, C++14 interface.
+- Automatic type mapping (serialization).
+- Zero/low overhead, when possible.
 - RAII for opening/closing files, groups, datasets, etc.
-- Written in C++14
+- Compatible with the HDF5 C API.
+- A second API layer `H5Easy` provides a oneliner API for common, simple
+  usecases.
 
 ### Feature support
 - create/read/write files, datasets, attributes, groups, dataspaces.
 - automatic memory management / ref counting
-- automatic conversion of `std::vector` and nested `std::vector` from/to any dataset with basic types
+- automatic conversion (serialization) of STL, Boost, Eigen and XTensor containers from/to any dataset
 - automatic conversion of `std::string` to/from variable- or fixed-length string dataset
-- selection() / slice support
-- parallel Read/Write operations from several nodes with Parallel HDF5
+- selection with simplified APIs for common cases, and fully support of (irregular) HyperSlabs
+- parallel HDF5 using MPI
 - Advanced types: Compound, Enum, Arrays of Fixed-length strings, References
 - half-precision (16-bit) floating-point datasets
 - `std::byte` in C++17 mode (with `-DCMAKE_CXX_STANDARD=17` or higher)
 - etc... (see [ChangeLog](./CHANGELOG.md))
-
-### Dependencies
-- HDF5 or pHDF5, including headers
-- boost (optional)
-- eigen3 (optional)
-- xtensor (optional)
-- half (optional)
-
-### Versioning & Code Stability
-We use semantic versioning. Currently, we're preparing `v3` which contains a
-limited set of breaking changes required to eliminate undesireable behaviour or
-modernize outdated patterns. We provide a
-[Migration Guide](https://highfive-devs.github.io/highfive/md__2home_2runner_2work_2_high_five_2_high_five_2doc_2migration__guide.html),
-please report any missing or incorrect information to help others make the
-switch more easily.
-
-- `v2.x.y` are stable and any API breaking changes are considered bugs. There's
-  like not going to be very many releases of the `v2` line once `v3` is stable.
-
-- `v3.0.0-beta?` are pre-releases of `v3.0.0`. We predict that one more
-  breaking changes might happen: the string handling is confusing to some of the
-  maintainers and the default encoding is inconsistent (and will likely be made
-  consistent).
-
-  For codes that either use `std::string` when dealing with strings, or that
-  don't use strings with HDF5 at all, we don't currently have any additional
-  breaking changes planned for 3.0.0.
-
 
 ### Known flaws
 - HighFive is not thread-safe. At best it has the same limitations as the HDF5 library. However, HighFive objects modify their members without protecting these writes. Users have reported that HighFive is not thread-safe even when using the threadsafe HDF5 library, e.g., https://github.com/BlueBrain/HighFive/discussions/675.
@@ -81,9 +67,7 @@ switch more easily.
 
 
 ## Examples
-
-#### Write a std::vector<int> to 1D HDF5 dataset and read it back
-
+Here's an expanded version of the example provided above.
 ```c++
 #include <highfive/highfive.hpp>
 
@@ -121,48 +105,16 @@ everything HighFive. Prior to 2.8.0 one would include `highfive/H5File.hpp`.
 writing to it. This is common in MPI-IO related patterns, or when growing a
 dataset over the course of a simulation.
 
-#### Write a 2 dimensional C double float array to a 2D HDF5 dataset
+### And Many More!
+We strive to have one example per usecase or feature of HighFive,
+see [src/examples/](https://github.com/highfive-devs/highfive/blob/master/src/examples/)
+for more examples.
 
-See [create_dataset_double.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/create_dataset_double.cpp)
+## H5Easy
+For simple, common usecases the [highfive/H5Easy.hpp](include/highfive/H5Easy.hpp)
+interface provides single line solution.
 
-#### Write and read a matrix of double float (boost::ublas) to a 2D HDF5 dataset
-
-See [boost_ublas_double.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/boost_ublas_double.cpp)
-
-#### Write and read a subset of a 2D double dataset
-
-See [select_partial_dataset_cpp11.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/select_partial_dataset_cpp11.cpp)
-
-#### Create, write and list HDF5 attributes
-
-See [create_attribute_string_integer.cpp](https://github.com/highfive-devs/highfive/blob/master/src/examples/create_attribute_string_integer.cpp)
-
-#### And others
-
-See [src/examples/](https://github.com/highfive-devs/highfive/blob/master/src/examples/) subdirectory for more info.
-
-
-### H5Easy
-
-For several 'standard' use cases the [highfive/H5Easy.hpp](include/highfive/H5Easy.hpp) interface is available. It allows:
-
-* Reading/writing in a single line of:
-
-    - scalars (to/from an extendible DataSet),
-    - strings,
-    - vectors (of standard types),
-    - [Eigen::Matrix](http://eigen.tuxfamily.org) (optional),
-    - [xt::xarray](https://github.com/QuantStack/xtensor) and [xt::xtensor](https://github.com/QuantStack/xtensor)
-      (optional).
-    - [cv::Mat_](https://docs.opencv.org/master/df/dfc/classcv_1_1Mat__.html)
-      (optional).
-
-* Getting in a single line:
-
-    - the size of a DataSet,
-    - the shape of a DataSet.
-
-#### Example
+### Example
 
 ```cpp
 #include <highfive/H5Easy.hpp>
@@ -170,21 +122,20 @@ For several 'standard' use cases the [highfive/H5Easy.hpp](include/highfive/H5Ea
 int main() {
     H5Easy::File file("example.h5", H5Easy::File::Overwrite);
 
-    int A = ...;
+    int A = 42;
     H5Easy::dump(file, "/path/to/A", A);
 
     A = H5Easy::load<int>(file, "/path/to/A");
 }
 ```
-
-whereby the `int` type of this example can be replaced by any of the above
-types. See [easy_load_dump.cpp](src/examples/easy_load_dump.cpp) for more
-details.
+where `A` in this example can be replaced by other scalar variables or any of
+the supported containers, i.e. STL, Boost, XTensor, Eigen and (Easy-only)
+OpenCV.
+See [easy_load_dump.cpp](src/examples/easy_load_dump.cpp) for more details.
 
 **Note:** Classes such as `H5Easy::File` are just short for the regular
 `HighFive` classes (in this case `HighFive::File`). They can thus be used
 interchangeably.
-
 
 ## CMake integration
 There's two common paths of integrating HighFive into a CMake based project.
@@ -209,25 +160,27 @@ project (typically as a git submodule), for example in `third_party/HighFive`.
 The projects `CMakeLists.txt` add the following lines
 ```cmake
 add_subdirectory(third_party/HighFive)
-target_link_libraries(foo HighFive)
+target_link_libraries(foo HighFive::HighFive)
 ```
 
 **Note:** `add_subdirectory(third_party/HighFive)` will search and "link" HDF5
 but wont search or link any optional dependencies such as Boost.
 
+**Note:** The two targets `HighFive` and `HighFive::HighFive` are aliases. The
+former is older and works with v2, while the latter was introduced in v3,
+because CMake targets work more nicely if they contain `::`.
+
 ### Regular Installation of HighFive
 
 Alternatively, HighFive can be install and "found" like regular software.
-
 The project's `CMakeLists.txt` should add the following:
 ```cmake
 find_package(HighFive REQUIRED)
-target_link_libraries(foo HighFive)
+target_link_libraries(foo HighFive::HighFive)
 ```
 
 **Note:** `find_package(HighFive)` will search for HDF5. "Linking" to
-`HighFive` includes linking with HDF5. The two commands will not search for or
-"link" to optional dependencies such as Boost.
+`HighFive` includes linking with HDF5.
 
 ### Bailout Approach
 
@@ -251,7 +204,6 @@ target_link_libraries(foo HighFive::Include)
 ```
 
 ### Optional Dependencies
-
 HighFive does not attempt to find or "link" to any optional dependencies, such
 as Boost, Eigen, etc. Any project using HighFive with any of the optional
 dependencies must include the respective header:
@@ -266,7 +218,34 @@ find_package(Boost REQUIRED)
 target_link_libraries(foo PUBLIC Boost::headers)
 ```
 
-# Questions?
+HighFive integrates with the following libraries:
+- boost (optional)
+- eigen3 (optional)
+- xtensor (optional)
+- half (optional)
+
+## Versioning & Code Stability
+We use semantic versioning. Currently, we're preparing `v3` which contains a
+limited set of breaking changes required to eliminate undesireable behaviour or
+modernize outdated patterns. We provide a
+[Migration Guide](https://highfive-devs.github.io/highfive/md__2home_2runner_2work_2_high_five_2_high_five_2doc_2migration__guide.html),
+please report any missing or incorrect information to help others make the
+switch more easily.
+
+- `v2.x.y` are stable and any API breaking changes are considered bugs. There's
+  like not going to be very many releases of the `v2` line once `v3` is stable.
+
+- `v3.0.0-beta?` are pre-releases of `v3.0.0`. We predict that one more
+  breaking changes might happen: the string handling is confusing to some of the
+  maintainers and the default encoding is inconsistent (and will likely be made
+  consistent).
+
+  For codes that either use `std::string` when dealing with strings, or that
+  don't use strings with HDF5 at all, we don't currently have any additional
+  breaking changes planned for 3.0.0.
+
+
+## Questions?
 
 Please first check if your question/issue has been answered/reported at
 [BlueBrain/HighFive](https://github.com/BlueBrain/HighFive).
@@ -277,20 +256,20 @@ forum and join the community.
 
 For bugs and issues please use [Issues](https://github.com/highfive-devs/highfive/issues).
 
-# Funding & Acknowledgment
+## Funding & Acknowledgment
 
 HighFive releases are uploaded to Zenodo. If you wish to cite HighFive in a
 scientific publication you can use the DOIs for the
 [Zenodo records](https://zenodo.org/doi/10.5281/zenodo.10679422).
 
-## Blue Brain Project Era: 2015 - 2024
+### Blue Brain Project Era: 2015 - 2024
 
 HighFive was created and maintained as part of the BBP from 2015 until Dec 2024
 (when BBP closed) at [BlueBrain/HighFive](https://github.com/BlueBrain/HighFive).
 
 Please consult its README for funding information by the Blue Brain Project or EPFL.
 
-## Post Blue Brain Project: 2025 - present
+### Post Blue Brain Project: 2025 - present
 
 One of the main contributors to
 [BlueBrain/HighFive](https://github.com/BlueBrain/HighFive) wanted to keep the
@@ -300,7 +279,7 @@ project.
 
 This repository is not supported by the Blue Brain Project or EPFL.
 
-# License & Copyright
+## License & Copyright
 
 Boost Software License 1.0
 Copyright © 2015-2024 Blue Brain Project/EPFL
