@@ -13,8 +13,7 @@
 
 HighFive is a modern, user-friendly, header-only, C++14 interface for libhdf5.
 ```c++
-// We create an empty HDF55 file, choosing to truncate
-// an existing file:
+// Create/open a file:
 HighFive::File file(filename, HighFive::File::Truncate);
 
 // ... write the data to disk
