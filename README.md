@@ -13,21 +13,16 @@
 
 HighFive is a modern, user-friendly, header-only, C++14 interface for libhdf5.
 ```c++
-#include <highfive/highfive.hpp>
-using namespace HighFive;
+// We create an empty HDF55 file, choosing to truncate
+// an existing file:
+HighFive::File file(filename, HighFive::File::Truncate);
 
-{
-    // We create an empty HDF55 file, choosing to truncate
-    // an existing file:
-    File file(filename, File::Truncate);
+// ... write the data to disk
+std::vector<int> data(50, 1);
+auto dataset = file.createDataSet("grp/data", data);
 
-    // ... write the data to disk
-    std::vector<int> data(50, 1);
-    auto dataset = file.createDataSet("grp/data", data);
-
-    // ... and read it back, automatically allocating memory:
-    data = dataset.read<std::vector<int>>();
-}
+// ... and read it back, automatically allocating memory:
+data = dataset.read<std::vector<int>>();
 ```
 
 It integrates nicely with other CMake projects through CMake targets:
