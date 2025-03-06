@@ -96,12 +96,7 @@ everything HighFive. Prior to 2.8.0 one would include `highfive/H5File.hpp`.
 writing to it. This is common in MPI-IO related patterns, or when growing a
 dataset over the course of a simulation.
 
-### And Many More Examples!
-We strive to have one example per usecase or feature of HighFive,
-see [src/examples/](https://github.com/highfive-devs/highfive/blob/master/src/examples/)
-for more examples.
-
-## H5Easy
+### H5Easy
 For simple, common usecases the [highfive/H5Easy.hpp](include/highfive/H5Easy.hpp)
 interface provides single line solution. Here's the example from the
 introduction again:
@@ -125,6 +120,12 @@ See [easy_load_dump.cpp](src/examples/easy_load_dump.cpp) for more details.
 **Note:** Classes such as `H5Easy::File` are just short for the regular
 `HighFive` classes (in this case `HighFive::File`). They can thus be used
 interchangeably.
+
+### And Many More Examples!
+We strive to have one example per usecase or feature of HighFive,
+see [src/examples/](https://github.com/highfive-devs/highfive/blob/master/src/examples/)
+for more examples.
+
 
 ## CMake integration
 There's two common paths of integrating HighFive into a CMake based project.
