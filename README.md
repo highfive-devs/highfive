@@ -103,10 +103,8 @@ for more examples.
 
 ## H5Easy
 For simple, common usecases the [highfive/H5Easy.hpp](include/highfive/H5Easy.hpp)
-interface provides single line solution.
-
-### Example
-
+interface provides single line solution. Here's the example from the
+introduction again:
 ```cpp
 #include <highfive/H5Easy.hpp>
 
