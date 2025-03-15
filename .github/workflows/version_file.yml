@@ -1,5 +1,7 @@
 name: HighFive Check Version File
 
+permissions: read-all
+
 on:
   push:
     branches:

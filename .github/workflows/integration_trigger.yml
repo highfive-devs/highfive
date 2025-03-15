@@ -1,5 +1,7 @@
 name: Integration Test Trigger
 
+permissions: read-all
+
 on:
   push:
     branches:
