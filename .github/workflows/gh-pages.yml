@@ -1,5 +1,10 @@
 name: Documentation
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 on:
   push:
     branches:
@@ -8,11 +13,6 @@ on:
     branches:
       - v2.x
       - main
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 # Allow only one concurrent deployment
 concurrency:
