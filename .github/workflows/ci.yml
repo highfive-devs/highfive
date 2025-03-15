@@ -1,5 +1,9 @@
 name: Unit Tests
 
+# See, scorecard.dev (Token Permission)
+# https://github.com/ossf/scorecard/blob/a16e0f9eb245274f08512e33dc7afa78d21c460c/docs/checks.md#token-permissions
+permissions: read-all
+
 concurrency:
   group: ${{ github.workflow }}#${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'main' }}
