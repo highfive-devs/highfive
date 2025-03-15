@@ -2,7 +2,7 @@ name: Unit Tests
 
 concurrency:
   group: ${{ github.workflow }}#${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref == 'main' }}
 
 on:
   push:
