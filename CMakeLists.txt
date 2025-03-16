@@ -134,6 +134,11 @@ write_basic_package_version_file(
   VERSION ${PACKAGE_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfig.cmake
+    INSTALL_DESTINATION lib/cmake/HighFive
+)
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
   DESTINATION "include"
@@ -147,7 +152,7 @@ install(EXPORT HighFiveTargets
 )
 
 install(FILES
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfig.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfigVersion.cmake
   DESTINATION lib/cmake/HighFive
 )
