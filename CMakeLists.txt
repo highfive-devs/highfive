@@ -152,6 +152,14 @@ install(FILES
   DESTINATION lib/cmake/HighFive
 )
 
+# export targets into build tree
+export(
+    EXPORT HighFiveTargets
+    FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveTargets.cmake"
+    NAMESPACE HighFive::
+)
+
+
 # Preparing local building (tests, examples)
 # ------------------------------------------
 
