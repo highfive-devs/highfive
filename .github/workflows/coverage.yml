@@ -64,7 +64,7 @@ jobs:
         lcov --capture  --directory . --no-external --output-file build/coverage-run.info
         (cd build; lcov --add-tracefile coverage-base.info --add-tracefile coverage-run.info --output-file coverage-combined.info)
 
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v5
       with:
         files: ./build/coverage-combined.info
         fail_ci_if_error: false
