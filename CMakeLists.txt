@@ -128,6 +128,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/highfive/H5Version.hpp.in
 
 # Install
 # -------
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfigVersion.cmake
@@ -137,7 +138,7 @@ write_basic_package_version_file(
 configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfig.cmake
-    INSTALL_DESTINATION lib/cmake/HighFive
+    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/HighFive/cmake
 )
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
@@ -148,13 +149,13 @@ install(TARGETS HighFive HighFiveInclude EXPORT HighFiveTargets)
 install(EXPORT HighFiveTargets
   FILE HighFiveTargets.cmake
   NAMESPACE HighFive::
-  DESTINATION lib/cmake/HighFive
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/HighFive/cmake
 )
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfig.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfigVersion.cmake
-  DESTINATION lib/cmake/HighFive
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/HighFive/cmake
 )
 
 # export targets into build tree
