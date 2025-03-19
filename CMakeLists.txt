@@ -37,6 +37,10 @@ mark_as_advanced(HIGHFIVE_HAS_FRIEND_DECLARATIONS)
 
 option(HIGHFIVE_FIND_HDF5 "Find and link with HDF5." On)
 
+set(HIGHFIVE_CMAKE_INSTALL_DIR "share/HighFive/cmake" CACHE STRING
+  "Directory where HighFive's CMake code will be installed. Default: share/HighFive/cmake")
+
+
 # Configure Tests & Examples
 # --------------------------
 
@@ -128,17 +132,17 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/highfive/H5Version.hpp.in
 
 # Install
 # -------
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfigVersion.cmake
   VERSION ${PACKAGE_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
+
 configure_package_config_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfig.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/HighFive/cmake
+    INSTALL_DESTINATION ${HIGHFIVE_CMAKE_INSTALL_DIR}
 )
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
@@ -149,13 +153,13 @@ install(TARGETS HighFive HighFiveInclude EXPORT HighFiveTargets)
 install(EXPORT HighFiveTargets
   FILE HighFiveTargets.cmake
   NAMESPACE HighFive::
-  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/HighFive/cmake
+  DESTINATION ${HIGHFIVE_CMAKE_INSTALL_DIR}
 )
 
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfig.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/HighFiveConfigVersion.cmake
-  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/HighFive/cmake
+  DESTINATION ${HIGHFIVE_CMAKE_INSTALL_DIR}
 )
 
 # export targets into build tree
