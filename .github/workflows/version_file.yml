@@ -1,6 +1,7 @@
 name: HighFive Check Version File
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
