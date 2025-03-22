@@ -37,8 +37,8 @@ mark_as_advanced(HIGHFIVE_HAS_FRIEND_DECLARATIONS)
 
 option(HIGHFIVE_FIND_HDF5 "Find and link with HDF5." On)
 
-set(HIGHFIVE_CMAKE_INSTALL_DIR "share/HighFive/cmake" CACHE STRING
-  "Directory where HighFive's CMake code will be installed. Default: share/HighFive/cmake")
+set(HIGHFIVE_CMAKE_INSTALL_DIR "lib/cmake/HighFive" CACHE STRING
+  "Directory where HighFive's CMake code will be installed. Default: lib/cmake/HighFive")
 
 
 # Configure Tests & Examples
