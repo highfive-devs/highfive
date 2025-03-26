@@ -34,9 +34,28 @@ if(${INTEGRATION_STRATEGY} STREQUAL "bailout")
   set(HIGHFIVE_FIND_HDF5 Off)
 endif()
 
-# Since any project depending on 'Hi5Dependent' also needs HighFive, it doesn't
-# make sense to vendor HighFive. Therefore, use
-find_package(HighFive REQUIRED)
+if(${VENDOR_STRATEGY} STREQUAL "submodule_excl")
+  # When vendoring via a Git submodule, this will not install HighFive
+  # alongside this library. It it likely the preferred option.
+  add_subdirectory("deps/HighFive" EXCLUDE_FROM_ALL)
+elseif(${VENDOR_STRATEGY} STREQUAL "submodule_incl")
+  # When vendoring via a Git submodule, this will install HighFive
+  # alongside this library.
+  add_subdirectory("deps/HighFive")
+elseif(${VENDOR_STRATEGY} STREQUAL "fetch_content")
+  # By default FetchContent will include HighFive in the targets to be
+  # installed.
+  include(FetchContent)
+  FetchContent_Declare(HighFive
+    GIT_REPOSITORY $ENV{HIGHFIVE_GIT_REPOSITORY}
+    GIT_TAG $ENV{HIGHFIVE_GIT_TAG}
+  )
+  FetchContent_MakeAvailable(HighFive)
+elseif(${VENDOR_STRATEGY} STREQUAL "external")
+  # When HighFive is installed like regular software and then "found", do the
+  # following:
+  find_package(HighFive REQUIRED)
+endif()
 
 # For demonstration purposes it consists of a shared and static library
 add_library(${PROJECT_NAME}Write SHARED "src/hi5_dependent/write_vector.cpp")
@@ -122,6 +141,11 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake
   DESTINATION cmake
+)
+
+export(EXPORT ${PROJECT_NAME}Targets
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}Targets.cmake"
+  NAMESPACE Hi5Dependent::
 )
 
 if(USE_BOOST)
