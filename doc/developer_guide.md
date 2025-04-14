@@ -239,7 +239,8 @@ not vendor.
 There's two broad strategies for integrating HighFive into other code: *finding* or
 *vendoring*. When finding HighFive, the assumption by the consumer is that it's
 been installed somewhere and it can find it. When vendoring, the consumer
-brings their own copy of HighFive and uses it.
+brings their own copy of HighFive and uses it. The different vendoring
+strategies are:
 
 - **find_package**: the standard way for finding dependencies in CMake. Usually
   the assumption is that HighFive was install properly, either systemwide or in
@@ -328,11 +329,11 @@ The conceptually easy choices are:
   HighFive.
 
 - Libraries and applications that have dependencies that use HighFive should
-  use `find_package` since it's the easiest was of injecting a common version
+  use `find_package` since it's the easiest way of injecting a common version
   of HighFive everwhere.
 
 Since we can't (and don't want to) force our consumers to use `find_package`
-and ban vendoring, we have to test what happends when libraries vendor
+and ban vendoring, we have to test what happens when libraries vendor
 HighFive. (Many of these are likely sources of headache if you try to figure
 out which code is when using which of the multiple copies of HighFive
 involved; and how they decide to use that version.)
