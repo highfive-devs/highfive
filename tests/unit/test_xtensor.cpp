@@ -13,10 +13,19 @@
 #include <catch2/catch_template_test_macros.hpp>
 
 #include <highfive/highfive.hpp>
+#include <highfive/xtensor.hpp>
+
+#if HIGHFIVE_XTENSOR_HEADER_VERSION == 1
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xview.hpp>
 #include <xtensor/xio.hpp>
-#include <highfive/xtensor.hpp>
+#elif HIGHFIVE_XTENSOR_HEADER_VERSION == 2
+#include <xtensor/containers/xtensor.hpp>
+#include <xtensor/views/xview.hpp>
+#include <xtensor/io/xio.hpp>
+#else
+#error "Failed to detect HIGHFIVE_XTENSOR_HEADER_VERSION."
+#endif
 
 #include "data_generator.hpp"
 

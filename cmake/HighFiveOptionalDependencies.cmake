@@ -27,6 +27,11 @@ if(NOT TARGET HighFiveXTensorDependency)
     find_package(xtensor REQUIRED)
     target_link_libraries(HighFiveXTensorDependency INTERFACE xtensor)
     target_compile_definitions(HighFiveXTensorDependency INTERFACE HIGHFIVE_TEST_XTENSOR=1)
+
+    if(HIGHFIVE_XTENSOR_HEADER_VERSION)
+      target_compile_definitions(HighFiveXTensorDependency INTERFACE
+        HIGHFIVE_XTENSOR_HEADER_VERSION=${HIGHFIVE_XTENSOR_HEADER_VERSION})
+    endif()
   endif()
 endif()
 

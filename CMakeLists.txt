@@ -39,7 +39,7 @@ option(HIGHFIVE_FIND_HDF5 "Find and link with HDF5." On)
 
 set(HIGHFIVE_CMAKE_INSTALL_DIR "lib/cmake/HighFive" CACHE STRING
   "Directory where HighFive's CMake code will be installed. Default: lib/cmake/HighFive")
-
+set(HIGHFIVE_XTENSOR_HEADER_VERSION "0" CACHE STRING "XTensor header version: 1 for <xtensor/xtensor.hpp>, 2 for <xtensor/containers/xtensor.hpp>, and 0 for automatic detection.")
 
 # Configure Tests & Examples
 # --------------------------
