@@ -14,6 +14,8 @@ RUN apt-get update && \
     libbz2-dev libreadline-dev libsqlite3-dev curl git \
     libncursesw5-dev xz-utils tk-dev libxml2-dev \
     libxmlsec1-dev libffi-dev liblzma-dev ca-certificates \
+    # tools
+    telnet \
     && rm -rf /var/lib/apt/lists/*
 
 # # Build REST VOL
@@ -32,7 +34,7 @@ ENV PYENV_ROOT="/home/kothar/.pyenv"
 ENV PATH="${PYENV_ROOT}/bin:${PYENV_ROOT}/shims:${PATH}"
 RUN curl https://pyenv.run | bash
 RUN pyenv install 3.9.21 && pyenv global 3.9.21
-RUN pip install hsds==0.8.4 --break-system-packages
+RUN pip install hsds h5py h5pyd --break-system-packages
 
 # Setup env variables for HSDS / REST VOL
 ENV HDF5_PLUGIN_PATH=/usr/local/vol-rest/lib
@@ -40,6 +42,12 @@ ENV HDF5_VOL_CONNECTOR=REST
 ENV HSDS_USERNAME=admin
 ENV HSDS_PASSWORD=admin
 ENV HSDS_ENDPOINT=http://localhost:5101
+
+# The following is for h5pyd
+ENV HS_USERNAME=admin
+ENV HS_PASSWORD=admin
+ENV HS_ENDPOINT=http://localhost:5101
+
 
 # Create `~/launch-hsds.sh script file
 RUN mkdir -p /home/kothar/.bin && cat <<'EOF' > /home/kothar/.bin/start-hsds
