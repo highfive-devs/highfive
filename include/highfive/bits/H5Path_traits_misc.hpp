@@ -22,8 +22,10 @@ inline PathTraits<Derivate>::PathTraits() {
                   "PathTraits can only be applied to Group, DataSet and Attribute");
     const auto& obj = static_cast<const Derivate&>(*this);
     if (obj.isValid()) {
+#if !defined(HIGHFIVE_USE_RESTVOL)
         const hid_t file_id = detail::h5i_get_file_id<PropertyException>(obj.getId());
         _file_obj.reset(new File(file_id));
+#endif
     }
 }
 

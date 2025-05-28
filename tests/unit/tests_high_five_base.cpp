@@ -45,7 +45,7 @@ using namespace HighFive;
 using Catch::Matchers::Equals;
 
 TEST_CASE("Basic HighFive tests") {
-    const std::string file_name("h5tutr_dset.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5tutr_dset.h5");
     const std::string dataset_name("dset");
 
     // Create a new file using the default property lists.
@@ -92,7 +92,7 @@ TEST_CASE("Test silent HighFive") {
 
     try {
         SilenceHDF5 silence;
-        File file("nonexistent", File::ReadOnly);
+        File file(to_abs_if_rest_vol("nonexistent"), File::ReadOnly);
     } catch (const FileException&) {
     }
     CHECK(buffer[0] == '\0');
@@ -104,9 +104,9 @@ TEST_CASE("Test silent HighFive") {
 }
 
 TEST_CASE("Test open modes in HighFive") {
-    const std::string file_name("openmodes.h5");
+    const std::string file_name = to_abs_if_rest_vol("openmodes.h5");
 
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
 
     SilenceHDF5 silencer;
 
@@ -121,12 +121,12 @@ TEST_CASE("Test open modes in HighFive") {
     // But if its there and exclusive is given, should fail
     CHECK_THROWS_AS(File(file_name, File::ReadWrite | File::Excl), FileException);
     // ReadWrite and Excl flags are fine together (posix)
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
     {
         File file(file_name, File::ReadWrite | File::Excl);
     }
     // All three are fine as well (as long as the file does not exist)
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
     {
         File file(file_name, File::ReadWrite | File::Create | File::Excl);
     }
@@ -134,14 +134,14 @@ TEST_CASE("Test open modes in HighFive") {
     // Just a few combinations are incompatible, detected by hdf5lib
     CHECK_THROWS_AS(File(file_name, File::Truncate | File::Excl), FileException);
 
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
     CHECK_THROWS_AS(File(file_name, File::Truncate | File::Excl), FileException);
 
     // But in most cases we will truncate and that should always work
     {
         File file(file_name, File::Truncate);
     }
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
     {
         File file(file_name, File::Truncate);
     }
@@ -173,9 +173,9 @@ TEST_CASE("File::AccessMode") {
 }
 
 TEST_CASE("Test file version bounds") {
-    const std::string file_name("h5_version_bounds.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_version_bounds.h5");
 
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
 
     {
         File file(file_name, File::Truncate);
@@ -184,7 +184,7 @@ TEST_CASE("Test file version bounds") {
         CHECK(bounds.second == H5F_LIBVER_LATEST);
     }
 
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
 
     {
         FileAccessProps fapl;
@@ -198,7 +198,7 @@ TEST_CASE("Test file version bounds") {
 
 #if H5_VERSION_GE(1, 10, 1)
 TEST_CASE("Test file space strategy") {
-    const std::string file_name("h5_file_space_strategy.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_file_space_strategy.h5");
     auto strategies = std::vector<H5F_fspace_strategy_t>{H5F_FSPACE_STRATEGY_FSM_AGGR,
                                                          H5F_FSPACE_STRATEGY_AGGR,
                                                          H5F_FSPACE_STRATEGY_PAGE,
@@ -214,13 +214,17 @@ TEST_CASE("Test file space strategy") {
 
         {
             File file(file_name, File::ReadOnly);
+#if defined(HIGHFIVE_USE_RESTVOL)
+            CHECK_THROWS_AS(file.getFileSpaceStrategy(), FileException);
+#else
             CHECK(file.getFileSpaceStrategy() == strategy);
+#endif
         }
     }
 }
 
 TEST_CASE("Test file space page size") {
-    const std::string file_name("h5_file_space_page_size.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_file_space_page_size.h5");
     hsize_t page_size = 1024;
     {
         FileCreateProps create_props;
@@ -232,13 +236,17 @@ TEST_CASE("Test file space page size") {
 
     {
         File file(file_name, File::ReadOnly);
+#if defined(HIGHFIVE_USE_RESTVOL)
+        CHECK_THROWS_AS(file.getFileSpaceStrategy(), FileException);
+#else
         CHECK(file.getFileSpacePageSize() == page_size);
+#endif
     }
 }
 
 #ifndef H5_HAVE_PARALLEL
-TEST_CASE("Test page buffer size") {
-    const std::string file_name("h5_page_buffer_size.h5");
+TEST_CASE("Test page buffer size", RESTVOL_DISABLED("")) {
+    const std::string file_name = to_abs_if_rest_vol("h5_page_buffer_size.h5");
     hsize_t page_size = 1024;
     {
         FileCreateProps create_props;
@@ -302,9 +310,9 @@ TEST_CASE("Test page buffer size") {
 #endif
 
 TEST_CASE("Test metadata block size assignment") {
-    const std::string file_name("h5_meta_block_size.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_meta_block_size.h5");
 
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
 
     {
         File file(file_name, File::Truncate);
@@ -312,7 +320,7 @@ TEST_CASE("Test metadata block size assignment") {
         CHECK(file.getMetadataBlockSize() == 2048);
     }
 
-    std::remove(file_name.c_str());
+    delete_file_if_exists(file_name.c_str());
 
     {
         FileAccessProps fapl;
@@ -323,7 +331,7 @@ TEST_CASE("Test metadata block size assignment") {
 }
 
 TEST_CASE("Test group properties") {
-    const std::string file_name("h5_group_properties.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_group_properties.h5");
     FileAccessProps fapl;
     // When using hdf5 1.10.2 and later, the lower bound may be set to
     // H5F_LIBVER_V18
@@ -340,7 +348,7 @@ TEST_CASE("Test group properties") {
 }
 
 TEST_CASE("Test allocation time") {
-    const std::string file_name("h5_dataset_alloc_time.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_dataset_alloc_time.h5");
     File file(file_name, File::Truncate);
 
     size_t n_elements = 10;
@@ -353,8 +361,10 @@ TEST_CASE("Test allocation time") {
     auto datatype = create_datatype<decltype(data)::value_type>();
     auto dataset = file.createDataSet("dset", dataspace, datatype, dcpl);
 
+#if !defined(HIGHFIVE_USE_RESTVOL)
     auto alloc_size = H5Dget_storage_size(dataset.getId());
     CHECK(alloc_size == data.size() * sizeof(decltype(data)::value_type));
+#endif
 }
 
 template <class T>
@@ -484,13 +494,13 @@ TEST_CASE("Test default DataSet constructor") {
     check_invalid_hid_AnnotateTraits(ds);
     check_invalid_hid_PathTraits(ds);
 
-    File file("h5_default_dset_ctor.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_default_dset_ctor.h5"), File::Truncate);
     ds = file.createDataSet("dset", std::vector<int>{1, 2, 3, 4, 5});
     CHECK(ds.isValid());
 }
 
 TEST_CASE("Test default Group constructor") {
-    File file("h5_default_group_ctor.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_default_group_ctor.h5"), File::Truncate);
     Group linkable = file.createGroup("bar");
 
     Group grp;
@@ -506,7 +516,7 @@ TEST_CASE("Test default Group constructor") {
 
 
 TEST_CASE("Test groups and datasets") {
-    const std::string file_name("h5_group_test.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_group_test.h5");
     const std::string dataset_name("dset");
     const std::string chunked_dataset_name("chunked_dset");
     const std::string chunked_dataset_small_name("chunked_dset_small");
@@ -601,8 +611,8 @@ TEST_CASE("Test groups and datasets") {
     }
 }
 
-TEST_CASE("FileSpace") {
-    const std::string filename = "filespace.h5";
+TEST_CASE("FileSpace", RESTVOL_DISABLED("")) {
+    const std::string filename = to_abs_if_rest_vol("filespace.h5");
     const std::string ds_path = "dataset";
     const std::vector<int> data{13, 24, 36};
 
@@ -612,8 +622,8 @@ TEST_CASE("FileSpace") {
     CHECK(file.getFileSize() > 0);
 }
 
-TEST_CASE("FreeSpace (default)") {
-    const std::string filename = "freespace_default.h5";
+TEST_CASE("FreeSpace (default)", RESTVOL_DISABLED("")) {
+    const std::string filename = to_abs_if_rest_vol("freespace_default.h5");
     const std::string ds_path = "dataset";
     const std::vector<int> data{13, 24, 36};
 
@@ -631,8 +641,8 @@ TEST_CASE("FreeSpace (default)") {
 }
 
 #if H5_VERSION_GE(1, 10, 1)
-TEST_CASE("FreeSpace (tracked)") {
-    const std::string filename = "freespace_tracked.h5";
+TEST_CASE("FreeSpace (tracked)", RESTVOL_DISABLED("")) {
+    const std::string filename = to_abs_if_rest_vol("freespace_tracked.h5");
     const std::string ds_path = "dataset";
     const std::vector<int> data{13, 24, 36};
 
@@ -663,7 +673,7 @@ TEST_CASE("FreeSpace (tracked)") {
 #endif
 
 TEST_CASE("Test extensible datasets") {
-    const std::string file_name("create_extensible_dataset_example.h5");
+    const std::string file_name = to_abs_if_rest_vol("create_extensible_dataset_example.h5");
     const std::string dataset_name("dset");
     constexpr long double t1[3][1] = {{2.0l}, {2.0l}, {4.0l}};
     constexpr long double t2[1][3] = {{4.0l, 8.0l, 6.0l}};
@@ -724,7 +734,7 @@ TEST_CASE("Test extensible datasets") {
 }
 
 TEST_CASE("Test reference count") {
-    const std::string file_name("h5_ref_count_test.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_ref_count_test.h5");
     const std::string dataset_name("dset");
     const std::string group_name_1("/group1");
     const std::string group_name_2("/group2");
@@ -789,7 +799,7 @@ TEST_CASE("Test reference count") {
 }
 
 TEST_CASE("Test simple listings") {
-    const std::string file_name("h5_list_test.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_list_test.h5");
     const std::string group_name_core("group_name");
     const std::string group_nested_name("/group_nested");
 
@@ -851,7 +861,7 @@ TEST_CASE("Test simple listings") {
 }
 
 TEST_CASE("DataTypeEqualTakeBack") {
-    const std::string file_name("h5tutr_dset.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5tutr_dset.h5");
     const std::string dataset_name("dset");
 
     // Create a new file using the default property lists.
@@ -871,13 +881,15 @@ TEST_CASE("DataTypeEqualTakeBack") {
     CHECK(s == dataset.getDataType());
     CHECK(d != dataset.getDataType());
 
+#if !defined(HIGHFIVE_USE_RESTVOL)
     // Test getAddress and expect deprecation warning
     auto addr = dataset.getInfo().getAddress();
     CHECK(addr != 0);
+#endif
 }
 
 TEST_CASE("DataSpaceTest") {
-    const std::string file_name("h5tutr_space.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5tutr_space.h5");
     const std::string dataset_name("dset");
 
     // Create a new file using the default property lists.
@@ -1045,7 +1057,7 @@ TEST_CASE("ChunkingConstructorsTest") {
 
 TEST_CASE("HighFiveReadWriteShortcut") {
     std::ostringstream filename;
-    filename << "h5_rw_vec_shortcut_test.h5";
+    filename << to_abs_if_rest_vol("h5_rw_vec_shortcut_test.h5");
 
     const unsigned x_size = 800;
     const std::string dataset_name("dset");
@@ -1119,7 +1131,7 @@ TEST_CASE("HighFiveReadWriteShortcut") {
 template <typename T>
 void readWriteAttributeVectorTest() {
     std::ostringstream filename;
-    filename << "h5_rw_attribute_vec_" << typeNameHelper<T>() << "_test.h5";
+    filename << to_abs_if_rest_vol("h5_rw_attribute_vec_") << typeNameHelper<T>() << "_test.h5";
 
     std::srand((unsigned) std::time(0));
     const size_t x_size = 25;
@@ -1218,7 +1230,9 @@ TEST_CASE("WriteLargeAttribute") {
 
     auto fapl = HighFive::FileAccessProps::Default();
     fapl.add(HighFive::FileVersionBounds(H5F_LIBVER_LATEST, H5F_LIBVER_LATEST));
-    HighFive::File file("create_large_attribute.h5", HighFive::File::Truncate, fapl);
+    HighFive::File file(to_abs_if_rest_vol("create_large_attribute.h5"),
+                        HighFive::File::Truncate,
+                        fapl);
     auto gcpl = HighFive::GroupCreateProps::Default();
     gcpl.add(HighFive::AttributePhaseChange(0, 0));
 
@@ -1229,7 +1243,9 @@ TEST_CASE("WriteLargeAttribute") {
 TEST_CASE("AttributePhaseChange") {
     auto fapl = HighFive::FileAccessProps::Default();
     fapl.add(HighFive::FileVersionBounds(H5F_LIBVER_LATEST, H5F_LIBVER_LATEST));
-    HighFive::File file("attribute_phase_change.h5", HighFive::File::Truncate, fapl);
+    HighFive::File file(to_abs_if_rest_vol("attribute_phase_change.h5"),
+                        HighFive::File::Truncate,
+                        fapl);
 
     auto gcpl = HighFive::GroupCreateProps::Default();
     gcpl.add(HighFive::AttributePhaseChange(42, 24));
@@ -1242,8 +1258,8 @@ TEST_CASE("AttributePhaseChange") {
 }
 
 TEST_CASE("datasetOffset") {
-    std::string filename = "datasetOffset.h5";
-    std::string dsetname = "dset";
+    const std::string filename = to_abs_if_rest_vol("datasetOffset.h5");
+    const std::string dsetname = "dset";
     const size_t size_dataset = 20;
 
     File file(filename, File::ReadWrite | File::Create | File::Truncate);
@@ -1251,7 +1267,11 @@ TEST_CASE("datasetOffset") {
     DataSet ds = file.createDataSet<int>(dsetname, DataSpace::From(data));
     ds.write(data);
     DataSet ds_read = file.getDataSet(dsetname);
+#if defined(HIGHFIVE_USE_RESTVOL)
+    CHECK_THROWS_AS(ds_read.getOffset(), DataSetException);
+#else
     CHECK(ds_read.getOffset() > 0);
+#endif
 }
 
 
@@ -1350,7 +1370,7 @@ TEST_CASE("productSet") {
     using Point = size_t;
     using Points = std::vector<size_t>;
 
-    const std::string file_name("h5_test_product_set.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_test_product_set.h5");
 
     auto generate = [](size_t n, size_t m, auto f) {
         auto x = std::vector<std::vector<double>>(n);
@@ -1378,12 +1398,15 @@ TEST_CASE("productSet") {
         auto yslice = Slice{1, 3};
         auto yslices = Slices{yslice};
         auto xslices = Slices{{0, 1}, {3, 5}};
-
+#if defined(HIGHFIVE_USE_RESTVOL)
+        CHECK_THROWS_AS(dset.select(ProductSet(yslice, xslices)).read(subarray), SliceException);
+#else
         dset.select(ProductSet(yslice, xslices)).read(subarray);
 
         check(array, subarray, yslices, xslices);
+#endif
     }
-
+#if !defined(HIGHFIVE_USE_RESTVOL)
     SECTION("Rr") {
         std::vector<std::vector<double>> subarray;
 
@@ -1453,13 +1476,15 @@ TEST_CASE("productSet") {
         dset.select(ProductSet(yslices, xslices)).read(subarray);
         check(array, subarray, yslices, xslices);
     }
+#endif
 }
 
 
 template <typename T>
 void attribute_scalar_rw() {
     std::ostringstream filename;
-    filename << "h5_rw_attribute_scalar_rw" << typeNameHelper<T>() << "_test.h5";
+    filename << to_abs_if_rest_vol("h5_rw_attribute_scalar_rw") << typeNameHelper<T>()
+             << "_test.h5";
 
     File h5file(filename.str(), File::ReadWrite | File::Create | File::Truncate);
 
@@ -1496,7 +1521,7 @@ TEMPLATE_LIST_TEST_CASE("attribute_scalar_rw_all", "[template]", dataset_test_ty
     attribute_scalar_rw<TestType>();
 }
 
-TEST_CASE("attribute_scalar_rw_string") {
+TEST_CASE("attribute_scalar_rw_string", RESTVOL_DISABLED("")) {
     attribute_scalar_rw<std::string>();
 }
 
@@ -1529,7 +1554,7 @@ TEST_CASE("HighFiveOutofDimension") {
 template <typename T>
 void readWriteShuffleDeflateTest() {
     std::ostringstream filename;
-    filename << "h5_rw_deflate_" << typeNameHelper<T>() << "_test.h5";
+    filename << to_abs_if_rest_vol("h5_rw_deflate_") << typeNameHelper<T>() << "_test.h5";
     const std::string dataset_name("dset");
     const size_t x_size = 128;
     const size_t y_size = 32;
@@ -1594,7 +1619,7 @@ TEMPLATE_LIST_TEST_CASE("ReadWriteShuffleDeflate", "[template]", numerical_test_
 template <typename T>
 void readWriteSzipTest() {
     std::ostringstream filename;
-    filename << "h5_rw_szip_" << typeNameHelper<T>() << "_test.h5";
+    filename << to_abs_if_rest_vol("h5_rw_szip_") << typeNameHelper<T>() << "_test.h5";
     const std::string dataset_name("dset");
     const size_t x_size = 128;
     const size_t y_size = 32;
@@ -1674,7 +1699,7 @@ void check_broadcast_scalar_memspace(File& file,
 }
 
 TEST_CASE("Broadcast scalar memspace, dset") {
-    File file("h5_broadcast_scalar_memspace_dset.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_broadcast_scalar_memspace_dset.h5"), File::Truncate);
 
     SECTION("[1]") {
         check_broadcast_scalar_memspace<testing::DataSetCreateTraits>(file, "dset", {1});
@@ -1686,7 +1711,7 @@ TEST_CASE("Broadcast scalar memspace, dset") {
 }
 
 TEST_CASE("Broadcast scalar memspace, attr") {
-    File file("h5_broadcast_scalar_memspace_attr.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_broadcast_scalar_memspace_attr.h5"), File::Truncate);
 
     SECTION("[1]") {
         check_broadcast_scalar_memspace<testing::AttributeCreateTraits>(file, "attr", {1});
@@ -1710,12 +1735,12 @@ void check_broadcast_scalar_filespace(File& file, const std::string& name) {
 }
 
 TEST_CASE("Broadcast scalar filespace, dset") {
-    File file("h5_broadcast_scalar_filespace_dset.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_broadcast_scalar_filespace_dset.h5"), File::Truncate);
     check_broadcast_scalar_filespace<testing::DataSetCreateTraits>(file, "dset");
 }
 
 TEST_CASE("Broadcast scalar filespace, attr") {
-    File file("h5_broadcast_scalar_filespace_attr.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_broadcast_scalar_filespace_attr.h5"), File::Truncate);
     check_broadcast_scalar_filespace<testing::AttributeCreateTraits>(file, "attr");
 }
 
@@ -1756,12 +1781,12 @@ void check_modify_memspace(File& file, const std::string& name) {
 }
 
 TEST_CASE("Modify MemSpace, dset") {
-    File file("h5_modify_memspace_dset.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_modify_memspace_dset.h5"), File::Truncate);
     check_modify_memspace<testing::DataSetCreateTraits>(file, "dset");
 }
 
 TEST_CASE("Modify MemSpace, attr") {
-    File file("h5_modify_memspace_attr.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_modify_memspace_attr.h5"), File::Truncate);
     check_modify_memspace<testing::AttributeCreateTraits>(file, "attr");
 }
 
@@ -1779,12 +1804,12 @@ void check_modify_scalar_filespace(File& file, const std::string& name) {
 }
 
 TEST_CASE("Modify Scalar FileSpace, dset") {
-    File file("h5_modify_scalar_filespace_dset.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_modify_scalar_filespace_dset.h5"), File::Truncate);
     check_modify_scalar_filespace<testing::DataSetCreateTraits>(file, "dset");
 }
 
 TEST_CASE("Modify Scalar FileSpace, attr") {
-    File file("h5_modify_scalar_filespace_attr.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_modify_scalar_filespace_attr.h5"), File::Truncate);
     check_modify_scalar_filespace<testing::AttributeCreateTraits>(file, "attr");
 }
 
@@ -1805,18 +1830,18 @@ void check_modify_scalar_memspace(File& file, const std::string& name) {
 }
 
 TEST_CASE("Modify Scalar MemSpace, dset") {
-    File file("h5_modify_scalar_memspace_dset.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_modify_scalar_memspace_dset.h5"), File::Truncate);
     check_modify_scalar_memspace<testing::DataSetCreateTraits>(file, "dset");
 }
 
 TEST_CASE("Modify Scalar MemSpace, attr") {
-    File file("h5_modify_scalar_memspace_attr.h5", File::Truncate);
+    File file(to_abs_if_rest_vol("h5_modify_scalar_memspace_attr.h5"), File::Truncate);
     check_modify_scalar_memspace<testing::AttributeCreateTraits>(file, "attr");
 }
 
 
 TEST_CASE("HighFiveRecursiveGroups") {
-    const std::string file_name("h5_ds_exist.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_ds_exist.h5");
     const std::string group_1("group1");
     const std::string group_2("group2");
     const std::string ds_path = group_1 + "/" + group_2;
@@ -1865,7 +1890,7 @@ TEST_CASE("HighFiveRecursiveGroups") {
 }
 
 TEST_CASE("HighFiveInspect") {
-    const std::string file_name("group_info.h5");
+    const std::string file_name = to_abs_if_rest_vol("group_info.h5");
     const std::string group_1("group1");
     const std::string ds_name = "ds";
 
@@ -1904,8 +1929,8 @@ TEST_CASE("HighFiveInspect") {
     CHECK(ds.getInfo().getRefCount() == 1);
 }
 
-TEST_CASE("HighFiveGetPath") {
-    File file("getpath.h5", File::ReadWrite | File::Create | File::Truncate);
+TEST_CASE("HighFiveGetPath", RESTVOL_DISABLED("")) {
+    File file(to_abs_if_rest_vol("getpath.h5"), File::ReadWrite | File::Create | File::Truncate);
 
     int number = 100;
     Group group = file.createGroup("group");
@@ -1922,18 +1947,20 @@ TEST_CASE("HighFiveGetPath") {
     CHECK("attribute" == attribute.getName());
     CHECK("/group/data" == attribute.getPath());
 
+#if !defined(HIGHFIVE_USE_RESTVOL)
     CHECK(file == dataset.getFile());
     CHECK(file == attribute.getFile());
 
     // Destroy file early (it should live inside Dataset/Group)
-    std::unique_ptr<File> f2(new File("getpath.h5"));
+    std::unique_ptr<File> f2(new File(to_abs_if_rest_vol("getpath.h5")));
     const auto& d2 = f2->getDataSet("/group/data");
     f2.reset(nullptr);
     CHECK(d2.getFile().getPath() == "/");
+#endif
 }
 
 TEST_CASE("HighFiveSoftLinks") {
-    const std::string file_name("softlinks.h5");
+    const std::string file_name = to_abs_if_rest_vol("softlinks.h5");
     const std::string ds_path("/hard_link/dataset");
     const std::string link_path("/soft_link/to_ds");
     const std::vector<int> data{11, 22, 33};
@@ -1963,7 +1990,7 @@ TEST_CASE("HighFiveSoftLinks") {
 }
 
 TEST_CASE("HighFiveHardLinks Dataset (create intermediate)") {
-    const std::string file_name("hardlinks_dataset_intermiate.h5");
+    const std::string file_name = to_abs_if_rest_vol("hardlinks_dataset_intermiate.h5");
     const std::string ds_path("/group/dataset");
     const std::string ds_link_path("/alternate/dataset");
     const std::vector<int> data{12, 24, 36};
@@ -1983,7 +2010,7 @@ TEST_CASE("HighFiveHardLinks Dataset (create intermediate)") {
 }
 
 TEST_CASE("HighFiveHardLinks Dataset (relative paths)") {
-    const std::string file_name("hardlinks_dataset_relative.h5");
+    const std::string file_name = to_abs_if_rest_vol("hardlinks_dataset_relative.h5");
     const std::string ds_path("/group/dataset");
     const std::string ds_link_path("/alternate/dataset");
     const std::vector<int> data{12, 24, 36};
@@ -2005,7 +2032,7 @@ TEST_CASE("HighFiveHardLinks Dataset (relative paths)") {
 }
 
 TEST_CASE("HighFiveHardLinks Group") {
-    const std::string file_name("hardlinks_group.h5");
+    const std::string file_name = to_abs_if_rest_vol("hardlinks_group.h5");
     const std::string group_path("/group");
     const std::string ds_name("dataset");
     const std::string group_link_path("/alternate");
@@ -2027,7 +2054,7 @@ TEST_CASE("HighFiveHardLinks Group") {
 }
 
 TEST_CASE("HighFiveRename") {
-    File file("h5_rename.h5", File::ReadWrite | File::Create | File::Truncate);
+    File file(to_abs_if_rest_vol("h5_rename.h5"), File::ReadWrite | File::Create | File::Truncate);
 
     int number = 100;
 
@@ -2052,7 +2079,8 @@ TEST_CASE("HighFiveRename") {
 }
 
 TEST_CASE("HighFiveRenameRelative") {
-    File file("h5_rename_relative.h5", File::ReadWrite | File::Create | File::Truncate);
+    File file(to_abs_if_rest_vol("h5_rename_relative.h5"),
+              File::ReadWrite | File::Create | File::Truncate);
     Group group = file.createGroup("group");
 
     int number = 100;
@@ -2114,7 +2142,7 @@ TEST_CASE("HighFivePropertyObjectsQuirks") {
 
 TEST_CASE("HighFiveLinkCreationOrderProperty") {
     {  // For file
-        const std::string file_name("h5_keep_creation_order_file.h5");
+        const std::string file_name = to_abs_if_rest_vol("h5_keep_creation_order_file.h5");
         FileCreateProps keepCreationOrder{};
         keepCreationOrder.add(LinkCreationOrder(CreationOrder::Tracked | CreationOrder::Indexed));
 
@@ -2133,7 +2161,7 @@ TEST_CASE("HighFiveLinkCreationOrderProperty") {
         CHECK((linkCreationOrder.getFlags() & CreationOrder::Indexed) != 0);
     }
     {  // For groups
-        const std::string file_name("h5_keep_creation_order_group.h5");
+        const std::string file_name = to_abs_if_rest_vol("h5_keep_creation_order_group.h5");
         GroupCreateProps keepCreationOrder{};
         keepCreationOrder.add(LinkCreationOrder(CreationOrder::Tracked | CreationOrder::Indexed));
 
@@ -2191,7 +2219,7 @@ TEST_CASE("DirectWriteBool") {
         free(bool_ptr);
     }
 
-    auto file = File("rw_bool_from_ptr.h5", File::Truncate);
+    auto file = File(to_abs_if_rest_vol("rw_bool_from_ptr.h5"), File::Truncate);
 
     size_t n = 4;
     bool* expected = new bool[n];
@@ -2230,7 +2258,7 @@ TEST_CASE("DirectWriteBool") {
 
 
 TEST_CASE("HighFiveReference") {
-    const std::string file_name("h5_ref_test.h5");
+    const std::string file_name = to_abs_if_rest_vol("h5_ref_test.h5");
     const std::string dataset1_name("dset1");
     const std::string dataset2_name("dset2");
     const std::string group_name("/group1");
@@ -2316,7 +2344,7 @@ void test_eigen_vec(File& file, const std::string& test_flavor, const T& vec_inp
 }
 
 TEST_CASE("HighFiveEigen") {
-    const std::string file_name("test_eigen.h5");
+    const std::string file_name = to_abs_if_rest_vol("test_eigen.h5");
 
     // Create a new file using the default property lists.
     File file(file_name, File::ReadWrite | File::Create | File::Truncate);

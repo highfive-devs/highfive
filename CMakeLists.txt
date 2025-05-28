@@ -67,7 +67,7 @@ set(RESTVOL_ROOT_DIR "" CACHE PATH "Path to the REST VOL installation")
 option(HIGHFIVE_TEST_SPAN "Enable testing std::span, requires C++20" ${HIGHFIVE_TEST_SPAN_DEFAULT})
 option(HIGHFIVE_TEST_BOOST "Enable testing Boost features" OFF)
 option(HIGHFIVE_TEST_BOOST_SPAN "Additionally, enable testing `boost::span`" OFF)
-option(HIGHFIVE_TEST_EIGEN "Enable testing Eigen" OFF)
+option(HIGHFIVE_TEST_EIGEN "Enable testing Eigen" ON)
 option(HIGHFIVE_TEST_OPENCV "Enable testing OpenCV" OFF)
 option(HIGHFIVE_TEST_XTENSOR "Enable testing xtensor" OFF)
 option(HIGHFIVE_TEST_HALF_FLOAT "Enable testing half-precision floats" OFF)
@@ -84,7 +84,11 @@ mark_as_advanced(HIGHFIVE_SANITIZER)
 
 # Check compiler cxx_std requirements
 # -----------------------------------
-set(HIGHFIVE_CXX_STANDARD_DEFAULT 14)
+if(HIGHFIVE_ENABLE_RESTVOL)
+    set(HIGHFIVE_CXX_STANDARD_DEFAULT 20)
+else()
+    set(HIGHFIVE_CXX_STANDARD_DEFAULT 14)
+endif()
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD ${HIGHFIVE_CXX_STANDARD_DEFAULT})

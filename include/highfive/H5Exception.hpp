@@ -159,6 +159,15 @@ class ReferenceException: public Exception {
     ReferenceException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
+
+///
+/// \brief Exception specific to HighFive Slice interface
+///
+class SliceException: public Exception {
+  public:
+    SliceException(const std::string& err_msg)
+        : Exception(err_msg) {}
+};
 }  // namespace HighFive
 
 #include "bits/H5Exception_misc.hpp"

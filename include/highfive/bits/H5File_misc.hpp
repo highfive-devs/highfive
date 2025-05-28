@@ -7,7 +7,9 @@
  *
  */
 #pragma once
-
+#if defined(HIGHFIVE_USE_RESTVOL)
+#include <filesystem>
+#endif
 #include <string>
 
 #include <H5Fpublic.h>
@@ -48,6 +50,11 @@ inline File::File(const std::string& filename,
                   AccessMode access_mode,
                   const FileCreateProps& fileCreateProps,
                   const FileAccessProps& fileAccessProps) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    if (!std::filesystem::path(filename).is_absolute()) {
+        throw FileException("The provided path must be absolute when working with REST VOL.");
+    }
+#endif
     unsigned openFlags = convert_open_flag(access_mode);
 
     unsigned createMode = openFlags & (H5F_ACC_TRUNC | H5F_ACC_EXCL);

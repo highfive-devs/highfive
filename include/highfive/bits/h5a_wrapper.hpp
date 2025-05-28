@@ -119,6 +119,23 @@ inline herr_t h5a_read(hid_t attr_id, hid_t type_id, void* buf) {
 }
 
 inline herr_t h5a_write(hid_t attr_id, hid_t type_id, void const* buf) {
+    {
+        hsize_t size = H5Aget_storage_size(attr_id);
+        std::cout << "Attribute storage size: " << size << " bytes" << std::endl;
+        hid_t type = H5Aget_type(attr_id);
+        size_t type_size = H5Tget_size(type);
+
+        hid_t space = H5Aget_space(attr_id);
+        hssize_t npoints = H5Sget_simple_extent_npoints(space);
+
+        size_t total_bytes = type_size * static_cast<size_t>(npoints);
+
+        std::cout << "Expected buffer size: " << total_bytes << " bytes" << std::endl;
+
+        H5Tclose(type);
+        H5Sclose(space);
+    }
+
     herr_t err = H5Awrite(attr_id, type_id, buf);
     if (err < 0) {
         HDF5ErrMapper::ToException<AttributeException>(std::string("Unable to write attribute"));
