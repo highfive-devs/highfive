@@ -92,7 +92,7 @@ TEST_CASE("Test silent HighFive") {
 
     try {
         SilenceHDF5 silence;
-        File file(to_abs_if_rest_vol("nonexistent"), File::ReadOnly);
+        File file("nonexistent", File::ReadOnly);
     } catch (const FileException&) {
     }
     CHECK(buffer[0] == '\0');
@@ -1961,55 +1961,7 @@ TEST_CASE("HighFiveGetPath", RESTVOL_DISABLED("")) {
 #endif
 }
 
-TEST_CASE("HighFiveSoftLinks") {
-    {
-        const char* filename = "/my_dataset.h5";  // Use absolute path for HSDS domain
-
-        // Step 1: Create FAPL and set REST VOL
-        hid_t fapl_id = H5Pcreate(H5P_FILE_ACCESS);
-        H5Pset_fapl_rest_vol(fapl_id);  // assumes ENV vars are set (see below)
-
-        // Step 2: Create file
-        hid_t file_id = H5Fcreate(filename, H5F_ACC_TRUNC, H5P_DEFAULT, fapl_id);
-        if (file_id < 0) {
-            std::cerr << "❌ Failed to create file.\n";
-        }
-
-        // Step 3: Create dataspace
-        hsize_t dims[1] = {3};
-        hid_t space_id = H5Screate_simple(1, dims, nullptr);
-
-        // Step 4: Enable intermediate group creation
-        hid_t lcpl_id = H5Pcreate(H5P_LINK_CREATE);
-        H5Pset_create_intermediate_group(lcpl_id, 1);
-
-        H5Gcreate2(file_id, "/foo/bar", lcpl_id, H5P_DEFAULT, H5P_DEFAULT);
-        // Step 5: Create dataset
-        hid_t dset_id = H5Dcreate2(file_id,
-                                   "foo/bar/dataset",
-                                   H5T_NATIVE_INT,
-                                   space_id,
-                                   lcpl_id,
-                                   H5P_DEFAULT,
-                                   H5P_DEFAULT);
-
-        if (dset_id < 0) {
-            std::cerr << "❌ H5Dcreate2 failed.\n";
-        }
-
-        // Step 6: Write data
-        std::vector<int> data = {10, 20, 30};
-        H5Dwrite(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, data.data());
-
-        H5Dclose(dset_id);
-        H5Sclose(space_id);
-        H5Pclose(lcpl_id);
-        H5Fclose(file_id);
-        H5Pclose(fapl_id);
-
-        std::cout << "✅ Successfully created and wrote dataset via REST VOL.\n";
-    }
-
+TEST_CASE("HighFiveSoftLinks", RESTVOL_UNSUPPORTED("")) {
     const std::string file_name = to_abs_if_rest_vol("softlinks.h5");
     const std::string ds_path("/hard_link/dataset");
     const std::string link_path("/soft_link/to_ds");
@@ -2442,6 +2394,15 @@ TEST_CASE("HighFiveEigen") {
         ds_name_flavor = "EigenMatrixXd";
         Eigen::MatrixXd vec_in = 100. * Eigen::MatrixXd::Random(20, 5);
         Eigen::MatrixXd vec_out(20, 5);
+
+        test_eigen_vec(file, ds_name_flavor, vec_in, vec_out);
+    }
+
+    // Eigen MatrixXcd
+    {
+        ds_name_flavor = "EigenMatrixXcd";
+        Eigen::MatrixXcd vec_in = 100. * Eigen::MatrixXcd::Random(20, 5);
+        Eigen::MatrixXcd vec_out(20, 5);
 
         test_eigen_vec(file, ds_name_flavor, vec_in, vec_out);
     }

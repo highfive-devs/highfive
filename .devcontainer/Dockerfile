@@ -15,7 +15,7 @@ RUN apt-get update && \
     libncursesw5-dev xz-utils tk-dev libxml2-dev \
     libxmlsec1-dev libffi-dev liblzma-dev ca-certificates \
     # tools
-    gdb libeigen3-dev \
+    gdb libeigen3-dev openssh-client\
     telnet \
     && rm -rf /var/lib/apt/lists/*
 
