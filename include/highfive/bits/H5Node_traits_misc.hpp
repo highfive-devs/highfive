@@ -42,6 +42,20 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
                                                    bool parents) {
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
+#if defined(HIGHFIVE_USE_RESTVOL)
+    auto pos = dataset_name.rfind('/');
+    if (pos != std::string::npos && pos != 0) {
+        const std::string path = dataset_name.substr(0, pos);
+        htri_t err = detail::h5l_exists(static_cast<Derivate*>(this)->getId(),
+                                        path.c_str(),
+                                        accessProps.getId());
+        if (err < 0) {
+            throw DataSetException("");
+        } else if (err == 0) {
+            this->createGroup(path);
+        }
+    }
+#endif
     return DataSet(detail::h5d_create2(static_cast<Derivate*>(this)->getId(),
                                        dataset_name.c_str(),
                                        dtype.getId(),

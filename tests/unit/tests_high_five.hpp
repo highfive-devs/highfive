@@ -214,12 +214,14 @@ inline HighFive::DataSet readWriteDataset(const DataT& ndvec,
 std::string to_abs_if_rest_vol(const std::string& path) {
     return "/" + path;
 }
-#define RESTVOL_DISABLED(label) "[.restvol-disabled]"
+#define RESTVOL_UNSUPPORTED(label) "[.restvol-unsupported]"
+#define RESTVOL_DISABLED(label)    "[.restvol-disabled]"
 #else
 std::string to_abs_if_rest_vol(const std::string& path) {
     return path;
 }
-#define RESTVOL_DISABLED(label) label
+#define RESTVOL_UNSUPPORTED(label) label
+#define RESTVOL_DISABLED(label)    label
 #endif
 
 void delete_file_if_exists(const std::string& name) {
