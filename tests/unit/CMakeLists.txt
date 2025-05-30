@@ -7,7 +7,7 @@ endif()
 
 ## Base tests
 # foreach(test_name tests_high_five_base tests_high_five_easy test_all_types test_high_five_selection tests_high_five_data_type test_boost test_empty_arrays test_legacy test_opencv test_string test_stl test_xtensor)
-foreach(test_name test_string)
+foreach(test_name tests_high_five_base test_string)
   add_executable(${test_name} "${test_name}.cpp")
   target_link_libraries(${test_name} HighFive HighFiveWarnings HighFiveFlags Catch2::Catch2WithMain)
   target_link_libraries(${test_name} HighFiveOptionalDependencies)

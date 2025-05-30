@@ -236,3 +236,23 @@ void delete_file_if_exists(const std::string& name) {
     std::remove(name.c_str());
 #endif
 }
+
+template <typename T>
+T& trim_if_rest_vol(T& var) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    if constexpr (std::is_same_v<T, std::string>) {
+        while (!var.empty() && var.back() == '\0')
+            var.pop_back();
+    }
+#endif
+    return var;
+}
+
+template <>
+std::vector<std::string>& trim_if_rest_vol<std::vector<std::string>>(
+    std::vector<std::string>& var) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    std::for_each(var.begin(), var.end(), &trim_if_rest_vol<std::string>);
+#endif
+    return var;
+}

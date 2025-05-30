@@ -40,7 +40,7 @@ template <typename Derivate>
 inline File& PathTraits<Derivate>::getFile() const {
     const auto& obj = static_cast<const Derivate&>(*this);
 #if defined(HIGHFIVE_USE_RESTVOL)
-    throw ObjectException("`PathTraits::getFile` is not supported in REST VOL.");
+    throw ObjectException("`PathTraits::getFile` is not supported with REST VOL.");
 #endif
     if (!obj.isValid()) {
         throw ObjectException("Invalid call to `PathTraits::getFile` for invalid object");

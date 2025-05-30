@@ -67,6 +67,9 @@ inline hid_t h5i_get_file_id(hid_t id) {
 }
 
 inline ssize_t h5i_get_name(hid_t id, char* name, size_t size) {
+    // #if defined(HIGHFIVE_USE_RESTVOL)
+    //     throw ObjectException("H5Iget_name is not supported with REST VOL.");
+    // #endif
     ssize_t n_chars = H5Iget_name(id, name, size);
     if (n_chars < 0) {
         HDF5ErrMapper::ToException<ObjectException>("Failed to get name of HID.");

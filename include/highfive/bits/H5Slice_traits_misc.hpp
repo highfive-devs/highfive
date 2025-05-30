@@ -217,7 +217,7 @@ template <typename Derivate>
 inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyperslab,
                                                const DataSpace& memspace) const {
 #if defined(HIGHFIVE_USE_RESTVOL)
-    throw SliceException("Hyperslabs not supported by REST VOL.");
+    throw SliceException("Hyperslabs not supported with REST VOL.");
 #endif
     // Note: The current limitation are that memspace must describe a
     //       packed memspace.
@@ -234,7 +234,7 @@ inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyperslab,
 template <typename Derivate>
 inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab) const {
 #if defined(HIGHFIVE_USE_RESTVOL)
-    throw SliceException("Hyperslabs not supported by REST VOL.");
+    throw SliceException("Hyperslabs not supported with REST VOL.");
 #endif
     const auto& slice = static_cast<const Derivate&>(*this);
     auto filespace = slice.getSpace();

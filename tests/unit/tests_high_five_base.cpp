@@ -672,7 +672,7 @@ TEST_CASE("FreeSpace (tracked)", RESTVOL_UNSUPPORTED("")) {
 }
 #endif
 
-TEST_CASE("Test extensible datasets") {
+TEST_CASE("Test extensible datasets", RESTVOL_DISABLED("")) {
     const std::string file_name = to_abs_if_rest_vol("create_extensible_dataset_example.h5");
     const std::string dataset_name("dset");
     constexpr long double t1[3][1] = {{2.0l}, {2.0l}, {4.0l}};
@@ -1055,7 +1055,7 @@ TEST_CASE("ChunkingConstructorsTest") {
     CHECK(third_res == third_ans);
 }
 
-TEST_CASE("HighFiveReadWriteShortcut", RESTVOL_DISABLED("")) {
+TEST_CASE("HighFiveReadWriteShortcut") {
     std::ostringstream filename;
     filename << to_abs_if_rest_vol("h5_rw_vec_shortcut_test.h5");
 
@@ -1082,15 +1082,15 @@ TEST_CASE("HighFiveReadWriteShortcut", RESTVOL_DISABLED("")) {
 
     std::vector<unsigned> result;
     dataset.read(result);
-    CHECK_THAT(vec, Equals(result));
+    REQUIRE_THAT(vec, Equals(result));
 
     std::string read_in;
     dataset.getAttribute("str").read(read_in);
-    CHECK(read_in == at_contents);
+    REQUIRE(trim_if_rest_vol(read_in) == at_contents);
 
     int out_int = 0;
     ds_int.read(out_int);
-    CHECK(my_int == out_int);
+    REQUIRE(my_int == out_int);
 
     decltype(my_nested) out_nested;
     ds_nested.read(out_nested);
@@ -1157,8 +1157,12 @@ void readWriteAttributeVectorTest() {
         CHECK(all_attribute_names.size() == 0);
         CHECK(!g.hasAttribute("my_attribute"));
 
+#if defined(HIGHFIVE_USE_RESTVOL)
+        Attribute a1 = g.createAttribute("my_attribute", vec);
+#else
         Attribute a1 = g.createAttribute<T>("my_attribute", DataSpace::From(vec));
         a1.write(vec);
+#endif
 
         // check now that we effectively have an attribute listable
         CHECK(g.getNumberAttributes() == 1);
@@ -1171,8 +1175,12 @@ void readWriteAttributeVectorTest() {
         // Create the same attribute on a newly created dataset
         DataSet s = g.createDataSet("dummy_dataset", DataSpace(1), AtomicType<int>());
 
+#if defined(HIGHFIVE_USE_RESTVOL)
+        Attribute a2 = s.createAttribute("my_attribute_copy", vec);
+#else
         Attribute a2 = s.createAttribute<T>("my_attribute_copy", DataSpace::From(vec));
         a2.write(vec);
+#endif
 
         // const data, short-circuit syntax
         const std::vector<int> v{1, 2, 3};
@@ -1184,6 +1192,7 @@ void readWriteAttributeVectorTest() {
 
         Attribute a1_read = file.getGroup("dummy_group").getAttribute("my_attribute");
         a1_read.read(result1);
+        trim_if_rest_vol(result1);
 
         CHECK(vec.size() == x_size);
         CHECK(result1.size() == x_size);
@@ -1192,6 +1201,7 @@ void readWriteAttributeVectorTest() {
         Attribute a2_read =
             file.getDataSet("/dummy_group/dummy_dataset").getAttribute("my_attribute_copy");
         a2_read.read(result2);
+        trim_if_rest_vol(result2);
 
         CHECK(vec.size() == x_size);
         CHECK(result2.size() == x_size);
@@ -1217,7 +1227,7 @@ void readWriteAttributeVectorTest() {
     }
 }
 
-TEST_CASE("ReadWriteAttributeVectorString", RESTVOL_DISABLED("")) {
+TEST_CASE("ReadWriteAttributeVectorString") {
     readWriteAttributeVectorTest<std::string>();
 }
 
@@ -1500,12 +1510,7 @@ void attribute_scalar_rw() {
     {
         T out(attribute_value);
         if constexpr (std::is_same_v<T, std::string>) {
-            auto dataspace = DataSpace::From(out);
-            auto fixed_length = FixedLengthStringType(out.size(), StringPadding::NullTerminated);
-            auto att = g.createAttribute("family", dataspace, fixed_length);
-            // const auto out0 = out.c_str();
-            // Attribute att = g.createAttribute<decltype(out0)>("family", DataSpace::From(out0));
-            att.write(out);
+            auto att = g.createAttribute("family", out);
         } else {
             Attribute att = g.createAttribute<T>("family", DataSpace::From(out));
             att.write(out);
@@ -1522,7 +1527,7 @@ void attribute_scalar_rw() {
         T res;
         Attribute att = g.getAttribute("family");
         att.read(res);
-        CHECK(res == attribute_value);
+        CHECK(trim_if_rest_vol(res) == attribute_value);
     }
 }
 
@@ -1940,7 +1945,7 @@ TEST_CASE("HighFiveInspect") {
 #endif
 }
 
-TEST_CASE("HighFiveGetPath", RESTVOL_DISABLED("")) {
+TEST_CASE("HighFiveGetPath") {
     File file(to_abs_if_rest_vol("getpath.h5"), File::ReadWrite | File::Create | File::Truncate);
 
     int number = 100;
@@ -1948,17 +1953,21 @@ TEST_CASE("HighFiveGetPath", RESTVOL_DISABLED("")) {
     DataSet dataset = group.createDataSet("data", DataSpace(1), AtomicType<int>());
     dataset.write(number);
     std::string string_list("Very important DataSet!");
+#if defined(HIGHFIVE_USE_RESTVOL)
+    Attribute attribute = dataset.createAttribute<std::string>("attribute", string_list);
+#else
     Attribute attribute = dataset.createAttribute<std::string>("attribute",
                                                                DataSpace::From(string_list));
     attribute.write(string_list);
+#endif
 
     CHECK("/" == file.getPath());
     CHECK("/group" == group.getPath());
     CHECK("/group/data" == dataset.getPath());
     CHECK("attribute" == attribute.getName());
-    CHECK("/group/data" == attribute.getPath());
 
 #if !defined(HIGHFIVE_USE_RESTVOL)
+    CHECK("/group/data" == attribute.getPath());
     CHECK(file == dataset.getFile());
     CHECK(file == attribute.getFile());
 

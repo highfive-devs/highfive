@@ -114,7 +114,7 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
     /// \brief Get the list of properties for creation of this file
     FileCreateProps getCreatePropertyList() const {
 #if defined(HIGHFIVE_USE_RESTVOL)
-        throw FileException("REST VOL does not support H5Fget_create_plist.");
+        throw FileException("H5Fget_create_plist is not supported with REST VOL.");
 #else
         return details::get_plist<FileCreateProps>(*this, H5Fget_create_plist);
 #endif
