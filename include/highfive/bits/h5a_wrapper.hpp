@@ -12,6 +12,13 @@ inline hid_t h5a_create2(hid_t loc_id,
                          hid_t space_id,
                          hid_t acpl_id,
                          hid_t aapl_id) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    // Check if the type is a variable-length string
+    if (H5Tget_class(type_id) == H5T_STRING && H5Tis_variable_str(type_id) > 0) {
+        throw AttributeException(
+            "Variable-length string attributes are not supported with REST VOL");
+    }
+#endif
     auto attr_id = H5Acreate2(loc_id, attr_name, type_id, space_id, acpl_id, aapl_id);
     if (attr_id < 0) {
         HDF5ErrMapper::ToException<AttributeException>(
@@ -119,23 +126,6 @@ inline herr_t h5a_read(hid_t attr_id, hid_t type_id, void* buf) {
 }
 
 inline herr_t h5a_write(hid_t attr_id, hid_t type_id, void const* buf) {
-    {
-        hsize_t size = H5Aget_storage_size(attr_id);
-        std::cout << "Attribute storage size: " << size << " bytes" << std::endl;
-        hid_t type = H5Aget_type(attr_id);
-        size_t type_size = H5Tget_size(type);
-
-        hid_t space = H5Aget_space(attr_id);
-        hssize_t npoints = H5Sget_simple_extent_npoints(space);
-
-        size_t total_bytes = type_size * static_cast<size_t>(npoints);
-
-        std::cout << "Expected buffer size: " << total_bytes << " bytes" << std::endl;
-
-        H5Tclose(type);
-        H5Sclose(space);
-    }
-
     herr_t err = H5Awrite(attr_id, type_id, buf);
     if (err < 0) {
         HDF5ErrMapper::ToException<AttributeException>(std::string("Unable to write attribute"));

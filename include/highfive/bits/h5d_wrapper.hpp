@@ -99,6 +99,12 @@ inline hid_t h5d_create2(hid_t loc_id,
                          hid_t lcpl_id,
                          hid_t dcpl_id,
                          hid_t dapl_id) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    // Check if the type is a variable-length string
+    if (H5Tget_class(type_id) == H5T_STRING && H5Tis_variable_str(type_id) > 0) {
+        throw DataSetException("Variable-length string datasets are not supported with REST VOL");
+    }
+#endif
     hid_t dataset_id = H5Dcreate2(loc_id, name, type_id, space_id, lcpl_id, dcpl_id, dapl_id);
 
     if (dataset_id == H5I_INVALID_HID) {

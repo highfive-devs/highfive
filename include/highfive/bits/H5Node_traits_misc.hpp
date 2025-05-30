@@ -83,15 +83,40 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
                                                    const DataSetCreateProps& createProps,
                                                    const DataSetAccessProps& accessProps,
                                                    bool parents) {
-    DataSet ds =
-        createDataSet(dataset_name,
-                      DataSpace::From(data),
-                      create_and_check_datatype<typename details::inspector<T>::base_type>(),
-                      createProps,
-                      accessProps,
-                      parents);
-    ds.write(data);
-    return ds;
+    auto dataspace = DataSpace::From(data);
+#if defined(HIGHFIVE_USE_RESTVOL)
+    if constexpr (std::is_same_v<T, std::string>) {
+        auto datatype = FixedLengthStringType(data.size() + 1, StringPadding::NullTerminated);
+        DataSet ds =
+            createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
+        ds.write(data);
+        return ds;
+    } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type, std::string>) {
+        auto string_length = std::max_element(data.begin(),
+                                              data.end(),
+                                              [](const std::string& a, const std::string& b) {
+                                                  return a.size() < b.size();
+                                              })
+                                 ->size();
+        auto datatype = FixedLengthStringType(string_length + 1, StringPadding::NullPadded);
+        DataSet ds =
+            createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
+        ds.write(data);
+        return ds;
+    } else {
+#endif
+        DataSet ds =
+            createDataSet(dataset_name,
+                          dataspace,
+                          create_and_check_datatype<typename details::inspector<T>::base_type>(),
+                          createProps,
+                          accessProps,
+                          parents);
+        ds.write(data);
+        return ds;
+#if defined(HIGHFIVE_USE_RESTVOL)
+    }
+#endif
 }
 
 template <typename Derivate>

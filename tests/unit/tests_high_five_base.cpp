@@ -672,7 +672,7 @@ TEST_CASE("FreeSpace (tracked)", RESTVOL_UNSUPPORTED("")) {
 }
 #endif
 
-TEST_CASE("Test extensible datasets", RESTVOL_DISABLED("")) {
+TEST_CASE("Test extensible datasets") {
     const std::string file_name = to_abs_if_rest_vol("create_extensible_dataset_example.h5");
     const std::string dataset_name("dset");
     constexpr long double t1[3][1] = {{2.0l}, {2.0l}, {4.0l}};
@@ -1499,8 +1499,17 @@ void attribute_scalar_rw() {
     // write a scalar attribute
     {
         T out(attribute_value);
-        Attribute att = g.createAttribute<T>("family", DataSpace::From(out));
-        att.write(out);
+        if constexpr (std::is_same_v<T, std::string>) {
+            auto dataspace = DataSpace::From(out);
+            auto fixed_length = FixedLengthStringType(out.size(), StringPadding::NullTerminated);
+            auto att = g.createAttribute("family", dataspace, fixed_length);
+            // const auto out0 = out.c_str();
+            // Attribute att = g.createAttribute<decltype(out0)>("family", DataSpace::From(out0));
+            att.write(out);
+        } else {
+            Attribute att = g.createAttribute<T>("family", DataSpace::From(out));
+            att.write(out);
+        }
     }
 
     h5file.flush();
@@ -1521,7 +1530,7 @@ TEMPLATE_LIST_TEST_CASE("attribute_scalar_rw_all", "[template]", dataset_test_ty
     attribute_scalar_rw<TestType>();
 }
 
-TEST_CASE("attribute_scalar_rw_string", RESTVOL_DISABLED("")) {
+TEST_CASE("attribute_scalar_rw_string") {
     attribute_scalar_rw<std::string>();
 }
 
