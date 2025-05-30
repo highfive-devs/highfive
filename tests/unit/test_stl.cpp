@@ -15,11 +15,12 @@
 #include "compary_arrays.hpp"
 #include "create_traits.hpp"
 #include "data_generator.hpp"
+#include "tests_high_five.hpp"
 
 using namespace HighFive;
 
 TEST_CASE("std::array undersized", "[stl]") {
-    auto file = File("rw_std_array_undersized.h5", File::Truncate);
+    auto file = File(to_abs_if_rest_vol("rw_std_array_undersized.h5"), File::Truncate);
     auto x = std::array<double, 3>{1.0, 2.0, 3.0};
     auto dset = file.createDataSet("x", x);
 
@@ -31,7 +32,7 @@ TEST_CASE("std::array undersized", "[stl]") {
 
 TEST_CASE("T[n][m]") {
     using reference_container = std::vector<std::vector<double>>;
-    auto file = File("rw_carray.h5", File::Truncate);
+    auto file = File(to_abs_if_rest_vol("rw_carray.h5"), File::Truncate);
 
     constexpr size_t n = 3;
     constexpr size_t m = 5;

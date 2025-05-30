@@ -373,6 +373,12 @@ inline void SliceTraits<Derivate>::read(T& array, const DataTransferProps& xfer_
                                         r.getPointer());
 #endif
     }
+    // #if defined(HIGHFIVE_USE_RESTVOL)
+    //     if constexpr (std::is_same_v<T, std::string>) {
+    //         while (!array.empty() && array.back() == '\0')
+    //             array.pop_back();
+    //     }
+    // #endif
 }
 
 
@@ -385,9 +391,11 @@ inline void SliceTraits<Derivate>::read_raw(T* array,
                   "read() requires a non-const structure to read data into");
 
     const auto& slice = static_cast<const Derivate&>(*this);
+#if defined(HIGHFIVE_USE_RESTVOL)
     const DataSpace& mem_space = slice.getMemSpace();
     auto dims = mem_space.getDimensions();
     const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
+#endif
     detail::h5d_read(details::get_dataset(slice).getId(),
                      mem_datatype.getId(),
                      details::get_memspace_id(slice),
@@ -443,9 +451,11 @@ inline void SliceTraits<Derivate>::write_raw(const T* buffer,
                                              const DataType& mem_datatype,
                                              const DataTransferProps& xfer_props) {
     const auto& slice = static_cast<const Derivate&>(*this);
+#if defined(HIGHFIVE_USE_RESTVOL)
     const DataSpace& mem_space = slice.getMemSpace();
     auto dims = mem_space.getDimensions();
     const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
+#endif
     detail::h5d_write(details::get_dataset(slice).getId(),
                       mem_datatype.getId(),
                       details::get_memspace_id(slice),
