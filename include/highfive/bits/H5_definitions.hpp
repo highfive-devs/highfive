@@ -16,6 +16,11 @@
 #define H5_DEPRECATED_USING(msg)
 #endif
 
+#if defined(HIGHFIVE_USE_RESTVOL)
+#define HIGHFIVE_NOEXCEPT_IF_NOT_RESTVOL
+#else
+#define HIGHFIVE_NOEXCEPT_IF_NOT_RESTVOL noexcept
+#endif
 
 // Forward declarations
 

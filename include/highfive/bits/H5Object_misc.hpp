@@ -102,7 +102,7 @@ inline ObjectInfo Object::getInfo() const {
     return info;
 }
 
-inline haddr_t ObjectInfo::getAddress() const noexcept {
+inline haddr_t ObjectInfo::getAddress() const HIGHFIVE_NOEXCEPT_IF_NOT_RESTVOL {
 #if defined(HIGHFIVE_USE_RESTVOL)
     throw ObjectException("Unable to obtain addr info with REST VOL.");
 #else
