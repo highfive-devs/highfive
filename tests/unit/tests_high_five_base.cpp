@@ -2023,7 +2023,6 @@ TEST_CASE("HighFiveHardLinks Dataset (create intermediate)", RESTVOL_UNSUPPORTED
 
     {
         File file(file_name, File::Truncate);
-        auto group = file.createGroup("/group");
         auto dset = file.createDataSet(ds_path, data);
         file.createHardLink(ds_link_path, dset);
         file.unlink(ds_path);
@@ -2031,7 +2030,6 @@ TEST_CASE("HighFiveHardLinks Dataset (create intermediate)", RESTVOL_UNSUPPORTED
 
     {
         File file(file_name, File::ReadWrite);
-        auto group = file.createGroup("/alternate");
         auto data_out = file.getDataSet(ds_link_path).read<std::vector<int>>();
         CHECK(data == data_out);
     }
