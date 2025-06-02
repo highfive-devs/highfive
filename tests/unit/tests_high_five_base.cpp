@@ -1511,12 +1511,16 @@ void attribute_scalar_rw() {
     // write a scalar attribute
     {
         T out(attribute_value);
+#if defined(HIGHFIVE_USE_RESTVOL)
         if constexpr (std::is_same_v<T, std::string>) {
             auto att = g.createAttribute("family", out);
         } else {
+#endif
             Attribute att = g.createAttribute<T>("family", DataSpace::From(out));
             att.write(out);
+#if defined(HIGHFIVE_USE_RESTVOL)
         }
+#endif
     }
 
     h5file.flush();
