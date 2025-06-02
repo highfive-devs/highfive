@@ -75,6 +75,9 @@ inline herr_t h5d_write(hid_t dset_id,
 }
 
 inline haddr_t h5d_get_offset(hid_t dset_id) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    throw DataSetException("H5Dget_offset is not supported in REST VOL.");
+#endif
     uint64_t addr = H5Dget_offset(dset_id);
     if (addr == HADDR_UNDEF) {
         HDF5ErrMapper::ToException<DataSetException>("Cannot get offset of DataSet.");

@@ -44,9 +44,6 @@ inline DataSpace DataSet::getMemSpace() const {
 }
 
 inline uint64_t DataSet::getOffset() const {
-#if defined(HIGHFIVE_USE_RESTVOL)
-    throw DataSetException("H5Dget_offset is not supported in REST VOL.");
-#endif
     return static_cast<uint64_t>(detail::h5d_get_offset(_hid));
 }
 

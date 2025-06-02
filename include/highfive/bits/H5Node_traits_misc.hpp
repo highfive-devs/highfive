@@ -60,11 +60,13 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
                                                    const DataSetCreateProps& createProps,
                                                    const DataSetAccessProps& accessProps,
                                                    bool parents) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    if (parents) {
+        create_parent_group(this, dataset_name, accessProps);
+    }
+#endif
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
-#if defined(HIGHFIVE_USE_RESTVOL)
-    create_parent_group(this, dataset_name, accessProps);
-#endif
     return DataSet(detail::h5d_create2(static_cast<Derivate*>(this)->getId(),
                                        dataset_name.c_str(),
                                        dtype.getId(),
