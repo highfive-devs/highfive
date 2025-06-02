@@ -1377,8 +1377,10 @@ void check(const S& array, const S& subarray, const Y& yslices, const X& xslices
 TEST_CASE("productSet") {
     using Slice = std::array<size_t, 2>;
     using Slices = std::vector<Slice>;
+#if !defined(HIGHFIVE_USE_RESTVOL)
     using Point = size_t;
-    using Points = std::vector<size_t>;
+    using Points = std::vector<Point>;
+#endif
 
     const std::string file_name = to_abs_if_rest_vol("h5_test_product_set.h5");
 

@@ -331,7 +331,7 @@ TEST_CASE("HighFiveFixedString") {
     }
 
     {  // Write as raw elements from pointer (with const)
-        const char (*strings_fixed)[10] = raw_strings;
+        const char(*strings_fixed)[10] = raw_strings;
         // With a pointer we dont know how many strings -> manual DataSpace
         file.createDataSet<char[10]>("ds4", DataSpace(2)).write(strings_fixed);
     }
