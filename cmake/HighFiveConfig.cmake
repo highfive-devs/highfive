@@ -20,4 +20,9 @@ if(NOT TARGET HighFive)
   add_library(HighFiveInclude ALIAS HighFive::Include)
 endif()
 
+if(HIGHFIVE_XTENSOR_HEADER_VERSION)
+  target_compile_definitions(HighFive::HighFive PUBLIC
+    HIGHFIVE_XTENSOR_HEADER_VERSION=${HIGHFIVE_XTENSOR_HEADER_VERSION}
+  )
+endif()
 

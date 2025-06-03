@@ -22,8 +22,16 @@
 
 
 #ifdef HIGHFIVE_TEST_XTENSOR
+#include <highfive/bits/xtensor_header_version.hpp>
+#if HIGHFIVE_XTENSOR_HEADER_VERSION == 1
 #include <xtensor/xrandom.hpp>
 #include <xtensor/xview.hpp>
+#elif HIGHFIVE_XTENSOR_HEADER_VERSION == 2
+#include <xtensor/generators/xrandom.hpp>
+#include <xtensor/views/xview.hpp>
+#else
+#error "Failed to detect HIGHFIVE_XTENSOR_HEADER_VERSION."
+#endif
 #endif
 
 #ifdef HIGHFIVE_TEST_EIGEN

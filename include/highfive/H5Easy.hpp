@@ -28,8 +28,6 @@
 #endif
 
 #ifdef H5_USE_XTENSOR
-#include <xtensor/xarray.hpp>
-#include <xtensor/xtensor.hpp>
 #include "xtensor.hpp"
 #endif
 

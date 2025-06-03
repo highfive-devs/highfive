@@ -8,5 +8,5 @@ dependencies:
   - eigen
   - graphviz
   - hdf5
-  - xtensor
+  - xtensor<0.26
   - xtl

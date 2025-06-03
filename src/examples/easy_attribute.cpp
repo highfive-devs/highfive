@@ -13,7 +13,14 @@
 
 // optionally enable plug-in xtensor
 #ifdef H5_USE_XTENSOR
+#include "bits/xtensor_header_version.hpp"
+#if HIGHFIVE_XTENSOR_HEADER_VERSION == 1
 #include <xtensor/xtensor.hpp>
+#elif HIGHFIVE_XTENSOR_HEADER_VERSION == 2
+#include <xtensor/containers/xtensor.hpp>
+#else
+#error "Failed to detect HIGHFIVE_XTENSOR_HEADER_VERSION."
+#endif
 #endif
 
 // optionally enable plug-in Eigen
