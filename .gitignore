@@ -3,3 +3,4 @@ tests/test_project
 .idea
 
 .vs/
+.clang-format-venv/
