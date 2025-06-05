@@ -12,6 +12,12 @@ on:
   schedule:
     - cron: '0 8 * * 1'  # Run every Monday at 8 AM UTC
   workflow_dispatch:
+    inputs:
+      test_suite:
+        description: 'Test suite to run (comma-separated, empty for all)'
+        required: false
+        default: ''
+        type: string
   push:
     branches:
       - master
@@ -26,15 +32,32 @@ on:
       - '**.md'
       - '**.rst'
       - 'doc/**'
+    types: [opened, synchronize, reopened, labeled]
 
 env:
   HOMEBREW_NO_AUTO_UPDATE: 1  # for reproducibility, dont autoupdate
   BUILD_TYPE: RelWithDebInfo
   INSTALL_DIR: install
+  # Run everything for schedule and workflow_dispatch
+  # For PRs with labels, collect all matching test suites plus "always"
+  RUN_SUITE: >-
+    ${{
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'all' ||
+      join(
+        [
+          'always',
+          contains(github.event.pull_request.labels.*.name, 'ci-mpi-all') && 'mpi',
+          contains(github.event.pull_request.labels.*.name, 'ci-hdf5-all') && 'hdf5',
+          contains(github.event.pull_request.labels.*.name, 'ci-compiler-all') && 'compiler',
+          contains(github.event.pull_request.labels.*.name, 'ci-osx-all') && 'osx',
+          contains(github.event.pull_request.labels.*.name, 'ci-windows-all') && 'windows'
+        ],
+        ','
+      )
+    }}
 
 jobs:
   Linux_MPI:
-    # Only run minimal set for PR/push and full set for weekly
     runs-on: ${{ matrix.config.os }}
     name: Linux_MPI (${{ toJson(matrix.config) }})
     strategy:
@@ -45,31 +68,31 @@ jobs:
               os: ubuntu-24.04
               pkgs: ''
               run_cond: "always"
-          # Additional configs only for weekly runs
+          # Additional configs for specific test suites
           - config:
               os: ubuntu-24.04
               pkgs: 'libboost-all-dev libopencv-dev'
               flags: '-DHIGHFIVE_TEST_BOOST:Bool=ON -DHIGHFIVE_TEST_OPENCV:Bool=ON -GNinja'
-              run_cond: "weekly"
+              run_cond: "mpi"
           - config:
               os: ubuntu-latest
               pkgs: 'libboost-all-dev libeigen3-dev libopencv-dev'
               flags: '-DHIGHFIVE_TEST_BOOST:Bool=ON -DHIGHFIVE_TEST_EIGEN:Bool=ON -DHIGHFIVE_TEST_OPENCV:Bool=ON -GNinja'
-              run_cond: "weekly"
+              run_cond: "mpi"
           - config:
               os: ubuntu-24.04
               pkgs: 'libboost-all-dev'
               flags: '-DCMAKE_CXX_STANDARD=17 -DHIGHFIVE_TEST_BOOST:Bool=ON'
-              run_cond: "weekly"
+              run_cond: "mpi"
           - config:
               os: ubuntu-22.04
               flags: '-DHIGHFIVE_TEST_BOOST=Off -DCMAKE_CXX_STANDARD=20 -DHIGHFIVE_HAS_CONCEPTS=On'
-              run_cond: "weekly"
+              run_cond: "mpi"
           - config:
               os: ubuntu-24.04
               flags: '-DHIGHFIVE_TEST_BOOST=Off -DCMAKE_CXX_STANDARD=20 -DHIGHFIVE_HAS_CONCEPTS=On'
-              run_cond: "weekly"
-    if: ${{ github.event_name == 'schedule' || matrix.config.run_cond == 'always' }}
+              run_cond: "mpi"
+    if: env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.config.run_cond)
 
     steps:
       - uses: actions/checkout@v4
@@ -108,14 +131,14 @@ jobs:
           # Always run oldest version
           - hdf5_version: hdf5-1_8_23
             run_cond: "always"
-          # Additional versions only for weekly runs
+          # Additional versions for specific test suites
           - hdf5_version: hdf5-1_10_11
-            run_cond: "weekly"
+            run_cond: "hdf5"
           - hdf5_version: hdf5-1_12_3
-            run_cond: "weekly"
+            run_cond: "hdf5"
           - hdf5_version: hdf5_1.14.6
-            run_cond: "weekly"
-    if: ${{ github.event_name == 'schedule' || matrix.run_cond == 'always' }}
+            run_cond: "hdf5"
+    if: env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.run_cond)
 
     steps:
       - uses: actions/checkout@v4
@@ -170,8 +193,8 @@ jobs:
           # Always run GCC and Clang with C++14
           { CC: gcc-14, CXX: g++-14, pkgs: "gcc-14 g++-14", run_cond: "always" },
           { CC: clang-18, CXX: clang++-18, pkgs: "clang-18", run_cond: "always" },
-          # Additional compilers only for weekly runs
-          { CC: gcc-9, CXX: g++-9, pkgs: "gcc-9 g++-9", run_cond: "weekly" }
+          # Additional compilers for specific test suites
+          { CC: gcc-9, CXX: g++-9, pkgs: "gcc-9 g++-9", run_cond: "compiler" }
         ]
         include:
           - os: "ubuntu-22.04"
@@ -179,8 +202,8 @@ jobs:
               CC: clang-11
               CXX: clang++-11
               pkgs: clang-11
-              run_cond: "weekly"
-    if: ${{ github.event_name == 'schedule' || matrix.env.run_cond == 'always' }}
+              run_cond: "compiler"
+    if: env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.env.run_cond)
 
     steps:
       - uses: actions/checkout@v4
@@ -316,17 +339,17 @@ jobs:
         cxxstd: ["14"]  # Always run C++14
         run_cond: ["always"]  # Default config runs always
         include:
-          # Additional versions only for weekly runs
+          # Additional versions for specific test suites
           - os: "macOS-14"
             cxxstd: "17"
-            run_cond: "weekly"
+            run_cond: "osx"
           - os: "macOS-14"
             cxxstd: "20"
-            run_cond: "weekly"
+            run_cond: "osx"
           - os: "macOS-13"
             cxxstd: "20"
-            run_cond: "weekly"
-    if: ${{ github.event_name == 'schedule' || matrix.run_cond == 'always' }}
+            run_cond: "osx"
+    if: env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.run_cond)
 
     steps:
       - uses: actions/checkout@v4
@@ -377,23 +400,23 @@ jobs:
         cxxstd: ["14"]  # Always run C++14
         run_cond: ["always"]  # Default config runs always
         include:
-          # Additional configurations only for weekly runs
+          # Additional configurations for specific test suites
           - os: "windows-2025"
             cxxstd: "14"
-            run_cond: "weekly"
+            run_cond: "windows"
           - os: "windows-2022"
             cxxstd: "17"
-            run_cond: "weekly"
+            run_cond: "windows"
           - os: "windows-2022"
             cxxstd: "20"
-            run_cond: "weekly"
+            run_cond: "windows"
           - os: "windows-2025"
             cxxstd: "17"
-            run_cond: "weekly"
+            run_cond: "windows"
           - os: "windows-2025"
             cxxstd: "20"
-            run_cond: "weekly"
-    if: ${{ github.event_name == 'schedule' || matrix.run_cond == 'always' }}
+            run_cond: "windows"
+    if: env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.run_cond)
 
     steps:
       - uses: actions/checkout@v4
