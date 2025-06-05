@@ -9,14 +9,6 @@
 #define H5_DEPRECATED(msg)
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-#define H5_DEPRECATED_USING(msg) H5_DEPRECATED((msg))
-#else
-#pragma message("WARNING: Compiler doesn't support deprecating using statements.")
-#define H5_DEPRECATED_USING(msg)
-#endif
-
-
 // Forward declarations
 
 namespace HighFive {
