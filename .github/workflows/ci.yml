@@ -90,7 +90,7 @@ jobs:
               os: ubuntu-24.04
               flags: '-DHIGHFIVE_TEST_BOOST=Off -DCMAKE_CXX_STANDARD=20 -DHIGHFIVE_HAS_CONCEPTS=On'
               run_cond: "mpi"
-    if: ${{ env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.config.run_cond) }}
+    if: ${{ github.env.RUN_SUITE == 'all' || contains(github.env.RUN_SUITE, matrix.config.run_cond) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -136,7 +136,7 @@ jobs:
             run_cond: "hdf5"
           - hdf5_version: hdf5_1.14.6
             run_cond: "hdf5"
-    if: ${{ env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.run_cond) }}
+    if: ${{ github.env.RUN_SUITE == 'all' || contains(github.env.RUN_SUITE, matrix.run_cond) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -201,7 +201,7 @@ jobs:
               CXX: clang++-11
               pkgs: clang-11
               run_cond: "compiler"
-    if: ${{ env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.env.run_cond) }}
+    if: ${{ github.env.RUN_SUITE == 'all' || contains(github.env.RUN_SUITE, matrix.env.run_cond) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -347,7 +347,7 @@ jobs:
           - os: "macOS-13"
             cxxstd: "20"
             run_cond: "osx"
-    if: ${{ env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.run_cond) }}
+    if: ${{ github.env.RUN_SUITE == 'all' || contains(github.env.RUN_SUITE, matrix.run_cond) }}
 
     steps:
       - uses: actions/checkout@v4
@@ -414,7 +414,7 @@ jobs:
           - os: "windows-2025"
             cxxstd: "20"
             run_cond: "windows"
-    if: ${{ env.RUN_SUITE == 'all' || contains(env.RUN_SUITE, matrix.run_cond) }}
+    if: ${{ github.env.RUN_SUITE == 'all' || contains(github.env.RUN_SUITE, matrix.run_cond) }}
 
     steps:
       - uses: actions/checkout@v4
