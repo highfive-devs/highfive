@@ -31,14 +31,9 @@ env:
   INSTALL_DIR: install
 
 jobs:
-
-  # Job testing compiling on several Ubuntu systems + MPI
-  # =========================================================
-  #
-  # XTensor tests are run for conda/mamba and MacOS
   Linux_MPI:
-    runs-on: ${{matrix.config.os}}
-    name: Linux_MPI (${{toJson(matrix.config)}})
+    runs-on: ${{ matrix.config.os }}
+    name: Linux_MPI (${{ toJson(matrix.config) }})
     strategy:
       matrix:
         include:
@@ -65,95 +60,94 @@ jobs:
               flags: '-DHIGHFIVE_TEST_BOOST=Off -DCMAKE_CXX_STANDARD=20 -DHIGHFIVE_HAS_CONCEPTS=On'
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: "Install libraries"
-      run: |
-        sudo apt-get -qq update
-        sudo apt-get -qq install libhdf5-openmpi-dev libsz2 ninja-build ${{ matrix.config.pkgs }}
+      - name: "Install libraries"
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install libhdf5-openmpi-dev libsz2 ninja-build ${{ matrix.config.pkgs }}
 
-    - name: Build
-      run: |
-        CMAKE_OPTIONS=(-DHDF5_PREFER_PARALLEL:BOOL=ON ${{ matrix.config.flags }})
-        source $GITHUB_WORKSPACE/.github/build.sh
+      - name: Build
+        run: |
+          CMAKE_OPTIONS=(-DHDF5_PREFER_PARALLEL:BOOL=ON ${{ matrix.config.flags }})
+          source $GITHUB_WORKSPACE/.github/build.sh
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ctest -j2 --output-on-failure -C $BUILD_TYPE
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+      - name: Test No HDF5 Diagnositics
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
 
-    - name: Examples
-      working-directory: ${{github.workspace}}/build/src/examples
-      run: $GITHUB_WORKSPACE/.github/run_examples.sh
+      - name: Examples
+        working-directory: ${{ github.workspace }}/build/src/examples
+        run: $GITHUB_WORKSPACE/.github/run_examples.sh
 
-  # Job testing several versions of hdf5
-  # ===================================================
   Linux_HDF5_Versions:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        hdf5_version : [ hdf5-1_8_23, hdf5-1_10_11, hdf5-1_12_3, hdf5_1.14.6 ]
+        hdf5_version: [hdf5-1_8_23, hdf5-1_10_11, hdf5-1_12_3, hdf5_1.14.6]
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
-    - name: "Install libraries"
-      run: |
-        sudo apt-get -qq update
-        sudo apt-get -qq install ninja-build libsz2 zlib1g-dev libboost-all-dev
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: Build HDF5
-      run: |
-        wget https://github.com/HDFGroup/hdf5/archive/refs/tags/${{ matrix.hdf5_version }}.tar.gz --output-document hdf5.tar.gz
-        tar xf hdf5.tar.gz
-        mkdir -p hdf5-${{ matrix.hdf5_version }}/BUILD && cd hdf5-${{ matrix.hdf5_version }}/BUILD
-        cmake .. -DCMAKE_BUILD_TYPE=Release -GNinja -DCMAKE_INSTALL_PREFIX=$HOME/${{ matrix.hdf5_version }} -DHDF5_ENABLE_Z_LIB_SUPPORT=ON -DUSE_LIBAEC=ON -DHDF5_BUILD_EXAMPLES=OFF -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF
-        ninja && ninja install
+      - name: "Install libraries"
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install ninja-build libsz2 zlib1g-dev libboost-all-dev
 
-    - name: Build
-      run: |
-        CMAKE_OPTIONS=(
-          -GNinja
-          -DHDF5_ROOT=$HOME/${{ matrix.hdf5_version }}
-        )
-        source $GITHUB_WORKSPACE/.github/build.sh
+      - name: Build HDF5
+        run: |
+          wget https://github.com/HDFGroup/hdf5/archive/refs/tags/${{ matrix.hdf5_version }}.tar.gz --output-document hdf5.tar.gz
+          tar xf hdf5.tar.gz
+          mkdir -p hdf5-${{ matrix.hdf5_version }}/BUILD && cd hdf5-${{ matrix.hdf5_version }}/BUILD
+          cmake .. -DCMAKE_BUILD_TYPE=Release -GNinja -DCMAKE_INSTALL_PREFIX=$HOME/${{ matrix.hdf5_version }} -DHDF5_ENABLE_Z_LIB_SUPPORT=ON -DUSE_LIBAEC=ON -DHDF5_BUILD_EXAMPLES=OFF -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF
+          ninja && ninja install
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ctest -j2 --output-on-failure -C $BUILD_TYPE
+      - name: Build
+        run: |
+          CMAKE_OPTIONS=(
+            -GNinja
+            -DHDF5_ROOT=$HOME/${{ matrix.hdf5_version }}
+          )
+          source $GITHUB_WORKSPACE/.github/build.sh
 
-    - name: Test No HDF5 Diagnositics
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Examples
-      working-directory: ${{github.workspace}}/build/src/examples
-      run: $GITHUB_WORKSPACE/.github/run_examples.sh
+      - name: Test No HDF5 Diagnositics
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
 
-  # Job testing several compilers on a stable Linux
-  # ====================================================
+      - name: Examples
+        working-directory: ${{ github.workspace }}/build/src/examples
+        run: $GITHUB_WORKSPACE/.github/run_examples.sh
+
   Linux_Compilers:
-    runs-on: ${{matrix.os}}
-    env: ${{ matrix.env }}
+    runs-on: ${{ matrix.os }}
+    env:
+      CC: ${{ matrix.env.CC }}
+      CXX: ${{ matrix.env.CXX }}
+      pkgs: ${{ matrix.env.pkgs }}
     strategy:
       matrix:
-        os: [ "ubuntu-24.04" ]
+        os: ["ubuntu-24.04"]
         env: [
-          {CC: clang-18, CXX: clang++-18, pkgs: "clang-18"},
-          {CC: gcc-9, CXX: g++-9, pkgs: "gcc-9 g++-9"},
-          {CC: gcc-14, CXX: g++-14, pkgs: "gcc-14 g++-14"},
+          { CC: clang-18, CXX: clang++-18, pkgs: "clang-18" },
+          { CC: gcc-9, CXX: g++-9, pkgs: "gcc-9 g++-9" },
+          { CC: gcc-14, CXX: g++-14, pkgs: "gcc-14 g++-14" }
         ]
-
         include:
           - os: "ubuntu-22.04"
             env:
@@ -161,246 +155,229 @@ jobs:
               CXX: clang++-11
               pkgs: clang-11
 
-
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: "Install libraries"
-      run: |
-        sudo apt-get -qq update
-        sudo apt-get -qq install ${pkgs}
-        sudo apt-get -qq install libboost-all-dev libhdf5-dev libsz2 ninja-build
+      - name: "Install libraries"
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install ${pkgs}
+          sudo apt-get -qq install libboost-all-dev libhdf5-dev libsz2 ninja-build
 
-    - name: Build
-      run: |
-        CMAKE_OPTIONS=(-DHIGHFIVE_TEST_BOOST=ON -GNinja)
-        source $GITHUB_WORKSPACE/.github/build.sh
+      - name: Build
+        run: |
+          CMAKE_OPTIONS=(-DHIGHFIVE_TEST_BOOST=ON -GNinja)
+          source $GITHUB_WORKSPACE/.github/build.sh
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ctest -j2 --output-on-failure -C $BUILD_TYPE
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+      - name: Test No HDF5 Diagnositics
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
 
-    - name: Examples
-      working-directory: ${{github.workspace}}/build/src/examples
-      run: $GITHUB_WORKSPACE/.github/run_examples.sh
+      - name: Examples
+        working-directory: ${{ github.workspace }}/build/src/examples
+        run: $GITHUB_WORKSPACE/.github/run_examples.sh
 
-  # Job running unit-test with sanitizers
-  # =====================================
   Linux_Sanitizers:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
         env: [
-          {CC: clang, CXX: clang++, HIGHFIVE_SANITIZER: address},
-          {CC: clang, CXX: clang++, HIGHFIVE_SANITIZER: undefined},
-          {CC: gcc, CXX: g++, HIGHFIVE_GLIBCXX_ASSERTIONS: On},
+          { CC: clang, CXX: clang++, HIGHFIVE_SANITIZER: address },
+          { CC: clang, CXX: clang++, HIGHFIVE_SANITIZER: undefined },
+          { CC: gcc, CXX: g++, HIGHFIVE_GLIBCXX_ASSERTIONS: On }
         ]
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: "Install libraries"
-      run: |
-        sudo apt-get -qq update
-        sudo apt-get -qq install boost1.83 libeigen3-dev libhdf5-dev libsz2 ninja-build
+      - name: "Install libraries"
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install boost1.83 libeigen3-dev libhdf5-dev libsz2 ninja-build
 
-    - name: Build
-      run: |
-        CMAKE_OPTIONS=(
-          -GNinja
-          -DHIGHFIVE_TEST_BOOST:BOOL=ON
-          -DHIGHFIVE_TEST_BOOST_SPAN:BOOL=ON
-          -DHIGHFIVE_TEST_EIGEN:BOOL=ON
-          -DHIGHFIVE_BUILD_DOCS:BOOL=FALSE
-          -DHIGHFIVE_GLIBCXX_ASSERTIONS=${HIGHFIVE_GLIBCXX_ASSERTIONS:-OFF}
-          -DHIGHFIVE_SANITIZER=${HIGHFIVE_SANITIZER:-OFF}
-        )
-        source $GITHUB_WORKSPACE/.github/build.sh
+      - name: Build
+        run: |
+          CMAKE_OPTIONS=(
+            -GNinja
+            -DHIGHFIVE_TEST_BOOST:BOOL=ON
+            -DHIGHFIVE_TEST_BOOST_SPAN:BOOL=ON
+            -DHIGHFIVE_TEST_EIGEN:BOOL=ON
+            -DHIGHFIVE_BUILD_DOCS:BOOL=FALSE
+            -DHIGHFIVE_GLIBCXX_ASSERTIONS=${HIGHFIVE_GLIBCXX_ASSERTIONS:-OFF}
+            -DHIGHFIVE_SANITIZER=${HIGHFIVE_SANITIZER:-OFF}
+          )
+          source $GITHUB_WORKSPACE/.github/build.sh
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ctest -j2 --output-on-failure -C $BUILD_TYPE
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+      - name: Test No HDF5 Diagnositics
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
 
-    - name: Examples
-      working-directory: ${{github.workspace}}/build/src/examples
-      run: $GITHUB_WORKSPACE/.github/run_examples.sh
+      - name: Examples
+        working-directory: ${{ github.workspace }}/build/src/examples
+        run: $GITHUB_WORKSPACE/.github/run_examples.sh
 
-
-  # Job to check using HighFive from other CMake projects
-  # =====================================================
   CMake_Project:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        parallelism: [ serial, parallel ]
+        parallelism: [serial, parallel]
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: "Update Ubuntu"
-      run: |
-        sudo apt-get -qq update
+      - name: "Update Ubuntu"
+        run: |
+          sudo apt-get -qq update
 
-    - name: "Install common libraries"
-      run: |
-        sudo apt-get -qq install libboost-all-dev libsz2 ninja-build
+      - name: "Install common libraries"
+        run: |
+          sudo apt-get -qq install libboost-all-dev libsz2 ninja-build
 
-    - name: "Install serial HDF5"
-      if: matrix.parallelism == 'serial'
-      run: |
-        sudo apt-get -qq install libhdf5-dev
+      - name: "Install serial HDF5"
+        if: matrix.parallelism == 'serial'
+        run: |
+          sudo apt-get -qq install libhdf5-dev
 
+      - name: "Install parallel HDF5"
+        if: matrix.parallelism == 'parallel'
+        run: |
+          sudo apt-get -qq install libhdf5-openmpi-dev
 
-    - name: "Install parallel HDF5"
-      if: matrix.parallelism == 'parallel'
-      run: |
-        sudo apt-get -qq install libhdf5-openmpi-dev
+      - name: "CMake Project Integration"
+        run: bash tests/cmake_integration/test_cmake_integration.sh
 
-    - name: "CMake Project Integration"
-      run: bash tests/cmake_integration/test_cmake_integration.sh
-
-
-  # Job checking the benchmarks work
-  # ================================
   Benchmarks:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: "Install libraries"
-      run: |
-        sudo apt -y update
-        sudo apt -y  install --no-install-recommends  libhdf5-dev pkg-config
+      - name: "Install libraries"
+        run: |
+          sudo apt -y update
+          sudo apt -y install --no-install-recommends libhdf5-dev pkg-config
 
-    - name: "Build benchmarks"
-      working-directory: ${{github.workspace}}/src/benchmarks
-      run: make
+      - name: "Build benchmarks"
+        working-directory: ${{ github.workspace }}/src/benchmarks
+        run: make
 
-    - run: time ${{github.workspace}}/src/benchmarks/highfive_bench
+      - run: time ${{ github.workspace }}/src/benchmarks/highfive_bench
 
-
-  # Job testing in OSX
-  # ==================
   OSX:
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ "macOS-14" ]
+        os: ["macOS-14"]
         cxxstd: ["14", "17", "20"]
-
         include:
           - os: "macOS-13"
             cxxstd: "20"
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - name: "Install libraries (OSX)"
-      run: brew install boost eigen hdf5 ninja xtensor
+      - name: "Install libraries (OSX)"
+        run: brew install boost eigen hdf5 ninja xtensor
 
-    - name: Build
-      run: |
-        if (( ${{ matrix.cxxstd }} > 14 ))
-        then
-          TEST_XTENSOR=On
-        else
-          TEST_XTENSOR=Off
-        fi
+      - name: Build
+        run: |
+          if (( ${{ matrix.cxxstd }} > 14 ))
+          then
+            TEST_XTENSOR=On
+          else
+            TEST_XTENSOR=Off
+          fi
 
-        CMAKE_OPTIONS=(
-          -GNinja
-          -DHIGHFIVE_TEST_BOOST:BOOL=ON
-          -DHIGHFIVE_TEST_EIGEN:BOOL=ON
-          -DHIGHFIVE_TEST_XTENSOR:BOOL=${TEST_XTENSOR}
-          -DHIGHFIVE_BUILD_DOCS:BOOL=FALSE
-          -DCMAKE_CXX_STANDARD=${{matrix.cxxstd}}
-        )
-        source $GITHUB_WORKSPACE/.github/build.sh
+          CMAKE_OPTIONS=(
+            -GNinja
+            -DHIGHFIVE_TEST_BOOST:BOOL=ON
+            -DHIGHFIVE_TEST_EIGEN:BOOL=ON
+            -DHIGHFIVE_TEST_XTENSOR:BOOL=${TEST_XTENSOR}
+            -DHIGHFIVE_BUILD_DOCS:BOOL=FALSE
+            -DCMAKE_CXX_STANDARD=${{ matrix.cxxstd }}
+          )
+          source $GITHUB_WORKSPACE/.github/build.sh
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ctest -j2 --output-on-failure -C $BUILD_TYPE
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
-      working-directory: ${{github.workspace}}/build
-      run: |
-        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+      - name: Test No HDF5 Diagnositics
+        working-directory: ${{ github.workspace }}/build
+        run: |
+          ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
 
-    - name: Examples
-      working-directory: ${{github.workspace}}/build/src/examples
-      run: $GITHUB_WORKSPACE/.github/run_examples.sh
+      - name: Examples
+        working-directory: ${{ github.workspace }}/build/src/examples
+        run: $GITHUB_WORKSPACE/.github/run_examples.sh
 
-
-  # Job testing in Windows
-  # ======================
   Windows:
-    runs-on:  ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ "windows-2022", "windows-2025"]
         cxxstd: ["14", "17", "20"]
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-    - uses: mamba-org/setup-micromamba@v2
-      with:
-        environment-file: .github/mamba_env_cxx${{matrix.cxxstd}}.yaml
-        environment-name: win-test
+      - uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: .github/mamba_env_cxx${{ matrix.cxxstd }}.yaml
+          environment-name: win-test
 
-    - name: Build
-      shell: bash -l {0}
-      run: |
-        if (( ${{ matrix.cxxstd }} == 17 ))
-        then
-          XTENSOR_HEADER_VERSION=2
-        else
-          # Both C++14 and C++20 use 0.26
-          XTENSOR_HEADER_VERSION=1
-        fi
+      - name: Build
+        shell: bash -l {0}
+        run: |
+          if (( ${{ matrix.cxxstd }} == 17 ))
+          then
+            XTENSOR_HEADER_VERSION=2
+          else
+            # Both C++14 and C++20 use 0.26
+            XTENSOR_HEADER_VERSION=1
+          fi
 
-        CMAKE_OPTIONS=(
-          -DCMAKE_CXX_STANDARD=${{matrix.cxxstd}}
-          -DHIGHFIVE_UNIT_TESTS=ON
-          -DHIGHFIVE_TEST_BOOST:BOOL=ON
-          -DHIGHFIVE_TEST_EIGEN:BOOL=ON
-          -DHIGHFIVE_TEST_XTENSOR:BOOL=ON
-          -DHIGHFIVE_XTENSOR_HEADER_VERSION=$XTENSOR_HEADER_VERSION
-        )
-        source $GITHUB_WORKSPACE/.github/build.sh
+          CMAKE_OPTIONS=(
+            -DCMAKE_CXX_STANDARD=${{ matrix.cxxstd }}
+            -DHIGHFIVE_UNIT_TESTS=ON
+            -DHIGHFIVE_TEST_BOOST:BOOL=ON
+            -DHIGHFIVE_TEST_EIGEN:BOOL=ON
+            -DHIGHFIVE_TEST_XTENSOR:BOOL=ON
+            -DHIGHFIVE_XTENSOR_HEADER_VERSION=$XTENSOR_HEADER_VERSION
+          )
+          source $GITHUB_WORKSPACE/.github/build.sh
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      shell: bash -l {0}
-      run: |
-        ctest -j2 --output-on-failure -C $BUILD_TYPE
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        shell: bash -l {0}
+        run: |
+          ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
-      working-directory: ${{github.workspace}}/build
-      shell: bash -l {0}
-      run: |
-        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+      - name: Test No HDF5 Diagnositics
+        working-directory: ${{ github.workspace }}/build
+        shell: bash -l {0}
+        run: |
+          ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
