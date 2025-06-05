@@ -42,18 +42,16 @@ env:
   # For PRs with labels, collect all matching test suites plus "always"
   RUN_SUITE: >-
     ${{
-      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'all' ||
-      join(
-        [
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+      && 'all'
+      || format('{0}{1}{2}{3}{4}{5}',
           'always',
-          contains(github.event.pull_request.labels.*.name, 'ci-mpi-all') && 'mpi',
-          contains(github.event.pull_request.labels.*.name, 'ci-hdf5-all') && 'hdf5',
-          contains(github.event.pull_request.labels.*.name, 'ci-compiler-all') && 'compiler',
-          contains(github.event.pull_request.labels.*.name, 'ci-osx-all') && 'osx',
-          contains(github.event.pull_request.labels.*.name, 'ci-windows-all') && 'windows'
-        ],
-        ','
-      )
+          contains(github.event.pull_request.labels.*.name, 'ci-mpi-all') && ',mpi' || '',
+          contains(github.event.pull_request.labels.*.name, 'ci-hdf5-all') && ',hdf5' || '',
+          contains(github.event.pull_request.labels.*.name, 'ci-compiler-all') && ',compiler' || '',
+          contains(github.event.pull_request.labels.*.name, 'ci-osx-all') && ',osx' || '',
+          contains(github.event.pull_request.labels.*.name, 'ci-windows-all') && ',windows' || ''
+        )
     }}
 
 jobs:
