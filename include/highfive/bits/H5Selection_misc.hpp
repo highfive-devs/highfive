@@ -34,7 +34,7 @@ inline const DataSet& Selection::getDataset() const {
 }
 
 // Not only a shortcut but also for templated compat with H5Dataset
-inline const DataType Selection::getDataType() const {
+inline DataType Selection::getDataType() const {
     return _set.getDataType();
 }
 

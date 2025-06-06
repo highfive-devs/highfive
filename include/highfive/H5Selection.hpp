@@ -49,7 +49,7 @@ class Selection: public SliceTraits<Selection> {
     ///
     /// \brief return the datatype of the selection
     /// \return return the datatype of the selection
-    const DataType getDataType() const;
+    DataType getDataType() const;
 
   protected:
     Selection(const DataSpace& memspace, const DataSpace& file_space, const DataSet& set);

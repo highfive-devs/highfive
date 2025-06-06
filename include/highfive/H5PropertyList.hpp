@@ -231,7 +231,7 @@ class MPIOFileAccess {
 
   private:
     friend FileAccessProps;
-    void apply(const hid_t list) const;
+    void apply(hid_t list) const;
 
     MPI_Comm _comm;
     MPI_Info _info;
@@ -344,7 +344,7 @@ class FileVersionBounds {
 
   private:
     friend FileAccessProps;
-    void apply(const hid_t list) const;
+    void apply(hid_t list) const;
 
     H5F_libver_t _low;
     H5F_libver_t _high;
@@ -364,7 +364,7 @@ class MetadataBlockSize {
 
   private:
     friend FileAccessProps;
-    void apply(const hid_t list) const;
+    void apply(hid_t list) const;
     hsize_t _size;
 };
 
@@ -393,7 +393,7 @@ class FileSpaceStrategy {
   private:
     friend FileCreateProps;
 
-    void apply(const hid_t list) const;
+    void apply(hid_t list) const;
 
     H5F_fspace_strategy_t _strategy;
     hbool_t _persist;
@@ -422,7 +422,7 @@ class FileSpacePageSize {
 
   private:
     friend FileCreateProps;
-    void apply(const hid_t list) const;
+    void apply(hid_t list) const;
 
     hsize_t _page_size;
 };
@@ -579,9 +579,9 @@ class Caching {
   public:
     /// https://support.hdfgroup.org/HDF5/doc/RM/H5P/H5Pset_chunk_cache.html for
     /// details.
-    Caching(const size_t numSlots,
-            const size_t cacheSize,
-            const double w0 = static_cast<double>(H5D_CHUNK_CACHE_W0_DEFAULT));
+    Caching(size_t numSlots,
+            size_t cacheSize,
+            double w0 = static_cast<double>(H5D_CHUNK_CACHE_W0_DEFAULT));
 
     explicit Caching(const DataSetCreateProps& dcpl);
 
