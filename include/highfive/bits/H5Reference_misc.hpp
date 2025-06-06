@@ -43,11 +43,7 @@ inline T Reference::dereference(const Object& location) const {
     if (obj.getType() != T::type) {
         HDF5ErrMapper::ToException<ReferenceException>("Trying to dereference the wrong type");
     }
-#if defined __GNUC__ && __GNUC__ < 9
-    return std::move(obj);
-#else
-    return obj;
-#endif
+    return T(std::move(obj));
 }
 
 inline Object Reference::get_ref(const Object& location) const {
