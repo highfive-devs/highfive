@@ -214,7 +214,7 @@ inline ProductSet::ProductSet(const Slices&... slices) {
 
 
 template <typename Derivate>
-inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyperslab,
+inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab,
                                                const DataSpace& memspace) const {
     // Note: The current limitation are that memspace must describe a
     //       packed memspace.
@@ -223,7 +223,7 @@ inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyperslab,
     //       hyperslabs when the memory is not contiguous, e.g.
     //       `std::vector<std::vector<double>>`.
     const auto& slice = static_cast<const Derivate&>(*this);
-    auto filespace = hyperslab.apply(slice.getSpace());
+    auto filespace = hyper_slab.apply(slice.getSpace());
 
     return detail::make_selection(memspace, filespace, details::get_dataset(slice));
 }

@@ -420,23 +420,23 @@ template <typename Derivate>
 class SliceTraits {
   public:
     ///
-    /// \brief Select an \p hyperslab in the current Slice/Dataset.
+    /// \brief Select an \p hyper_slab in the current Slice/Dataset.
     ///
     /// HyperSlabs can be either regular or irregular. Irregular hyperslabs are typically generated
     /// by taking the union of regular hyperslabs. An irregular hyperslab, in general, does not fit
     /// nicely into a multi-dimensional array, but only a subset of such an array.
     ///
     /// Therefore, the only memspaces supported for general hyperslabs are one-dimensional arrays.
-    Selection select(const HyperSlab& hyperslab) const;
+    Selection select(const HyperSlab& hyper_slab) const;
 
     ///
-    /// \brief Select an \p hyperslab in the current Slice/Dataset.
+    /// \brief Select an \p hyper_slab in the current Slice/Dataset.
     ///
     /// If the selection can be read into a simple, multi-dimensional dataspace,
     /// then this overload enable specifying the shape of the memory dataspace
     /// with `memspace`. Note, that simple implies no offsets, strides or
     /// number of blocks, just the size of the block in each dimension.
-    Selection select(const HyperSlab& hyperslab, const DataSpace& memspace) const;
+    Selection select(const HyperSlab& hyper_slab, const DataSpace& memspace) const;
 
     ///
     /// \brief Select a region in the current Slice/Dataset of \p count points at
@@ -492,11 +492,11 @@ class SliceTraits {
     /// responsibility to ensure that the right amount of space has been
     /// allocated.
     /// \param array: A buffer containing enough space for the data
-    /// \param dtype: The type of the data, in case it cannot be automatically guessed
+    /// \param mem_datatype: The type of the data in memory. This prevents deducing it from T.
     /// \param xfer_props: Data Transfer properties
     template <typename T>
     void read_raw(T* array,
-                  const DataType& dtype,
+                  const DataType& mem_datatype,
                   const DataTransferProps& xfer_props = DataTransferProps()) const;
 
     ///

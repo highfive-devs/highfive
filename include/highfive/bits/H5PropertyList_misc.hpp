@@ -131,8 +131,8 @@ inline PageBufferSize::PageBufferSize(size_t page_buffer_size,
     , _min_meta(min_meta_percent)
     , _min_raw(min_raw_percent) {}
 
-inline PageBufferSize::PageBufferSize(const FileAccessProps& plist) {
-    detail::h5p_get_page_buffer_size(plist.getId(), &_page_buffer_size, &_min_meta, &_min_raw);
+inline PageBufferSize::PageBufferSize(const FileAccessProps& fapl) {
+    detail::h5p_get_page_buffer_size(fapl.getId(), &_page_buffer_size, &_min_meta, &_min_raw);
 }
 
 inline void PageBufferSize::apply(const hid_t list) const {

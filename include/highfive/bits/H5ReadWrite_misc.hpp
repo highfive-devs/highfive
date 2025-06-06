@@ -56,7 +56,7 @@ struct BufferInfo {
     const Operation op;
 
     template <class F>
-    BufferInfo(const DataType& dtype, F getName, Operation _op);
+    BufferInfo(const DataType& file_data_type, F getName, Operation _op);
 
     size_t getRank(const T& array) const;
     size_t getMinRank() const;
