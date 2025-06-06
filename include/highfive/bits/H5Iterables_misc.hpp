@@ -23,13 +23,13 @@ namespace details {
 struct HighFiveIterateData {
     inline HighFiveIterateData(std::vector<std::string>& my_names)
         : names(my_names)
-        , err(NULL) {}
+        , err(nullptr) {}
 
     std::vector<std::string>& names;
     std::exception* err;
 
-    inline void throwIfError() {
-        if (err) {
+    inline void throwIfError() const {
+        if (err != nullptr) {
             throw *err;
         }
     }
