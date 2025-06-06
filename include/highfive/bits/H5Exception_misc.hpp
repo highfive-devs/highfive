@@ -49,7 +49,7 @@ struct HDF5ErrMapper {
             detail::nothrow::h5e_walk2(err_stack,
                                        H5E_WALK_UPWARD,
                                        &HDF5ErrMapper::stackWalk<ExceptionType>,
-                                       &e_iter);
+                                       (void*) &e_iter);
             detail::nothrow::h5e_clear2(err_stack);
 
             const char* next_err_msg = (e.nextException() != NULL) ? (e.nextException()->what())
