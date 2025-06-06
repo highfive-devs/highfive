@@ -298,7 +298,7 @@ inline Selection SliceTraits<Derivate>::select(const ElementSet& elements) const
     // switch for data conversion on 32bits platforms
     if (std::is_same<std::size_t, hsize_t>::value) {
         // `if constexpr` can't be used, thus a reinterpret_cast is needed.
-        data = reinterpret_cast<const hsize_t*>(&(elements._ids[0]));
+        data = reinterpret_cast<const hsize_t*>(elements._ids.data());
     } else {
         raw_elements.resize(length);
         std::copy(elements._ids.begin(), elements._ids.end(), raw_elements.begin());
