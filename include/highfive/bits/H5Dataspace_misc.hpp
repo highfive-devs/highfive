@@ -74,21 +74,20 @@ inline DataSpace::DataSpace(const std::vector<size_t>& dims, const std::vector<s
 }
 
 inline DataSpace::DataSpace(DataSpace::DataspaceType space_type) {
-    H5S_class_t h5_dataspace_type;
-    switch (space_type) {
-    case DataSpace::dataspace_scalar:
-        h5_dataspace_type = H5S_SCALAR;
-        break;
-    case DataSpace::dataspace_null:
-        h5_dataspace_type = H5S_NULL;
-        break;
-    default:
-        throw DataSpaceException(
-            "Invalid dataspace type: should be "
-            "dataspace_scalar or dataspace_null");
-    }
+    auto to_hdf5 = [](auto _space_type) -> H5S_class_t {
+        switch (_space_type) {
+        case DataSpace::dataspace_scalar:
+            return H5S_SCALAR;
+        case DataSpace::dataspace_null:
+            return H5S_NULL;
+        default:
+            throw DataSpaceException(
+                "Invalid dataspace type: should be "
+                "dataspace_scalar or dataspace_null");
+        }
+    };
 
-    _hid = detail::h5s_create(h5_dataspace_type);
+    _hid = detail::h5s_create(to_hdf5(space_type));
 }
 
 inline DataSpace DataSpace::clone() const {
