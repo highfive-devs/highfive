@@ -22,7 +22,7 @@ namespace HighFive {
 ///
 class Exception: public std::exception {
   public:
-    Exception(const std::string& err_msg)
+    explicit Exception(const std::string& err_msg)
         : _errmsg(err_msg) {}
 
     Exception(const Exception& other) = default;
@@ -87,7 +87,7 @@ class Exception: public std::exception {
 ///
 class ObjectException: public Exception {
   public:
-    ObjectException(const std::string& err_msg)
+    explicit ObjectException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -96,7 +96,7 @@ class ObjectException: public Exception {
 ///
 class DataTypeException: public Exception {
   public:
-    DataTypeException(const std::string& err_msg)
+    explicit DataTypeException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -105,7 +105,7 @@ class DataTypeException: public Exception {
 ///
 class FileException: public Exception {
   public:
-    FileException(const std::string& err_msg)
+    explicit FileException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -114,7 +114,7 @@ class FileException: public Exception {
 ///
 class DataSpaceException: public Exception {
   public:
-    DataSpaceException(const std::string& err_msg)
+    explicit DataSpaceException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -123,7 +123,7 @@ class DataSpaceException: public Exception {
 ///
 class AttributeException: public Exception {
   public:
-    AttributeException(const std::string& err_msg)
+    explicit AttributeException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -132,7 +132,7 @@ class AttributeException: public Exception {
 ///
 class DataSetException: public Exception {
   public:
-    DataSetException(const std::string& err_msg)
+    explicit DataSetException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -141,7 +141,7 @@ class DataSetException: public Exception {
 ///
 class GroupException: public Exception {
   public:
-    GroupException(const std::string& err_msg)
+    explicit GroupException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -150,7 +150,7 @@ class GroupException: public Exception {
 ///
 class PropertyException: public Exception {
   public:
-    PropertyException(const std::string& err_msg)
+    explicit PropertyException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 
@@ -159,7 +159,7 @@ class PropertyException: public Exception {
 ///
 class ReferenceException: public Exception {
   public:
-    ReferenceException(const std::string& err_msg)
+    explicit ReferenceException(const std::string& err_msg)
         : Exception(err_msg) {}
 };
 }  // namespace HighFive

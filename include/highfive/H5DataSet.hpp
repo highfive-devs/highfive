@@ -103,7 +103,7 @@ class DataSet: public Object,
   protected:
     using Object::Object;  // bring DataSet(hid_t)
 
-    DataSet(Object&& o) noexcept
+    explicit DataSet(Object&& o) noexcept
         : Object(std::move(o)) {}
 
     friend class Reference;

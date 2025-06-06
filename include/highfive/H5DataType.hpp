@@ -176,7 +176,7 @@ class VariableLengthStringType: public StringType {
     ///
     /// \brief Create a variable length string HDF5 datatype.
     ///
-    VariableLengthStringType(CharacterSet character_set = CharacterSet::Ascii);
+    explicit VariableLengthStringType(CharacterSet character_set = CharacterSet::Ascii);
 };
 
 
@@ -231,7 +231,7 @@ class CompoundType: public DataType {
     ///
     /// \brief Initializes a compound type from a DataType
     /// \param type
-    inline CompoundType(DataType&& type)
+    inline explicit CompoundType(DataType&& type)
         : DataType(type) {
         if (getClass() != DataTypeClass::Compound) {
             std::ostringstream ss;
