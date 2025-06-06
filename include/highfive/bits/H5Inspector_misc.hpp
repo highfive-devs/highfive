@@ -475,7 +475,7 @@ struct inspector<T[N]> {
     static constexpr bool is_trivially_nestable = is_trivially_copyable;
 
     static void prepare(type& val, const std::vector<size_t>& dims) {
-        if (dims.size() < 1) {
+        if (dims.empty()) {
             throw DataSpaceException("Invalid 'dims', must be at least 1 dimensional.");
         }
 
