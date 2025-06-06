@@ -27,12 +27,12 @@ class ElementSet {
     ///
     /// \param list List of continuous coordinates (e.g.: in 2 dimensions space
     /// `ElementSet{1, 2, 3 ,4}` creates points `(1, 2)` and `(3, 4)`).
-    explicit ElementSet(std::initializer_list<std::size_t> list);
+    ElementSet(std::initializer_list<std::size_t> list);
     ///
     /// \brief Create a list of points of N-dimension for selection.
     ///
     /// \param list List of N-dim points.
-    explicit ElementSet(std::initializer_list<std::vector<std::size_t>> list);
+    ElementSet(std::initializer_list<std::vector<std::size_t>> list);
     ///
     /// \brief Create a list of points of N-dimension for selection.
     ///
@@ -63,10 +63,10 @@ inline std::vector<size_t> toSTLSizeVector(const std::vector<hsize_t>& from) {
 struct RegularHyperSlab {
     RegularHyperSlab() = default;
 
-    RegularHyperSlab(const std::vector<size_t>& offset_,
-                     const std::vector<size_t>& count_ = {},
-                     const std::vector<size_t>& stride_ = {},
-                     const std::vector<size_t>& block_ = {})
+    explicit RegularHyperSlab(const std::vector<size_t>& offset_,
+                              const std::vector<size_t>& count_ = {},
+                              const std::vector<size_t>& stride_ = {},
+                              const std::vector<size_t>& block_ = {})
         : offset(toHDF5SizeVector(offset_))
         , count(toHDF5SizeVector(count_))
         , stride(toHDF5SizeVector(stride_))
