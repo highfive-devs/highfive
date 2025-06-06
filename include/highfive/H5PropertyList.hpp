@@ -664,7 +664,7 @@ class MpioNoCollectiveCause {
 #endif
 
 struct CreationOrder {
-    enum _CreationOrder {
+    enum _creation_order {
         Tracked = H5P_CRT_ORDER_TRACKED,
         Indexed = H5P_CRT_ORDER_INDEXED,
     };
