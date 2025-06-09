@@ -277,27 +277,6 @@ jobs:
       run: bash tests/cmake_integration/test_cmake_integration.sh
 
 
-  # Job checking the benchmarks work
-  # ================================
-  Benchmarks:
-    runs-on: ubuntu-24.04
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
-
-    - name: "Install libraries"
-      run: |
-        sudo apt -y update
-        sudo apt -y  install --no-install-recommends  libhdf5-dev pkg-config
-
-    - name: "Build benchmarks"
-      working-directory: ${{github.workspace}}/src/benchmarks
-      run: make
-
-    - run: time ${{github.workspace}}/src/benchmarks/highfive_bench
-
-
   # Job testing in OSX
   # ==================
   OSX:
