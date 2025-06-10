@@ -69,6 +69,11 @@ jobs:
       with:
         submodules: true
 
+    - name: "Setup MPI"
+      uses: mpi4py/setup-mpi@v1
+      with:
+        mpi: openmpi
+
     - name: "Install libraries"
       run: |
         sudo apt-get -qq update
