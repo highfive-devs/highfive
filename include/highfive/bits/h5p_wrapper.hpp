@@ -32,8 +32,8 @@ inline herr_t h5p_get_file_space_strategy(hid_t plist_id,
                                           hbool_t* persist,
                                           hsize_t* threshold) {
     herr_t err = H5Pget_file_space_strategy(plist_id, strategy, persist, threshold);
-    if (err) {
-        HDF5ErrMapper::ToException<PropertyException>("Error setting file space strategy.");
+    if (err < 0) {
+        HDF5ErrMapper::ToException<PropertyException>("Error getting file space strategy.");
     }
 
     return err;
