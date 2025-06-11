@@ -262,6 +262,7 @@ inline size_t find_first_atomic_member_size(hid_t hid) {
     return detail::h5t_get_size(hid);
 }
 
+namespace detail {
 // Calculate the padding required to align an element of a struct
 // For padding see explanation here: https://en.cppreference.com/w/cpp/language/object#Alignment
 // It is to compute padding following last element inserted inside a struct
@@ -278,11 +279,16 @@ inline size_t find_first_atomic_member_size(hid_t hid) {
 // element of the struct.
 //
 // As we are with `size_t` element, we need to compute everything inside R+
-#define _H5_STRUCT_PADDING(current_size, member_size)                                \
-    (((member_size) >= (current_size))                                               \
-         ? (((member_size) - (current_size)) % (member_size))                        \
-         : ((((member_size) - (((current_size) - (member_size)) % (member_size)))) % \
-            (member_size)))
+inline size_t struct_padding(size_t current_size, size_t member_size) {
+    if (member_size == 0) {
+        throw DataTypeException("Unexpected `member_size == 0`.");
+    }
+
+    return member_size >= current_size
+               ? (member_size - current_size) % member_size
+               : ((member_size - ((current_size - member_size) % member_size))) % member_size;
+}
+}  // namespace detail
 
 inline void CompoundType::create(size_t size) {
     if (size == 0) {
@@ -302,7 +308,7 @@ inline void CompoundType::create(size_t size) {
             // Set the offset of this member within the struct according to the
             // standard alignment rules. The c++ standard specifies that:
             // > objects have an alignment requirement of which their size is a multiple
-            member.offset = current_size + _H5_STRUCT_PADDING(current_size, first_atomic_size);
+            member.offset = current_size + detail::struct_padding(current_size, first_atomic_size);
 
             // Set the current size to the end of the new member
             current_size = member.offset + member_size;
@@ -312,7 +318,7 @@ inline void CompoundType::create(size_t size) {
             max_atomic_size = std::max(max_atomic_size, first_atomic_size);
         }
 
-        size = current_size + _H5_STRUCT_PADDING(current_size, max_atomic_size);
+        size = current_size + detail::struct_padding(current_size, max_atomic_size);
     }
 
     // Create the HDF5 type
@@ -323,8 +329,6 @@ inline void CompoundType::create(size_t size) {
         detail::h5t_insert(_hid, member.name.c_str(), member.offset, member.base_type.getId());
     }
 }
-
-#undef _H5_STRUCT_PADDING
 
 inline void CompoundType::commit(const Object& object, const std::string& name) const {
     detail::h5t_commit2(
