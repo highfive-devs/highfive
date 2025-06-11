@@ -130,11 +130,11 @@ class NodeTraits {
     ///
     /// \brief moves an object and its content within an HDF5 file.
     /// \param src_path relative path of the object to current File/Group
-    /// \param dest_path new relative path of the object to current File/Group
+    /// \param dst_path new relative path of the object to current File/Group
     /// \param parents Create intermediate groups if needed. Default: true.
     /// \return boolean that is true if the move was successful
     bool rename(const std::string& src_path,
-                const std::string& dest_path,
+                const std::string& dst_path,
                 bool parents = true) const;
 
     ///
@@ -147,24 +147,24 @@ class NodeTraits {
 
     ///
     /// \brief check a dataset or group exists in the current node / group
-    /// \param node_name dataset/group name to check
+    /// \param node_path dataset/group name to check
     /// \return true if a dataset/group with the associated name exists, or false
-    bool exist(const std::string& node_name) const;
+    bool exist(const std::string& node_path) const;
 
     ///
     /// \brief unlink the given dataset or group
-    /// \param node_name dataset/group name to unlink
-    void unlink(const std::string& node_name) const;
+    /// \param node_path dataset/group name to unlink
+    void unlink(const std::string& node_path) const;
 
     ///
     /// \brief Returns the kind of link of the given name (soft, hard...)
-    /// \param node_name The entry to check, path relative to the current group
-    LinkType getLinkType(const std::string& node_name) const;
+    /// \param node_path The entry to check, path relative to the current group
+    LinkType getLinkType(const std::string& node_path) const;
 
     ///
     /// \brief A shorthand to get the kind of object pointed to (group, dataset, type...)
-    /// \param node_name The entry to check, path relative to the current group
-    ObjectType getObjectType(const std::string& node_name) const;
+    /// \param node_path The entry to check, path relative to the current group
+    ObjectType getObjectType(const std::string& node_path) const;
 
     ///
     /// \brief A shorthand to create softlink to any object which provides `getPath`
@@ -216,7 +216,7 @@ class NodeTraits {
     // A wrapper over the low-level H5Lexist
     // It makes behavior consistent among versions and by default transforms
     // errors to exceptions
-    bool _exist(const std::string& node_name, bool raise_errors = true) const;
+    bool _exist(const std::string& node_path, bool raise_errors = true) const;
 };
 
 

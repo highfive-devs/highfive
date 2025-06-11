@@ -69,13 +69,13 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
     ///
     /// \brief File
     /// \param filename: filepath of the HDF5 file
-    /// \param openFlags: Open mode / flags ( ReadOnly, ReadWrite)
+    /// \param access_mode: Open mode / flags ( ReadOnly, ReadWrite, etc.)
     /// \param fileCreateProps: the file create properties
     /// \param fileAccessProps: the file access properties
     ///
     /// Open or create a new HDF5 file
     File(const std::string& filename,
-         AccessMode openFlags,
+         AccessMode access_mode,
          const FileCreateProps& fileCreateProps,
          const FileAccessProps& fileAccessProps = FileAccessProps::Default());
 

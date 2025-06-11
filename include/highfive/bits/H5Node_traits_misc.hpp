@@ -182,10 +182,10 @@ inline std::vector<std::string> NodeTraits<Derivate>::listObjectNames(IndexType 
 }
 
 template <typename Derivate>
-inline bool NodeTraits<Derivate>::_exist(const std::string& node_name, bool raise_errors) const {
+inline bool NodeTraits<Derivate>::_exist(const std::string& node_path, bool raise_errors) const {
     SilenceHDF5 silencer{};
     const auto val = detail::nothrow::h5l_exists(static_cast<const Derivate*>(this)->getId(),
-                                                 node_name.c_str(),
+                                                 node_path.c_str(),
                                                  H5P_DEFAULT);
     if (val < 0) {
         if (raise_errors) {
@@ -198,25 +198,25 @@ inline bool NodeTraits<Derivate>::_exist(const std::string& node_name, bool rais
     // The root path always exists, but H5Lexists return 0 or 1
     // depending of the version of HDF5, so always return true for it
     // We had to call H5Lexists anyway to check that there are no errors
-    return (node_name == "/") ? true : (val > 0);
+    return (node_path == "/") ? true : (val > 0);
 }
 
 template <typename Derivate>
-inline bool NodeTraits<Derivate>::exist(const std::string& group_path) const {
+inline bool NodeTraits<Derivate>::exist(const std::string& node_path) const {
     // When there are slashes, first check everything is fine
     // so that subsequent errors are only due to missing intermediate groups
-    if (group_path.find('/') != std::string::npos) {
+    if (node_path.find('/') != std::string::npos) {
         _exist("/");  // Shall not throw under normal circumstances
         // Unless "/" (already checked), verify path exists (not throwing errors)
-        return (group_path == "/") ? true : _exist(group_path, false);
+        return (node_path == "/") ? true : _exist(node_path, false);
     }
-    return _exist(group_path);
+    return _exist(node_path);
 }
 
 
 template <typename Derivate>
-inline void NodeTraits<Derivate>::unlink(const std::string& node_name) const {
-    detail::h5l_delete(static_cast<const Derivate*>(this)->getId(), node_name.c_str(), H5P_DEFAULT);
+inline void NodeTraits<Derivate>::unlink(const std::string& node_path) const {
+    detail::h5l_delete(static_cast<const Derivate*>(this)->getId(), node_path.c_str(), H5P_DEFAULT);
 }
 
 
@@ -238,24 +238,24 @@ static inline LinkType _convert_link_type(const H5L_type_t& ltype) noexcept {
 }
 
 template <typename Derivate>
-inline LinkType NodeTraits<Derivate>::getLinkType(const std::string& node_name) const {
+inline LinkType NodeTraits<Derivate>::getLinkType(const std::string& node_path) const {
     H5L_info_t linkinfo;
     detail::h5l_get_info(static_cast<const Derivate*>(this)->getId(),
-                         node_name.c_str(),
+                         node_path.c_str(),
                          &linkinfo,
                          H5P_DEFAULT);
 
     if (linkinfo.type == H5L_TYPE_ERROR) {
-        HDF5ErrMapper::ToException<GroupException>(std::string("Link type of \"") + node_name +
+        HDF5ErrMapper::ToException<GroupException>(std::string("Link type of \"") + node_path +
                                                    "\" is H5L_TYPE_ERROR");
     }
     return _convert_link_type(linkinfo.type);
 }
 
 template <typename Derivate>
-inline ObjectType NodeTraits<Derivate>::getObjectType(const std::string& node_name) const {
+inline ObjectType NodeTraits<Derivate>::getObjectType(const std::string& node_path) const {
     const auto id = detail::h5o_open(static_cast<const Derivate*>(this)->getId(),
-                                     node_name.c_str(),
+                                     node_path.c_str(),
                                      H5P_DEFAULT);
     auto object_type = _convert_object_type(detail::h5i_get_type(id));
     detail::h5o_close(id);
