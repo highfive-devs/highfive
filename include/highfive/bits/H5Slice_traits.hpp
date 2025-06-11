@@ -237,7 +237,8 @@ class HyperSlab {
     /// The length of a stream of `Op::Or` starting at `begin`.
     size_t detect_streak(Select_ const* begin, Select_ const* end, Op op) const {
         assert(op == Op::Or);
-        auto it = std::find_if(begin, end, [op](const Select_& sel) { return sel.op != op; });
+        auto const* it =
+            std::find_if(begin, end, [op](const Select_& sel) { return sel.op != op; });
         return static_cast<size_t>(it - begin);
     }
 
@@ -304,8 +305,8 @@ class HyperSlab {
         auto space = space_.clone();
         auto n_selects = selects.size();
         for (size_t i = 0; i < n_selects; ++i) {
-            auto begin = selects.data() + i;
-            auto end = selects.data() + n_selects;
+            auto const* const begin = selects.data() + i;
+            auto const* const end = selects.data() + n_selects;
 
             auto n_ors = detect_streak(begin, end, Op::Or);
 

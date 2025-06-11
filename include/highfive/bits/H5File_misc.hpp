@@ -60,13 +60,15 @@ inline File::File(const std::string& filename,
     if (!mustCreate) {
         // Silence open errors if create is allowed
         std::unique_ptr<SilenceHDF5> silencer;
-        if (openOrCreate)
-            silencer.reset(new SilenceHDF5());
+        if (openOrCreate) {
+            silencer = std::make_unique<SilenceHDF5>();
+        }
 
         _hid = detail::nothrow::h5f_open(filename.c_str(), openMode, fileAccessProps.getId());
 
-        if (isValid())
+        if (isValid()) {
             return;  // Done
+        }
 
         if (openOrCreate) {
             // Will attempt to create ensuring wont clobber any file

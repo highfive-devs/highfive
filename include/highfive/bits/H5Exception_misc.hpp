@@ -18,9 +18,10 @@ namespace HighFive {
 
 struct HDF5ErrMapper {
     template <typename ExceptionType>
-    static inline herr_t stackWalk(unsigned n, const H5E_error2_t* err_desc, void* client_data) {
+    static inline herr_t stackWalk(unsigned /* n */,
+                                   const H5E_error2_t* err_desc,
+                                   void* client_data) {
         auto** e_iter = static_cast<ExceptionType**>(client_data);
-        (void) n;
 
         const char* major_err = detail::nothrow::h5e_get_major(err_desc->maj_num);
         const char* minor_err = detail::nothrow::h5e_get_minor(err_desc->min_num);
@@ -49,7 +50,7 @@ struct HDF5ErrMapper {
             detail::nothrow::h5e_walk2(err_stack,
                                        H5E_WALK_UPWARD,
                                        &HDF5ErrMapper::stackWalk<ExceptionType>,
-                                       &e_iter);
+                                       (void*) &e_iter);
             detail::nothrow::h5e_clear2(err_stack);
 
             const char* next_err_msg = (e.nextException() != NULL) ? (e.nextException()->what())

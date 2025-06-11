@@ -187,14 +187,14 @@ class NodeTraits {
                         const std::string& obj_path,
                         LinkCreateProps linkCreateProps = LinkCreateProps(),
                         const LinkAccessProps& linkAccessProps = LinkAccessProps(),
-                        const bool parents = true);
+                        bool parents = true);
 
     void createExternalLink(const std::string& link_name,
                             const std::string& h5_file,
                             const std::string& obj_path,
                             LinkCreateProps linkCreateProps = LinkCreateProps(),
                             const LinkAccessProps& linkAccessProps = LinkAccessProps(),
-                            const bool parents = true);
+                            bool parents = true);
 
     ///
     /// \brief Creates hardlinks
@@ -208,7 +208,7 @@ class NodeTraits {
                         const T& target_obj,
                         LinkCreateProps linkCreateProps = LinkCreateProps(),
                         const LinkAccessProps& linkAccessProps = LinkAccessProps(),
-                        const bool parents = true);
+                        bool parents = true);
 
   private:
     using derivate_type = Derivate;

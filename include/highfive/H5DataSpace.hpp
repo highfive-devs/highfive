@@ -121,7 +121,7 @@ class DataSpace: public Object {
     //            to use this constructor
     template <typename IT,
               typename = typename std::enable_if<!std::is_integral<IT>::value, IT>::type>
-    DataSpace(const IT begin, const IT end);
+    DataSpace(IT begin, IT end);
 
     /// \brief Create a resizable N-dimensional DataSpace.
     /// \param dims Initial size of dataspace

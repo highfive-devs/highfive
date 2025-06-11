@@ -29,8 +29,7 @@ namespace details {
 // converter function for hsize_t -> size_t when hsize_t != size_t
 template <typename Size>
 inline std::vector<std::size_t> to_vector_size_t(const std::vector<Size>& vec) {
-    static_assert(std::is_same<Size, std::size_t>::value == false,
-                  " hsize_t != size_t mandatory here");
+    static_assert(!std::is_same<Size, std::size_t>::value, " hsize_t != size_t mandatory here");
     std::vector<size_t> res(vec.size());
     std::transform(vec.cbegin(), vec.cend(), res.begin(), [](Size e) {
         return static_cast<size_t>(e);
