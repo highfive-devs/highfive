@@ -55,7 +55,6 @@ jobs:
           )
           cmake -B build -S . "${CMAKE_OPTIONS[@]}"
           cmake --build build --target doc
-          cp -r doc/poster build/doc/html/
 
       - name: Upload artifact
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
