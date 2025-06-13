@@ -119,7 +119,7 @@ class ObjectInfo {
     /// \brief Retrieve the object's last modification time
     time_t getModificationTime() const noexcept;
 
-  protected:
+  private:
 #if (H5Oget_info_vers < 3)
     H5O_info_t raw_info;
 #else

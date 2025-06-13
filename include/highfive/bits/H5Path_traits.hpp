@@ -27,7 +27,7 @@ class PathTraits {
     /// \return the File object ref
     File& getFile() const;
 
-  protected:
+  private:
     std::shared_ptr<File> _file_obj;  // keep a ref to file so we keep its ref count > 0
 };
 

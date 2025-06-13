@@ -71,7 +71,7 @@ class Exception: public std::exception {
         return _err_minor;
     }
 
-  protected:
+  private:
     std::string _errmsg;
     std::shared_ptr<Exception> _next;
     hid_t _err_major, _err_minor;
