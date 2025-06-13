@@ -45,15 +45,15 @@ inline std::vector<std::size_t> to_vector_size_t(const std::vector<std::size_t>&
 // read name from a H5 object using the specified function
 template <typename T>
 inline std::string get_name(T fct) {
-    const size_t maxLength = 255;
-    char buffer[maxLength + 1];
-    ssize_t retcode = fct(buffer, static_cast<hsize_t>(maxLength) + 1);
+    constexpr size_t maxLength = 255;
+    std::array<char, maxLength + 1> buffer;
+    ssize_t retcode = fct(buffer.data(), static_cast<hsize_t>(buffer.size()));
     if (retcode < 0) {
         HDF5ErrMapper::ToException<GroupException>("Error accessing object name");
     }
     const size_t length = static_cast<std::size_t>(retcode);
     if (length <= maxLength) {
-        return std::string(buffer, length);
+        return std::string(buffer.data(), length);
     }
     std::vector<char> bigBuffer(length + 1, 0);
     fct(bigBuffer.data(), length + 1);
