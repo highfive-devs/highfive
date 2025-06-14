@@ -21,7 +21,7 @@ namespace details {
 // iterator for H5 iterate
 
 struct HighFiveIterateData {
-    inline HighFiveIterateData(std::vector<std::string>& my_names)
+    explicit HighFiveIterateData(std::vector<std::string>& my_names)
         : names(my_names)
         , err(nullptr) {}
 

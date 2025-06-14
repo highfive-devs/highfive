@@ -69,7 +69,7 @@ inline ElementSet::ElementSet(const std::vector<std::vector<std::size_t>>& eleme
 namespace detail {
 class HyperCube {
   public:
-    HyperCube(size_t rank)
+    explicit HyperCube(size_t rank)
         : offset(rank)
         , count(rank) {}
 

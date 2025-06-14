@@ -395,10 +395,10 @@ TEST_CASE("HighFiveReadType") {
 
     File file(file_name, File::ReadWrite | File::Create | File::Truncate);
 
-    CompoundType t1 = create_compound_csl1();
+    auto t1 = create_compound_csl1();
     t1.commit(file, datatype_name1);
 
-    CompoundType t2 = file.getDataType(datatype_name1);
+    auto t2 = CompoundType(file.getDataType(datatype_name1));
 
     auto t3 = create_enum_position();
     t3.commit(file, datatype_name2);

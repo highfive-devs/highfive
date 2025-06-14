@@ -176,7 +176,7 @@ class VariableLengthStringType: public StringType {
     ///
     /// \brief Create a variable length string HDF5 datatype.
     ///
-    VariableLengthStringType(CharacterSet character_set = CharacterSet::Ascii);
+    explicit VariableLengthStringType(CharacterSet character_set = CharacterSet::Ascii);
 };
 
 
@@ -217,11 +217,11 @@ class CompoundType: public DataType {
     /// \brief Initializes a compound type from a vector of member definitions
     /// \param t_members
     /// \param size
-    inline CompoundType(const std::vector<member_def>& t_members, size_t size = 0)
+    inline explicit CompoundType(const std::vector<member_def>& t_members, size_t size = 0)
         : members(t_members) {
         create(size);
     }
-    inline CompoundType(std::vector<member_def>&& t_members, size_t size = 0)
+    inline explicit CompoundType(std::vector<member_def>&& t_members, size_t size = 0)
         : members(std::move(t_members)) {
         create(size);
     }
@@ -233,7 +233,7 @@ class CompoundType: public DataType {
     ///
     /// \brief Initializes a compound type from a DataType
     /// \param type
-    inline CompoundType(DataType&& type)
+    inline explicit CompoundType(DataType&& type)
         : DataType(type) {
         if (getClass() != DataTypeClass::Compound) {
             std::ostringstream ss;
@@ -309,7 +309,7 @@ class EnumType: public DataType {
 
     EnumType(const EnumType& other) = default;
 
-    EnumType(const std::vector<member_def>& t_members)
+    explicit EnumType(const std::vector<member_def>& t_members)
         : members(t_members) {
         static_assert(std::is_enum<T>::value, "EnumType<T>::create takes only enum");
         if (members.empty()) {

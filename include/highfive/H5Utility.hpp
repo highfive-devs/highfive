@@ -23,7 +23,7 @@ namespace HighFive {
 ///
 class SilenceHDF5 {
   public:
-    inline SilenceHDF5(bool enable = true)
+    inline explicit SilenceHDF5(bool enable = true)
         : _client_data(nullptr) {
         detail::nothrow::h5e_get_auto2(H5E_DEFAULT, &_func, &_client_data);
 
