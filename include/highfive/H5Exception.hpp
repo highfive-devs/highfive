@@ -23,12 +23,9 @@ namespace HighFive {
 class Exception: public std::exception {
   public:
     Exception(const std::string& err_msg)
-        : _errmsg(err_msg)
-        , _next()
-        , _err_major(0)
-        , _err_minor(0) {}
+        : _errmsg(err_msg) {}
 
-    virtual ~Exception() throw() {}
+    ~Exception() throw() override = default;
 
     ///
     /// \brief get the current exception error message
@@ -73,8 +70,8 @@ class Exception: public std::exception {
 
   private:
     std::string _errmsg;
-    std::shared_ptr<Exception> _next;
-    hid_t _err_major, _err_minor;
+    std::shared_ptr<Exception> _next = nullptr;
+    hid_t _err_major = 0, _err_minor = 0;
 
     friend struct HDF5ErrMapper;
 };
