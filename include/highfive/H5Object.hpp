@@ -75,13 +75,14 @@ class Object {
     Object(const Object& other);
 
     // Init with an low-level object id
-    explicit Object(hid_t);
+    explicit Object(hid_t) noexcept;
 
     // decrease reference counter
     ~Object();
 
     // Copy-Assignment operator
     Object& operator=(const Object& other);
+    Object& operator=(Object&& other);
 
     hid_t _hid;
 

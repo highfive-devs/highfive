@@ -25,13 +25,19 @@ class Exception: public std::exception {
     Exception(const std::string& err_msg)
         : _errmsg(err_msg) {}
 
-    ~Exception() throw() override = default;
+    Exception(const Exception& other) = default;
+    Exception(Exception&& other) noexcept = default;
+
+    Exception& operator=(const Exception& other) = default;
+    Exception& operator=(Exception&& other) noexcept = default;
+
+    ~Exception() noexcept override {}
 
     ///
     /// \brief get the current exception error message
     /// \return
     ///
-    inline const char* what() const throw() override {
+    inline const char* what() const noexcept override {
         return _errmsg.c_str();
     }
 

@@ -506,7 +506,7 @@ class Chunking {
 
     explicit Chunking(DataSetCreateProps& plist, size_t max_dims = 32);
 
-    const std::vector<hsize_t>& getDimensions() const noexcept;
+    const std::vector<hsize_t>& getDimensions() const;
 
   private:
     friend DataSetCreateProps;

@@ -211,8 +211,6 @@ class CompoundType: public DataType {
         size_t offset;
     };
 
-    CompoundType(const CompoundType& other) = default;
-
     ///
     /// \brief Initializes a compound type from a vector of member definitions
     /// \param t_members

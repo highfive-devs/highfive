@@ -296,7 +296,7 @@ inline Chunking::Chunking(DataSetCreateProps& plist, size_t max_dims)
     }
 }
 
-inline const std::vector<hsize_t>& Chunking::getDimensions() const noexcept {
+inline const std::vector<hsize_t>& Chunking::getDimensions() const {
     return _dims;
 }
 
