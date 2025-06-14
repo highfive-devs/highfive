@@ -410,7 +410,7 @@ struct inspector<std::array<T, N>> {
         }
         std::vector<size_t> next_dims(dims.begin() + 1, dims.end());
         size_t next_size = compute_total_size(next_dims);
-        for (size_t i = 0; i < dims[0]; ++i) {
+        for (size_t i = 0; i < val.size(); ++i) {
             inspector<value_type>::unserialize(vec_align + i * next_size, next_dims, val[i]);
         }
     }
@@ -484,7 +484,7 @@ struct inspector<T[N]> {
         }
 
         std::vector<size_t> next_dims(dims.begin() + 1, dims.end());
-        for (size_t i = 0; i < dims[0]; ++i) {
+        for (size_t i = 0; i < N; ++i) {
             inspector<value_type>::prepare(val[i], next_dims);
         }
     }
