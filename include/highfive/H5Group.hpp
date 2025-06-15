@@ -56,7 +56,7 @@ class Group: public Object,
         return details::get_plist<GroupCreateProps>(*this, H5Gget_create_plist);
     }
 
-    Group(Object&& o) noexcept
+    explicit Group(Object&& o) noexcept
         : Object(std::move(o)) {};
 
   protected:
