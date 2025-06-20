@@ -262,3 +262,15 @@ an address. Meaning one can't take it's address or const-references of it
 ## Removal of `Object*Props`.
 To our knowledge these could not be used meaningfully. Please create an issue
 if you relied on these.
+
+## Removal of `ObjectInfo::getAddress()`.
+The functionality was moved to Object::getAddress. Typically, replace
+```
+// old
+dataset.getInfo().getAddress()
+
+// new
+dataset.getAddress()
+```
+Keep in mind that not all files (e.g. HSDS) have addresses. Instead they seem
+to have VOL tokens. This is likely best avoided in generic code.

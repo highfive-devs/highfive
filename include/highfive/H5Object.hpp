@@ -10,11 +10,12 @@
 
 #include <ctime>
 
-#include <H5Ipublic.h>
-#include <H5Opublic.h>
-
 #include "bits/H5_definitions.hpp"
 #include "bits/H5Friends.hpp"
+
+#include "H5Exception.hpp"
+#include "bits/h5o_wrapper.hpp"
+#include "bits/h5i_wrapper.hpp"
 
 namespace HighFive {
 
@@ -54,6 +55,16 @@ class Object {
     /// \brief Retrieve several infos about the current object (address, dates, etc)
     ///
     ObjectInfo getInfo() const;
+
+    ///
+    /// \brief Address of an HDF5 object in the file.
+    ///
+    /// Not all HDF5 files support addresses anymore. The more recent concept
+    /// is a VOL token.
+    ///
+    /// \since 3.0.0
+    ///
+    haddr_t getAddress() const;
 
     ///
     /// \brief Gets the fundamental type of the object (dataset, group, etc)
@@ -106,10 +117,7 @@ class Object {
 ///
 class ObjectInfo {
   public:
-    /// \brief Retrieve the address of the object (within its file)
-    /// \deprecated Deprecated since HighFive 2.2. Soon supporting VOL tokens
-    H5_DEPRECATED("Deprecated since HighFive 2.2. Soon supporting VOL tokens")
-    haddr_t getAddress() const noexcept;
+    ObjectInfo(const Object& obj);
 
     /// \brief Retrieve the number of references to this object
     size_t getRefCount() const noexcept;
@@ -121,12 +129,7 @@ class ObjectInfo {
     time_t getModificationTime() const noexcept;
 
   private:
-#if (H5Oget_info_vers < 3)
-    H5O_info_t raw_info;
-#else
-    // Use compat H5O_info1_t while getAddress() is supported (deprecated)
-    H5O_info1_t raw_info;
-#endif
+    detail::h5o_info1_t raw_info;
 
     friend class Object;
 };
