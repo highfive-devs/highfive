@@ -1,4 +1,28 @@
 # Changes
+## Version 3.0.0-beta3 - 2025-06-20
+### New Features
+    - Allow Attributes on Groups via Easy. (#8)
+    - cmake: export into build directory (#27) Thanks @dglaeser.
+    - xtensor: Make HighFive compatible with 0.26. (#36)
+
+### Bug Fix
+    - Catch using `.back()` on empty vector. (#11)
+    - Fix error condition h5p_get_file_space_strategy. (#45)
+
+### Improvements
+    - Numerous improvements to the CI code.
+    - Shorter README.md (#20)
+    - Numerous code quality improvements. (#46, #50, #51, #54, #55)
+    - Eliminate zero-division warning. (#44)
+    - Avoid protected member variables. (#53)
+    - Silence overflow warning. (#56)
+    - Cleaner use of noexcept. (#57)
+    - Cleaner use of explicit ctors. (#58)
+
+### Removed
+    - Removed the C++20 concept for property lists. (#60)
+    - Removed ObjectInfo::getAddress. (#61)
+
 ## Version 3.0.0-beta2 - 2024-12-04
 ### New Features
     - Support `boost::span`. (#1025)
