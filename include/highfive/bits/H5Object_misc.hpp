@@ -13,6 +13,7 @@
 #include "../H5Exception.hpp"
 #include "../H5Utility.hpp"
 #include "h5i_wrapper.hpp"
+#include "h5o_wrapper.hpp"
 
 namespace HighFive {
 
