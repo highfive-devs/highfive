@@ -10,11 +10,12 @@
 
 #include <ctime>
 
-#include <H5Ipublic.h>
-#include <H5Opublic.h>
-
 #include "bits/H5_definitions.hpp"
 #include "bits/H5Friends.hpp"
+
+#include "H5Exception.hpp"
+#include "bits/h5o_wrapper.hpp"
+#include "bits/h5i_wrapper.hpp"
 
 namespace HighFive {
 
@@ -133,12 +134,7 @@ class ObjectInfo {
     time_t getModificationTime() const noexcept;
 
   private:
-#if (H5Oget_info_vers < 3)
-    H5O_info_t raw_info;
-#else
-    // Use compat H5O_info1_t while getAddress() is supported (deprecated)
-    H5O_info1_t raw_info;
-#endif
+    detail::h5o_info1_t raw_info;
 
     friend class Object;
 };
