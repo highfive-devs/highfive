@@ -19,7 +19,7 @@ namespace HighFive {
 inline Object::Object()
     : _hid(H5I_INVALID_HID) {}
 
-inline Object::Object(hid_t hid)
+inline Object::Object(hid_t hid) noexcept
     : _hid(hid) {}
 
 inline Object::Object(const Object& other)
@@ -32,6 +32,17 @@ inline Object::Object(const Object& other)
 inline Object::Object(Object&& other) noexcept
     : _hid(other._hid) {
     other._hid = H5I_INVALID_HID;
+}
+
+inline Object& Object::operator=(Object&& other) {
+    if (this != &other) {
+        if ((*this).isValid()) {
+            detail::h5i_dec_ref(_hid);
+        }
+        _hid = other._hid;
+        other._hid = H5I_INVALID_HID;
+    }
+    return *this;
 }
 
 inline Object& Object::operator=(const Object& other) {

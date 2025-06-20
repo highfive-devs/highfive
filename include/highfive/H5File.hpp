@@ -79,11 +79,22 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
          const FileCreateProps& fileCreateProps,
          const FileAccessProps& fileAccessProps = FileAccessProps::Default());
 
+    /// \brief Keeps reference count constant, and invalidates other.
+    File(File&& other) noexcept = default;
+
+    /// \brief Keeps reference count constant, and invalidates other.
+    File& operator=(File&& other) = default;
+
+    /// \brief Increments reference count, keeps other valid.
+    File(const File& other) = default;
+
+    /// \brief Increments reference count, keeps other valid.
+    File& operator=(const File& other) = default;
+
     ///
     /// \brief Return the name of the file
     ///
     const std::string& getName() const;
-
 
     /// \brief Object path of a File is always "/"
     std::string getPath() const noexcept {
