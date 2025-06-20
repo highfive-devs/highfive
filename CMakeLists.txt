@@ -71,9 +71,6 @@ option(HIGHFIVE_TEST_OPENCV "Enable testing OpenCV" OFF)
 option(HIGHFIVE_TEST_XTENSOR "Enable testing xtensor" OFF)
 option(HIGHFIVE_TEST_HALF_FLOAT "Enable testing half-precision floats" OFF)
 
-# TODO remove entirely.
-option(HIGHFIVE_HAS_CONCEPTS "Print readable compiler errors w/ C++20 concepts" OFF)
-
 set(HIGHFIVE_MAX_ERRORS 0 CACHE STRING "Maximum number of compiler errors.")
 option(HIGHFIVE_HAS_WERROR "Convert warnings to errors." OFF)
 option(HIGHFIVE_GLIBCXX_ASSERTIONS "Enable bounds check for STL." OFF)
