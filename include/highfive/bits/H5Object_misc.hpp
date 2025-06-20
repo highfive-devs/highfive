@@ -114,10 +114,6 @@ inline ObjectInfo::ObjectInfo(const Object& obj) {
     detail::h5o_get_info1(obj.getId(), &raw_info);
 }
 
-inline haddr_t ObjectInfo::getAddress() const noexcept {
-    return raw_info.addr;
-}
-
 inline size_t ObjectInfo::getRefCount() const noexcept {
     return raw_info.rc;
 }

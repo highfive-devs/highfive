@@ -871,8 +871,7 @@ TEST_CASE("DataTypeEqualTakeBack") {
     CHECK(s == dataset.getDataType());
     CHECK(d != dataset.getDataType());
 
-    // Test getAddress and expect deprecation warning
-    auto addr = dataset.getInfo().getAddress();
+    auto addr = dataset.getAddress();
     CHECK(addr != 0);
 }
 
