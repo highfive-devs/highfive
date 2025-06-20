@@ -101,20 +101,17 @@ inline ObjectType Object::getType() const {
 }
 
 inline ObjectInfo Object::getInfo() const {
-    ObjectInfo info;
-#if (H5Oget_info_vers < 3)
-    if (H5Oget_info(_hid, &info.raw_info) < 0) {
-#else
-    if (H5Oget_info1(_hid, &info.raw_info) < 0) {
-#endif
-        HDF5ErrMapper::ToException<ObjectException>("Unable to obtain info for object");
-    }
-    return info;
+    return ObjectInfo(*this);
+}
+
+inline ObjectInfo::ObjectInfo(const Object& obj) {
+    detail::h5o_get_info1(obj.getId(), &raw_info);
 }
 
 inline haddr_t ObjectInfo::getAddress() const noexcept {
     return raw_info.addr;
 }
+
 inline size_t ObjectInfo::getRefCount() const noexcept {
     return raw_info.rc;
 }

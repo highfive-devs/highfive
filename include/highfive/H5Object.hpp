@@ -106,6 +106,8 @@ class Object {
 ///
 class ObjectInfo {
   public:
+    ObjectInfo(const Object& obj);
+
     /// \brief Retrieve the address of the object (within its file)
     /// \deprecated Deprecated since HighFive 2.2. Soon supporting VOL tokens
     H5_DEPRECATED("Deprecated since HighFive 2.2. Soon supporting VOL tokens")
