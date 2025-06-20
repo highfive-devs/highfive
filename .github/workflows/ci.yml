@@ -46,11 +46,11 @@ jobs:
               os: ubuntu-24.04
               pkgs: ''
           - config:
-              os: ubuntu-24.04
+              os: ubuntu-22.04
               pkgs: 'libboost-all-dev libopencv-dev'
               flags: '-DHIGHFIVE_TEST_BOOST:Bool=ON -DHIGHFIVE_TEST_OPENCV:Bool=ON -GNinja'
           - config:
-              os: ubuntu-latest
+              os: ubuntu-24.04
               pkgs: 'libboost-all-dev libeigen3-dev libopencv-dev'
               flags: '-DHIGHFIVE_TEST_BOOST:Bool=ON -DHIGHFIVE_TEST_EIGEN:Bool=ON -DHIGHFIVE_TEST_OPENCV:Bool=ON -GNinja'
           - config:
@@ -58,11 +58,8 @@ jobs:
               pkgs: 'libboost-all-dev'
               flags: '-DCMAKE_CXX_STANDARD=17 -DHIGHFIVE_TEST_BOOST:Bool=ON'
           - config:
-              os: ubuntu-22.04
-              flags: '-DHIGHFIVE_TEST_BOOST=Off -DCMAKE_CXX_STANDARD=20 -DHIGHFIVE_HAS_CONCEPTS=On'
-          - config:
               os: ubuntu-24.04
-              flags: '-DHIGHFIVE_TEST_BOOST=Off -DCMAKE_CXX_STANDARD=20 -DHIGHFIVE_HAS_CONCEPTS=On'
+              flags: '-DHIGHFIVE_TEST_BOOST=Off -DCMAKE_CXX_STANDARD=20'
 
     steps:
     - uses: actions/checkout@v4

@@ -64,7 +64,7 @@ inline void PropertyList<T>::_initializeIfNeeded() {
 }
 
 template <PropertyType T>
-template <PropertyInterface P>
+template <typename P>
 inline void PropertyList<T>::add(const P& property) {
     _initializeIfNeeded();
     property.apply(_hid);
