@@ -56,6 +56,16 @@ class Object {
     ObjectInfo getInfo() const;
 
     ///
+    /// \brief Address of an HDF5 object in the file.
+    ///
+    /// Not all HDF5 files support addresses anymore. The more recent concept
+    /// is a VOL token.
+    ///
+    /// \since 3.0.0
+    ///
+    haddr_t getAddress() const;
+
+    ///
     /// \brief Gets the fundamental type of the object (dataset, group, etc)
     /// \exception ObjectException when the _hid is negative or the type
     ///     is custom and not registered yet

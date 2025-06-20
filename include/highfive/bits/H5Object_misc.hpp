@@ -104,6 +104,12 @@ inline ObjectInfo Object::getInfo() const {
     return ObjectInfo(*this);
 }
 
+inline haddr_t Object::getAddress() const {
+    detail::h5o_info1_t raw_info;
+    detail::h5o_get_info1(_hid, &raw_info);
+    return raw_info.addr;
+}
+
 inline ObjectInfo::ObjectInfo(const Object& obj) {
     detail::h5o_get_info1(obj.getId(), &raw_info);
 }
