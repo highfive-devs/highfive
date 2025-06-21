@@ -7,6 +7,7 @@ Chris Byrohl
 Chris De Grendele
 @contre
 Daniel Nachbaur
+Dennis Gläser
 Dmitri Bichko
 @eudoxos
 Fernando L. Pereira
