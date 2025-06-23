@@ -99,15 +99,17 @@ void selectionArraySimpleTest() {
     }
 }
 
-TEST_CASE("selectionArraySimpleString") {
+TEST_CASE("selectionArraySimpleString", RESTVOL_UNSUPPORTED("")) {
     selectionArraySimpleTest<std::string>();
 }
 
-TEMPLATE_LIST_TEST_CASE("selectionArraySimple", "[template]", dataset_test_types) {
+TEMPLATE_LIST_TEST_CASE("selectionArraySimple",
+                        RESTVOL_UNSUPPORTED("[template]"),
+                        dataset_test_types) {
     selectionArraySimpleTest<TestType>();
 }
 
-TEST_CASE("selectionByElementMultiDim") {
+TEST_CASE("selectionByElementMultiDim", RESTVOL_UNSUPPORTED("")) {
     const std::string file_name("h5_test_selection_multi_dim.h5");
     // Create a 2-dim dataset
     File file(file_name, File::ReadWrite | File::Create | File::Truncate);
@@ -201,19 +203,19 @@ void check_column_selection() {
     check_column_selection_values(result, values, dims, columns);
 }
 
-TEST_CASE("columnSelectionVectorDouble", "[selection]") {
+TEST_CASE("columnSelectionVectorDouble", RESTVOL_UNSUPPORTED("[selection]")) {
     check_column_selection<std::vector<double>>();
 }
 
-TEST_CASE("columnSelectionVector2DDouble", "[selection]") {
+TEST_CASE("columnSelectionVector2DDouble", RESTVOL_UNSUPPORTED("[selection]")) {
     check_column_selection<std::vector<std::vector<double>>>();
 }
 
-TEST_CASE("columnSelectionVector3DDouble", "[selection]") {
+TEST_CASE("columnSelectionVector3DDouble", RESTVOL_UNSUPPORTED("[selection]")) {
     check_column_selection<std::vector<std::vector<std::vector<double>>>>();
 }
 
-TEST_CASE("scalarColumnSelection", "[selection]") {
+TEST_CASE("scalarColumnSelection", RESTVOL_UNSUPPORTED("[selection]")) {
     const std::string dataset_name = "dset";
     std::string filename = "h5_rw_select_scalar_column_test_test.h5";
 
@@ -399,7 +401,9 @@ void regularHyperSlabSelectionTest() {
     }
 }
 
-TEMPLATE_LIST_TEST_CASE("hyperSlabSelection", "[template]", numerical_test_types) {
+TEMPLATE_LIST_TEST_CASE("hyperSlabSelection",
+                        RESTVOL_UNSUPPORTED("[template]"),
+                        numerical_test_types) {
     regularHyperSlabSelectionTest<TestType>();
 }
 
@@ -514,7 +518,9 @@ void irregularHyperSlabSelectionReadTest() {
     }
 }
 
-TEMPLATE_LIST_TEST_CASE("irregularHyperSlabSelectionRead", "[template]", numerical_test_types) {
+TEMPLATE_LIST_TEST_CASE("irregularHyperSlabSelectionRead",
+                        RESTVOL_UNSUPPORTED("[template]"),
+                        numerical_test_types) {
     irregularHyperSlabSelectionReadTest<TestType>();
 }
 
@@ -566,7 +572,9 @@ void irregularHyperSlabSelectionWriteTest() {
     }
 }
 
-TEMPLATE_LIST_TEST_CASE("irregularHyperSlabSelectionWrite", "[template]", std::tuple<int>) {
+TEMPLATE_LIST_TEST_CASE("irregularHyperSlabSelectionWrite",
+                        RESTVOL_UNSUPPORTED("[template]"),
+                        std::tuple<int>) {
     irregularHyperSlabSelectionWriteTest<TestType>();
 }
 
@@ -581,7 +589,7 @@ void check_selected(const std::vector<int>& selected,
     }
 }
 
-TEST_CASE("select_multiple_ors", "[hyperslab]") {
+TEST_CASE("select_multiple_ors", RESTVOL_UNSUPPORTED("[hyperslab]")) {
     size_t n = 100, m = 20;
     size_t nsel = 30;
     auto x = testing::DataGenerator<std::vector<std::vector<int>>>::create({n, m});
@@ -627,7 +635,7 @@ TEST_CASE("select_multiple_ors", "[hyperslab]") {
     }
 }
 
-TEST_CASE("select_multiple_ors_edge_cases", "[hyperslab]") {
+TEST_CASE("select_multiple_ors_edge_cases", RESTVOL_UNSUPPORTED("[hyperslab]")) {
     size_t n = 100, m = 20;
 
     auto x = testing::DataGenerator<std::vector<std::vector<int>>>::create({n, m});

@@ -32,6 +32,26 @@
 
 namespace HighFive {
 
+#if defined(HIGHFIVE_USE_RESTVOL)
+template <typename Derivate>
+void create_parent_group(NodeTraits<Derivate>* node,
+                         const std::string& path,
+                         const DataSetAccessProps& accessProps) {
+    auto pos = path.rfind('/');
+    if (pos != std::string::npos && pos != 0) {
+        const std::string subpath = path.substr(0, pos);
+        create_parent_group(node, subpath, accessProps);
+        htri_t err = detail::h5l_exists(static_cast<Derivate*>(node)->getId(),
+                                        subpath.c_str(),
+                                        accessProps.getId());
+        if (err < 0) {
+            throw DataSetException("");
+        } else if (err == 0) {
+            node->createGroup(subpath);
+        }
+    }
+}
+#endif
 
 template <typename Derivate>
 inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
@@ -40,6 +60,11 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
                                                    const DataSetCreateProps& createProps,
                                                    const DataSetAccessProps& accessProps,
                                                    bool parents) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    if (parents) {
+        create_parent_group(this, dataset_name, accessProps);
+    }
+#endif
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
     return DataSet(detail::h5d_create2(static_cast<Derivate*>(this)->getId(),
@@ -69,15 +94,40 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
                                                    const DataSetCreateProps& createProps,
                                                    const DataSetAccessProps& accessProps,
                                                    bool parents) {
-    DataSet ds =
-        createDataSet(dataset_name,
-                      DataSpace::From(data),
-                      create_and_check_datatype<typename details::inspector<T>::base_type>(),
-                      createProps,
-                      accessProps,
-                      parents);
-    ds.write(data);
-    return ds;
+    auto dataspace = DataSpace::From(data);
+#if defined(HIGHFIVE_USE_RESTVOL)
+    if constexpr (std::is_same_v<T, std::string>) {
+        auto datatype = FixedLengthStringType(data.size() + 1, StringPadding::NullTerminated);
+        DataSet ds =
+            createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
+        ds.write(data);
+        return ds;
+    } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type, std::string>) {
+        auto string_length = std::max_element(data.begin(),
+                                              data.end(),
+                                              [](const std::string& a, const std::string& b) {
+                                                  return a.size() < b.size();
+                                              })
+                                 ->size();
+        auto datatype = FixedLengthStringType(string_length + 1, StringPadding::NullPadded);
+        DataSet ds =
+            createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
+        ds.write(data);
+        return ds;
+    } else {
+#endif
+        DataSet ds =
+            createDataSet(dataset_name,
+                          dataspace,
+                          create_and_check_datatype<typename details::inspector<T>::base_type>(),
+                          createProps,
+                          accessProps,
+                          parents);
+        ds.write(data);
+        return ds;
+#if defined(HIGHFIVE_USE_RESTVOL)
+    }
+#endif
 }
 
 template <typename Derivate>

@@ -216,6 +216,9 @@ inline ProductSet::ProductSet(const Slices&... slices) {
 template <typename Derivate>
 inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyperslab,
                                                const DataSpace& memspace) const {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    throw SliceException("Hyperslabs not supported with REST VOL.");
+#endif
     // Note: The current limitation are that memspace must describe a
     //       packed memspace.
     //
@@ -230,6 +233,9 @@ inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyperslab,
 
 template <typename Derivate>
 inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab) const {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    throw SliceException("Hyperslabs not supported with REST VOL.");
+#endif
     const auto& slice = static_cast<const Derivate&>(*this);
     auto filespace = slice.getSpace();
     filespace = hyper_slab.apply(filespace);
@@ -367,6 +373,12 @@ inline void SliceTraits<Derivate>::read(T& array, const DataTransferProps& xfer_
                                         r.getPointer());
 #endif
     }
+    // #if defined(HIGHFIVE_USE_RESTVOL)
+    //     if constexpr (std::is_same_v<T, std::string>) {
+    //         while (!array.empty() && array.back() == '\0')
+    //             array.pop_back();
+    //     }
+    // #endif
 }
 
 
@@ -379,11 +391,19 @@ inline void SliceTraits<Derivate>::read_raw(T* array,
                   "read() requires a non-const structure to read data into");
 
     const auto& slice = static_cast<const Derivate&>(*this);
-
+#if defined(HIGHFIVE_USE_RESTVOL)
+    const DataSpace& mem_space = slice.getMemSpace();
+    auto dims = mem_space.getDimensions();
+    const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
+#endif
     detail::h5d_read(details::get_dataset(slice).getId(),
                      mem_datatype.getId(),
                      details::get_memspace_id(slice),
+#if defined(HIGHFIVE_USE_RESTVOL)
+                     is_scalar ? H5S_ALL : slice.getSpace().getId(),
+#else
                      slice.getSpace().getId(),
+#endif
                      xfer_props.getId(),
                      static_cast<void*>(array));
 }
@@ -431,11 +451,19 @@ inline void SliceTraits<Derivate>::write_raw(const T* buffer,
                                              const DataType& mem_datatype,
                                              const DataTransferProps& xfer_props) {
     const auto& slice = static_cast<const Derivate&>(*this);
-
+#if defined(HIGHFIVE_USE_RESTVOL)
+    const DataSpace& mem_space = slice.getMemSpace();
+    auto dims = mem_space.getDimensions();
+    const bool is_scalar = dims.empty() || (dims.size() == 1 && dims[0] == 1);
+#endif
     detail::h5d_write(details::get_dataset(slice).getId(),
                       mem_datatype.getId(),
                       details::get_memspace_id(slice),
+#if defined(HIGHFIVE_USE_RESTVOL)
+                      is_scalar ? H5S_ALL : slice.getSpace().getId(),
+#else
                       slice.getSpace().getId(),
+#endif
                       xfer_props.getId(),
                       static_cast<const void*>(buffer));
 }

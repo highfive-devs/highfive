@@ -214,6 +214,12 @@ HighFive integrates with the following libraries:
 - xtensor (optional)
 - half (optional)
 
+#### XTensor Header Location
+XTensor reorganized their headers in version 0.26. HighFive attempts to guess
+where the headers can be found. The guessing can be overridded by setting
+`HIGHFIVE_XTENSOR_HEADER_VERSION` to: `1` for finding `xtensor.hpp` in
+`<xtensor/xtensor.hpp>` and `2` for `<xtensor/containers/xtensor.hpp>`.
+
 ## Versioning & Code Stability
 We use semantic versioning. Currently, we're preparing `v3` which contains a
 limited set of breaking changes required to eliminate undesireable behaviour or

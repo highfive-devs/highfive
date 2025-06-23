@@ -15,18 +15,20 @@ RUN apt-get update && \
     libncursesw5-dev xz-utils tk-dev libxml2-dev \
     libxmlsec1-dev libffi-dev liblzma-dev ca-certificates \
     # tools
+    gdb libeigen3-dev openssh-client\
     telnet \
     && rm -rf /var/lib/apt/lists/*
 
-# # Build REST VOL
-# # https://github.com/HDFGroup/vol-rest
+# Build REST VOL
+# https://github.com/HDFGroup/vol-rest
 WORKDIR /HDFGroup
 RUN git clone https://github.com/HDFGroup/vol-rest
 WORKDIR /HDFGroup/vol-rest
 RUN git checkout ${REST_VOL_COMMIT}
 RUN mkdir build && cd build && \
-    cmake -DHDF5_VOL_REST_ENABLE_CURL_DEBUG=ON -DHDF5_VOL_REST_ENABLE_DEBUG=ON -DCMAKE_INSTALL_PREFIX=/usr/local/vol-rest -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DHDF5_VOL_REST_ENABLE_EXAMPLES=OFF .. && \
+    cmake -G Ninja -DHDF5_VOL_REST_ENABLE_CURL_DEBUG=ON -DHDF5_VOL_REST_ENABLE_DEBUG=ON -DCMAKE_INSTALL_PREFIX=/usr/local/vol-rest -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DHDF5_VOL_REST_ENABLE_EXAMPLES=OFF .. && \
     cmake --build . && cmake --install .
+RUN ln -s /usr/local/vol-rest/lib/libhdf5_vol_rest.so  /usr/local/vol-rest/lib/librest_vol.so
 
 USER kothar
 # We need pyenv to use older version of python for HSDS
@@ -37,6 +39,7 @@ RUN pyenv install 3.9.21 && pyenv global 3.9.21
 RUN pip install hsds h5py h5pyd --break-system-packages
 
 # Setup env variables for HSDS / REST VOL
+ENV HDF5_VOL_CONNECTOR_DEBUG=1
 ENV HDF5_PLUGIN_PATH=/usr/local/vol-rest/lib
 ENV HDF5_VOL_CONNECTOR=REST
 ENV HSDS_USERNAME=admin
@@ -47,7 +50,6 @@ ENV HSDS_ENDPOINT=http://localhost:5101
 ENV HS_USERNAME=admin
 ENV HS_PASSWORD=admin
 ENV HS_ENDPOINT=http://localhost:5101
-
 
 # Create `~/launch-hsds.sh script file
 RUN mkdir -p /home/kothar/.bin && cat <<'EOF' > /home/kothar/.bin/start-hsds

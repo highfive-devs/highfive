@@ -2,10 +2,19 @@
 
 #include "bits/H5Inspector_decl.hpp"
 #include "H5Exception.hpp"
+#include "bits/xtensor_header_version.hpp"
 
+#if HIGHFIVE_XTENSOR_HEADER_VERSION == 1
 #include <xtensor/xtensor.hpp>
 #include <xtensor/xarray.hpp>
 #include <xtensor/xadapt.hpp>
+#elif HIGHFIVE_XTENSOR_HEADER_VERSION == 2
+#include <xtensor/containers/xtensor.hpp>
+#include <xtensor/containers/xarray.hpp>
+#include <xtensor/containers/xadapt.hpp>
+#else
+#error "Set HIGHFIVE_XTENSOR_HEADER_VERSION to `1` for pre 0.26; `2` otherwise."
+#endif
 
 namespace HighFive {
 namespace details {

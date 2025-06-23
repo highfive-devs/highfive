@@ -61,6 +61,9 @@ inline void h5t_set_strpad(hid_t hid, H5T_str_t strpad) {
 }
 
 inline int h5t_get_nmembers(hid_t hid) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    throw DataTypeException("H5Tget_nmembers is not supported with REST VOL.");
+#endif
     auto result = H5Tget_nmembers(hid);
 
     if (result < 0) {

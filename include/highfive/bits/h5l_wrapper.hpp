@@ -55,15 +55,6 @@ inline herr_t h5l_get_info(hid_t loc_id, const char* name, H5L_info_t* linfo, hi
     return err;
 }
 
-inline herr_t h5l_delete(hid_t loc_id, const char* name, hid_t lapl_id) {
-    herr_t err = H5Ldelete(loc_id, name, lapl_id);
-    if (err < 0) {
-        HDF5ErrMapper::ToException<GroupException>(std::string("Invalid name for unlink() "));
-    }
-
-    return err;
-}
-
 inline htri_t h5l_exists(hid_t loc_id, const char* name, hid_t lapl_id) {
     htri_t tri = H5Lexists(loc_id, name, lapl_id);
     if (tri < 0) {
@@ -71,6 +62,20 @@ inline htri_t h5l_exists(hid_t loc_id, const char* name, hid_t lapl_id) {
     }
 
     return tri;
+}
+
+inline herr_t h5l_delete(hid_t loc_id, const char* name, hid_t lapl_id) {
+#if defined(HIGHFIVE_USE_RESTVOL)
+    htri_t exists = h5l_exists(loc_id, name, lapl_id);
+    if (exists != 1) {
+        HDF5ErrMapper::ToException<GroupException>(std::string("Invalid name for unlink() "));
+    }
+#endif
+    herr_t err = H5Ldelete(loc_id, name, lapl_id);
+    if (err < 0) {
+        HDF5ErrMapper::ToException<GroupException>(std::string("Invalid name for unlink() "));
+    }
+    return err;
 }
 
 namespace nothrow {

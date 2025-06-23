@@ -6,7 +6,7 @@
 #include <catch2/matchers/catch_matchers_vector.hpp>
 
 #include <highfive/highfive.hpp>
-
+#include "tests_high_five.hpp"
 using namespace HighFive;
 
 TEST_CASE("HighFiveReadWriteConsts") {
@@ -15,7 +15,7 @@ TEST_CASE("HighFiveReadWriteConsts") {
     // as a `double***`. And then uses `inspector` based code to write from the
     // `double***`.
 
-    const std::string file_name("3d_dataset_from_flat.h5");
+    const std::string file_name(to_abs_if_rest_vol("3d_dataset_from_flat.h5"));
     const std::string dataset_name("dset");
     const std::array<std::size_t, 3> DIMS{3, 3, 3};
     using datatype = int;
@@ -45,7 +45,7 @@ TEST_CASE("Array of char pointers") {
     // something doesn't work in HighFive. Knowing it doesn't work is useful
     // for developers, but could change in the future.
 
-    const std::string file_name = "vector_char_pointer.h5";
+    const std::string file_name = to_abs_if_rest_vol("vector_char_pointer.h5");
 
     File file(file_name, File::Truncate);
 
@@ -68,7 +68,11 @@ TEST_CASE("Array of char pointers") {
 
     SECTION("variable length") {
         auto datatype = VariableLengthStringType();
+#if defined(HIGHFIVE_USE_RESTVOL)
+        REQUIRE_THROWS(file.createDataSet("dset", filespace, datatype));
+#else
         auto dset = file.createDataSet("dset", filespace, datatype);
         REQUIRE_THROWS(dset.write(strings));
+#endif
     }
 }

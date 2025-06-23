@@ -14,6 +14,7 @@
 #include <catch2/catch_template_test_macros.hpp>
 
 #include "data_generator.hpp"
+#include "tests_high_five.hpp"
 
 namespace HighFive {
 namespace testing {
@@ -73,7 +74,9 @@ void compare_arrays(const Actual& actual,
                     const Expected& expected,
                     const std::vector<size_t>& dims) {
     using base_type = typename testing::ContainerTraits<Actual>::base_type;
-    compare_arrays(expected, actual, dims, [](base_type a, base_type b) { return a == b; });
+    compare_arrays(expected, actual, dims, [](base_type a, base_type b) {
+        return trim_if_rest_vol(a) == trim_if_rest_vol(b);
+    });
 }
 
 }  // namespace testing

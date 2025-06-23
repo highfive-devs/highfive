@@ -23,7 +23,8 @@
 using namespace HighFive;
 
 TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
-    const std::string file_name("rw_dataset_" + typeNameHelper<TestType>() + ".h5");
+    const std::string file_name(to_abs_if_rest_vol("rw_dataset_") + typeNameHelper<TestType>() +
+                                ".h5");
     const std::string dataset_name("dset");
     TestType t1{};
 
@@ -31,6 +32,9 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
         // Create a new file using the default property lists.
         File file(file_name, File::ReadWrite | File::Create | File::Truncate);
 
+#if defined(HIGHFIVE_USE_RESTVOL)
+        DataSet dataset = file.createDataSet(dataset_name, t1);
+#else
         // Create the dataset
         DataSet dataset =
             file.createDataSet(dataset_name,
@@ -39,6 +43,7 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
 
         // Write into the initial part of the dataset
         dataset.write(t1);
+#endif
     }
 
     // read it back
@@ -48,13 +53,17 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
         TestType value;
         DataSet dataset = file.getDataSet("/" + dataset_name);
         dataset.read(value);
-        CHECK(t1 == value);
+        CHECK(t1 == trim_if_rest_vol(value));
     }
 }
 
 #if HIGHFIVE_CXX_STD >= 17
-TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>", "[Types]", std::vector, std::byte) {
-    const std::string file_name("rw_dataset_vector_" + typeNameHelper<TestType>() + ".h5");
+TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>",
+                           RESTVOL_DISABLED("[Types]"),
+                           std::vector,
+                           std::byte) {
+    const std::string file_name(to_abs_if_rest_vol("rw_dataset_vector_") +
+                                typeNameHelper<TestType>() + ".h5");
     const std::string dataset_name("dset");
     TestType t1(5, std::byte(0xCD));
 
@@ -115,13 +124,17 @@ void check_read_regular(const std::string& file_name, const std::vector<size_t>&
     auto raw_expected = traits::create(dims);
     auto expected = testing::copy<reference_type>(raw_expected, dims);
 
+#if defined(HIGHFIVE_USE_RESTVOL)
+    auto attr = file.createAttribute("attr", expected);
+    auto dset = file.createDataSet("dset", expected);
+#else
     auto dataspace = DataSpace(dims);
     auto attr = testing::AttributeCreateTraits::create<base_type>(file, "dset", dataspace);
     attr.write(expected);
 
     auto dset = testing::DataSetCreateTraits::create<base_type>(file, "attr", dataspace);
     dset.write(expected);
-
+#endif
 
     SECTION("dset.read<Container>()") {
         check_read_auto<Container>(expected, dims, dset);
@@ -145,7 +158,8 @@ void check_read_regular(const std::string& file_name, const std::vector<size_t>&
 
 template <class Container>
 void check_read_regular() {
-    const std::string file_name("rw_read_regular" + typeNameHelper<Container>() + ".h5");
+    const std::string file_name(to_abs_if_rest_vol("rw_read_regular") +
+                                typeNameHelper<Container>() + ".h5");
     auto dims = testing::DataGenerator<Container>::default_dims();
 
     check_read_regular<Container>(file_name, dims);
@@ -169,7 +183,7 @@ void check_writing(const std::vector<size_t>& dims, Write write) {
     auto actual = testing::DataGenerator<reference_type>::allocate(dims);
     obj.read(actual);
 
-    testing::compare_arrays(actual, expected, dims);
+    testing::compare_arrays(trim_if_rest_vol(actual), expected, dims);
 
     testing::ContainerTraits<reference_type>::deallocate(actual, dims);
     testing::ContainerTraits<Container>::deallocate(values, dims);
@@ -225,6 +239,11 @@ void check_write_regular(const std::string& file_name, const std::vector<size_t>
         check_write_auto<testing::DataSetCreateTraits, Container>(file, "dset", dims);
     }
 
+    SECTION("createAttribute(name, container)") {
+        check_write_auto<testing::AttributeCreateTraits, Container>(file, "attr", dims);
+    }
+
+#if !defined(HIGHFIVE_USE_RESTVOL)
     SECTION("createDataSet(name, container)") {
         check_write_deduce_type<testing::DataSetCreateTraits, Container>(file, "dset", dims);
     }
@@ -234,21 +253,19 @@ void check_write_regular(const std::string& file_name, const std::vector<size_t>
     }
 
     SECTION("createAttribute(name, container)") {
-        check_write_auto<testing::AttributeCreateTraits, Container>(file, "attr", dims);
-    }
-
-    SECTION("createAttribute(name, container)") {
         check_write_deduce_type<testing::AttributeCreateTraits, Container>(file, "attr", dims);
     }
 
     SECTION("createAttribute(name, container)") {
         check_write_manual<testing::AttributeCreateTraits, Container>(file, "attr", dims);
     }
+#endif
 }
 
 template <class Container>
 void check_write_regular() {
-    std::string file_name("rw_write_regular" + typeNameHelper<Container>() + ".h5");
+    std::string file_name(to_abs_if_rest_vol("rw_write_regular") + typeNameHelper<Container>() +
+                          ".h5");
     auto dims = testing::DataGenerator<Container>::default_dims();
     check_write_regular<Container>(file_name, dims);
 }
