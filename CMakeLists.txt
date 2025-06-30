@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 cmake_policy(VERSION 3.13)
 
 project(HighFive VERSION 3.0.0)
-set(HIGHFIVE_VERSION_PRERELEASE 3)
 
 # Configure HighFive
 # ------------------
