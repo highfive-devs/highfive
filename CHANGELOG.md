@@ -1,4 +1,7 @@
 # Changes
+## Version 3.0.0-beta3 - 2025-06-30
+Same as 3.0.0-beta3.
+
 ## Version 3.0.0-beta3 - 2025-06-20
 ### New Features
     - Allow Attributes on Groups via Easy. (#8)
