@@ -59,37 +59,21 @@ Before releasing a new version perform the following:
 * Update `CMakeLists.txt` and `include/highfive/H5Version.hpp`.
 * Follow semantic versioning when deciding the next version number.
 * Check that
-  [HighFive-testing](https://github.com/BlueBrain/HighFive-testing/actions) ran
-  recently.
+  [HighFive-testing](https://github.com/BlueBrain/HighFive-testing/actions)
+  runs relevant integration tests. (Contains the BBP integration test but none
+  of them have caught up.)
 
-At this point there should be a commit on master which will be the release
-candidate. Don't tag it yet.
+At this point there should be a commit on master. Now create the release.
 
-Next step is to update the [HighFive/spack](https://github.com/BlueBrain/spack)
-recipe such that the proposed version points to the release candidate using the
-SHA of that commit. The recipe will look something like this:
+  Tag: v${VERSION}
+  Title: v${VERSION}
+  Body: copy-paste CHANGELOG.md
 
-```python
-    # ...
-
-    version("2.8.0", commit="094400f22145bcdcd2726ce72888d9d1c21e7068")
-    version("2.7.1", sha256="25b4c51a94d1e670dc93b9b73f51e79b65d8ff49bcd6e5d5582d5ecd2789a249")
-    version("2.7.0", sha256="8e05672ddf81a59ce014b1d065bd9a8c5034dbd91a5c2578e805ef880afa5907")
-    # ...
-```
-
-Push the changes to the BlueBrain spack repository. This will trigger building
-all BBP dependencies of HighFive, i.e. another integration test. Don't actually
-merge this commit yet.
-
-Now that we know that the integration test ran, and all BBP software can be
-built with the proposed version of HighFive, we can proceed and create the
-release. Once this is done perform a final round of updates:
+Next:
 
 * Download the archive (`*.tar.gz`) and compute its SHA256.
-* Update BlueBrain Spack recipe to use the archive and not the Git commit.
 * Update the upstream Spack recipe.
-* A Zenodo record should be generated automatically, check if it's sensible.
+* Create a Zendo entry, under highfive-devs/highfive (not BlueBrain/highfive).
 
 ## Writing Tests
 ### Generate Multi-Dimensional Test Data
