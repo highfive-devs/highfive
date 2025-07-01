@@ -36,7 +36,7 @@
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
     <tab type="examples" visible="yes" title="" intro=""/>  
-    <tab type="user" visible="yes" url='https://github.com/BlueBrain/HighFive' title="Github Page" intro=""/>
+    <tab type="user" visible="yes" url='https://github.com/highfive-devs/highfive' title="Github Page" intro=""/>
   </navindex>
 
   <!-- Layout definition for a class page -->
