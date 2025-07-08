@@ -696,6 +696,8 @@ class AttributePhaseChange {
     unsigned min_dense() const;
 
   private:
+    friend DataSetCreateProps;
+    friend FileCreateProps;
     friend GroupCreateProps;
     void apply(hid_t hid) const;
 
