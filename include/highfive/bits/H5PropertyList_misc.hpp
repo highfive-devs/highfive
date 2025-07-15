@@ -472,8 +472,21 @@ inline AttributePhaseChange::AttributePhaseChange(unsigned max_compact, unsigned
     : _max_compact(max_compact)
     , _min_dense(min_dense) {}
 
+template <class PList>
+void AttributePhaseChange::init(const PList& plist) {
+    detail::h5p_get_attr_phase_change(plist.getId(), &_max_compact, &_min_dense);
+}
+
+inline AttributePhaseChange::AttributePhaseChange(const FileCreateProps& fcpl) {
+    init(fcpl);
+}
+
 inline AttributePhaseChange::AttributePhaseChange(const GroupCreateProps& gcpl) {
-    detail::h5p_get_attr_phase_change(gcpl.getId(), &_max_compact, &_min_dense);
+    init(gcpl);
+}
+
+inline AttributePhaseChange::AttributePhaseChange(const DataSetCreateProps& dcpl) {
+    init(dcpl);
 }
 
 inline unsigned AttributePhaseChange::max_compact() const {

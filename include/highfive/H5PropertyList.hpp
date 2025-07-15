@@ -690,14 +690,25 @@ class AttributePhaseChange {
     AttributePhaseChange(unsigned max_compact, unsigned min_dense);
 
     /// \brief Extract threshold values from property list.
+    explicit AttributePhaseChange(const FileCreateProps& gcpl);
+
+    /// \brief Extract threshold values from property list.
     explicit AttributePhaseChange(const GroupCreateProps& gcpl);
+
+    /// \brief Extract threshold values from property list.
+    explicit AttributePhaseChange(const DataSetCreateProps& gcpl);
 
     unsigned max_compact() const;
     unsigned min_dense() const;
 
   private:
+    friend DataSetCreateProps;
+    friend FileCreateProps;
     friend GroupCreateProps;
     void apply(hid_t hid) const;
+
+    template <class PList>
+    void init(const PList& plist);
 
     unsigned _max_compact;
     unsigned _min_dense;
