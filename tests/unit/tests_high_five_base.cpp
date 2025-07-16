@@ -1566,6 +1566,9 @@ void readWriteShuffleDeflateTest() {
 
         dataset.write(array);
 
+#if H5_VERSION_GE(1, 10, 0)
+        dataset.flush();
+#endif
         file.flush();
     }
 
@@ -1629,6 +1632,9 @@ void readWriteSzipTest() {
 
         dataset.write(array);
 
+#if H5_VERSION_GE(1, 10, 0)
+        dataset.flush();
+#endif
         file.flush();
     }
 

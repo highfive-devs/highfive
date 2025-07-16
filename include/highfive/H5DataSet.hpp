@@ -70,6 +70,15 @@ class DataSet: public Object,
     /// \param dims New size of the dataset
     void resize(const std::vector<size_t>& dims);
 
+#if H5_VERSION_GE(1, 10, 0)
+    /// \brief flush
+    void flush();
+#endif
+
+#if H5_VERSION_GE(1, 10, 2)
+    /// \brief refresh
+    void refresh();
+#endif
 
     /// \brief Get the dimensions of the whole DataSet.
     ///       This is a shorthand for getSpace().getDimensions()
