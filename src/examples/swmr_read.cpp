@@ -41,9 +41,9 @@ int main(void) {
         dims = dataset.getDimensions();
         // if dimensions changed, it means new data was written to a file
         if (dims[0] != olddims[0]) {
-            std::vector<size_t> slice {dims[0] - olddims[0]};
+            std::vector<size_t> slice{dims[0] - olddims[0]};
             auto values = dataset.select(olddims, slice).read<std::vector<int>>();
-            for (const auto& v : values) {
+            for (const auto& v: values) {
                 std::cout << v << " ";
             }
             std::cout << std::flush;

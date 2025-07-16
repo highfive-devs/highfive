@@ -32,14 +32,13 @@ int main(void) {
     // To make sense for SWMR, the dataset should be extendable, and hence - chunkable
     DataSetCreateProps props;
     props.add(Chunking({1}));
-    auto dataset = file.createDataSet<int>(dataset_name,
-                        DataSpace({0ul}, {DataSpace::UNLIMITED}),
-                        props);
+    auto dataset =
+        file.createDataSet<int>(dataset_name, DataSpace({0ul}, {DataSpace::UNLIMITED}), props);
 
     // start the SWMR write
-    // you are not allowed to create new data headers (i.e. DataSets, Groups, and Attributes) after that
-    // you should also close() or destruct all the Groups and Attributes before calling this function
-    // see https://docs.hdfgroup.org/archive/support/HDF5/Tutor/swmr.html for details
+    // you are not allowed to create new data headers (i.e. DataSets, Groups, and Attributes) after
+    // that, you should also make sure all the Groups and Attributes are closed before calling this
+    // function see https://docs.hdfgroup.org/archive/support/HDF5/Tutor/swmr.html for details
     file.startSWMR();
 
     // If you want to open an already-existing file for SWMR write, use
@@ -49,8 +48,7 @@ int main(void) {
     std::cout << "Started the SWMR write" << std::endl;
 
     // Let's write to file.
-    for (int i=0; i<100; i++)
-    {
+    for (int i = 0; i < 100; i++) {
         // resize the dataset to fit the new element
         dataset.resize({static_cast<size_t>(i + 1)});
         // select the dataset slice and write the number to it

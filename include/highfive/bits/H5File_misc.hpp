@@ -41,9 +41,8 @@ inline unsigned convert_open_flag(File::AccessMode openFlags) {
         res_open |= H5F_ACC_SWMR_WRITE | H5F_ACC_RDWR;
 #else
     if (any(openFlags & (File::ReadSWMR | File::WriteSWMR)))
-        throw FileException("Your HDF5 library is too old for SWMR mode: "
-            H5_VERS_STR
-            ", while at least 1.10 is needed.");
+        throw FileException("Your HDF5 library is too old for SWMR mode: " H5_VERS_STR
+                            ", while at least 1.10 is needed.");
 #endif
     return res_open;
 }
