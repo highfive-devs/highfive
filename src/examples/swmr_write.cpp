@@ -18,7 +18,7 @@ const std::string dataset_name("array");
 
 /**
  * This is the SWMR writer.
- * It should be used in conjunction with SWMR reader (see read_swmr example)
+ * It should be used in conjunction with SWMR reader (see swmr_read example)
  */
 int main(void) {
     using namespace HighFive;
