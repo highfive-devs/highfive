@@ -59,4 +59,16 @@ inline void DataSet::resize(const std::vector<size_t>& dims) {
     detail::h5d_set_extent(getId(), real_dims.data());
 }
 
+#if H5_VERSION_GE(1, 10, 0)
+inline void DataSet::flush() {
+    detail::h5d_flush(_hid);
+}
+#endif
+
+#if H5_VERSION_GE(1, 10, 2)
+inline void DataSet::refresh() {
+    detail::h5d_refresh(_hid);
+}
+#endif
+
 }  // namespace HighFive

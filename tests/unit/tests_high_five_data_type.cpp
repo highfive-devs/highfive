@@ -101,6 +101,10 @@ TEST_CASE("HighFiveCompounds") {
 
         file.flush();
 
+#if H5_VERSION_GE(1, 10, 2)
+        dataset.refresh();
+#endif
+
         std::vector<CSL1> result;
         dataset.select({0}, {2}).read(result);
 
@@ -120,6 +124,11 @@ TEST_CASE("HighFiveCompounds") {
         dataset.write(csl);
 
         file.flush();
+
+#if H5_VERSION_GE(1, 10, 2)
+        dataset.refresh();
+#endif
+
         std::vector<CSL2> result = {{{1, 1, 1}, {2, 3, 4}}};
         dataset.select({0}, {2}).read(result);
 
@@ -357,6 +366,10 @@ TEST_CASE("HighFiveEnum") {
 
         file.flush();
 
+#if H5_VERSION_GE(1, 10, 2)
+        dataset.refresh();
+#endif
+
         Position result;
         dataset.select(ElementSet({0})).read(result);
 
@@ -376,6 +389,10 @@ TEST_CASE("HighFiveEnum") {
         dataset.write(robot_moves);
 
         file.flush();
+
+#if H5_VERSION_GE(1, 10, 2)
+        dataset.refresh();
+#endif
 
         std::vector<Direction> result;
         dataset.read(result);
