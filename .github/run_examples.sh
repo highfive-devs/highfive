@@ -15,11 +15,22 @@ fi
 
 for f in "${examples_dir}"/*_bin
 do
-  echo "-- ${f}"
-  if [[ "${f}" == *"parallel_"* ]]
+  if [[ "${f}" != *"swmr_"* ]]
   then
-    mpiexec -np 2 "${f}"
-  else
-    "${f}"
+    echo "-- ${f}"
+    if [[ "${f}" == *"parallel_"* ]]
+    then
+      mpiexec -np 2 "${f}"
+    else
+      "${f}"
+    fi
   fi
 done
+
+for f in "${examples_dir}"/swmr_*_bin
+do
+  echo "-- ${f}"
+  "${f}" &
+done
+
+wait

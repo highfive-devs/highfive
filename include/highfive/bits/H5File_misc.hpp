@@ -34,6 +34,17 @@ inline unsigned convert_open_flag(File::AccessMode openFlags) {
         res_open |= H5F_ACC_TRUNC;
     if (any(openFlags & File::Excl))
         res_open |= H5F_ACC_EXCL;
+#if H5_VERSION_GE(1, 10, 0)
+    if (any(openFlags & File::ReadSWMR))
+        res_open |= H5F_ACC_SWMR_READ | H5F_ACC_RDONLY;
+    if (any(openFlags & File::WriteSWMR))
+        res_open |= H5F_ACC_SWMR_WRITE | H5F_ACC_RDWR;
+#else
+    if (any(openFlags & (File::ReadSWMR | File::WriteSWMR)))
+        throw FileException("Your HDF5 library is too old for SWMR mode: "
+            H5_VERS_STR
+            ", while at least 1.10 is needed.");
+#endif
     return res_open;
 }
 }  // namespace
@@ -52,6 +63,9 @@ inline File::File(const std::string& filename,
 
     unsigned createMode = openFlags & (H5F_ACC_TRUNC | H5F_ACC_EXCL);
     unsigned openMode = openFlags & (H5F_ACC_RDWR | H5F_ACC_RDONLY);
+#if H5_VERSION_GE(1, 10, 0)
+    openMode |= openFlags & (H5F_ACC_SWMR_READ | H5F_ACC_SWMR_WRITE);
+#endif
     bool mustCreate = createMode > 0;
     bool openOrCreate = (openFlags & H5F_ACC_CREAT) > 0;
 
@@ -126,6 +140,12 @@ inline hsize_t File::getFileSpacePageSize() const {
 inline void File::flush() {
     detail::h5f_flush(_hid, H5F_SCOPE_GLOBAL);
 }
+
+#if H5_VERSION_GE(1, 10, 0)
+inline void File::startSWMR() {
+    detail::h5f_start_swmr_write(_hid);
+}
+#endif
 
 inline size_t File::getFileSize() const {
     hsize_t sizeValue = 0;
