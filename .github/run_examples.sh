@@ -16,6 +16,7 @@ fi
 for f in "${examples_dir}"/*_bin
 do
   if [[ "${f}" == *"swmr_"* ]]
+  then
     continue
   fi
 
