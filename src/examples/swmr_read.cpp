@@ -34,6 +34,9 @@ int main(void) {
     auto dataset = file.getDataSet(dataset_name);
     auto dims = dataset.getDimensions();
     auto olddims = std::vector<size_t>{0ul};
+    size_t max_dim = 10;
+
+    size_t count = 0;
     while (true) {
         // refresh is needed for SWMR read
         dataset.refresh();
@@ -52,11 +55,16 @@ int main(void) {
 
         // there is no way to know that the writer has stopped
         // we know that our example writer writes exactly 100 values
-        if (dims[0] >= 100) {
+        if (dims[0] >= max_dim) {
             break;
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        if (count >= 100 * max_dim) {
+            throw std::runtime_error("SWMR reader timed out.");
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        ++count;
     }
 
     std::cout << std::endl;

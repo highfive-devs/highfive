@@ -48,7 +48,7 @@ int main(void) {
     std::cout << "Started the SWMR write" << std::endl;
 
     // Let's write to file.
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
         // resize the dataset to fit the new element
         dataset.resize({static_cast<size_t>(i + 1)});
         // select the dataset slice and write the number to it
@@ -57,7 +57,7 @@ int main(void) {
         dataset.flush();
 
         // give time for the reader to react
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     return 0;
