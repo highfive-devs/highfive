@@ -74,6 +74,28 @@ inline herr_t h5d_write(hid_t dset_id,
     return err;
 }
 
+#if H5_VERSION_GE(1, 10, 0)
+inline herr_t h5d_flush(hid_t dset_id) {
+    herr_t err = H5Dflush(dset_id);
+    if (err < 0) {
+        HDF5ErrMapper::ToException<DataSetException>("Unable to flush the dataset.");
+    }
+
+    return err;
+}
+#endif
+
+#if H5_VERSION_GE(1, 10, 2)
+inline herr_t h5d_refresh(hid_t dset_id) {
+    herr_t err = H5Drefresh(dset_id);
+    if (err < 0) {
+        HDF5ErrMapper::ToException<DataSetException>("Unable to refresh the dataset.");
+    }
+
+    return err;
+}
+#endif
+
 inline haddr_t h5d_get_offset(hid_t dset_id) {
     uint64_t addr = H5Dget_offset(dset_id);
     if (addr == HADDR_UNDEF) {

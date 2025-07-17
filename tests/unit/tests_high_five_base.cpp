@@ -1225,19 +1225,41 @@ TEST_CASE("WriteLargeAttribute") {
     CHECK_NOTHROW(group.createAttribute("attr", large_attr));
 }
 
-TEST_CASE("AttributePhaseChange") {
-    auto fapl = HighFive::FileAccessProps::Default();
-    fapl.add(HighFive::FileVersionBounds(H5F_LIBVER_LATEST, H5F_LIBVER_LATEST));
-    HighFive::File file("attribute_phase_change.h5", HighFive::File::Truncate, fapl);
+template <class CPL, class CreateObject>
+void check_attribute_phase_change(CreateObject create_object) {
+    auto cpl = CPL::Default();
+    cpl.add(HighFive::AttributePhaseChange(42, 24));
 
-    auto gcpl = HighFive::GroupCreateProps::Default();
-    gcpl.add(HighFive::AttributePhaseChange(42, 24));
-
-    auto group = file.createGroup("grp", gcpl);
-
-    auto actual = AttributePhaseChange(group.getCreatePropertyList());
+    auto obj = create_object(cpl);
+    auto actual = AttributePhaseChange(obj.getCreatePropertyList());
     CHECK(actual.min_dense() == 24);
     CHECK(actual.max_compact() == 42);
+}
+
+TEST_CASE("AttributePhaseChange") {
+    auto create_file = [](HighFive::FileCreateProps fcpl = HighFive::FileCreateProps::Default()) {
+        auto fapl = HighFive::FileAccessProps::Default();
+        fapl.add(HighFive::FileVersionBounds(H5F_LIBVER_LATEST, H5F_LIBVER_LATEST));
+        return HighFive::File("attribute_phase_change.h5", HighFive::File::Truncate, fcpl, fapl);
+    };
+
+    SECTION("File") {
+        check_attribute_phase_change<HighFive::FileCreateProps>(create_file);
+    }
+
+    SECTION("Group") {
+        auto file = create_file();
+        check_attribute_phase_change<HighFive::GroupCreateProps>(
+            [&file](auto gcpl) { return file.createGroup("grp", gcpl); });
+    }
+
+    SECTION("Dataset") {
+        auto file = create_file();
+        check_attribute_phase_change<HighFive::DataSetCreateProps>([&file](auto dcpl) {
+            auto space = HighFive::DataSpace::Scalar();
+            return file.createDataSet<double>("dset", space, dcpl);
+        });
+    }
 }
 
 TEST_CASE("datasetOffset") {
@@ -1566,6 +1588,9 @@ void readWriteShuffleDeflateTest() {
 
         dataset.write(array);
 
+#if H5_VERSION_GE(1, 10, 0)
+        dataset.flush();
+#endif
         file.flush();
     }
 
@@ -1629,6 +1654,9 @@ void readWriteSzipTest() {
 
         dataset.write(array);
 
+#if H5_VERSION_GE(1, 10, 0)
+        dataset.flush();
+#endif
         file.flush();
     }
 
