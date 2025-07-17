@@ -31,6 +31,7 @@ done
 
 for f in "${examples_dir}"/swmr_*_bin
 do
+  [ -f "${f}" ] || continue
   echo "-- ${f}"
   "${f}" &
 done
