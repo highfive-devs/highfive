@@ -54,6 +54,11 @@ set(half_float_examples
   ${CMAKE_CURRENT_SOURCE_DIR}/create_dataset_half_float.cpp
 )
 
+set(swmr_examples
+  ${CMAKE_CURRENT_SOURCE_DIR}/swmr_read.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/swmr_write.cpp
+)
+
 function(compile_example example_source)
   get_filename_component(example_filename ${example_source} NAME)
   string(REPLACE ".cpp" "_bin" example_name ${example_filename})
@@ -94,6 +99,12 @@ endif()
 
 if(HDF5_IS_PARALLEL)
   foreach(example_source ${parallel_hdf5_examples})
+    compile_example(${example_source})
+  endforeach()
+endif()
+
+if(HDF5_VERSION VERSION_GREATER_EQUAL 1.10.2)
+  foreach(example_source ${swmr_examples})
     compile_example(${example_source})
   endforeach()
 endif()

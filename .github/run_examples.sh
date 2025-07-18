@@ -15,6 +15,11 @@ fi
 
 for f in "${examples_dir}"/*_bin
 do
+  if [[ "${f}" == *"swmr_"* ]]
+  then
+    continue
+  fi
+
   echo "-- ${f}"
   if [[ "${f}" == *"parallel_"* ]]
   then
@@ -23,3 +28,12 @@ do
     "${f}"
   fi
 done
+
+for f in "${examples_dir}"/swmr_*_bin
+do
+  [ -f "${f}" ] || continue
+  echo "-- ${f}"
+  "${f}" &
+done
+
+wait

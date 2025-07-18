@@ -40,6 +40,10 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
         Debug = 0x10u,
         /// Open flag: Create non existing file
         Create = 0x20u,
+        /// Open flag: Open in SWMR read
+        ReadSWMR = 0x40u,
+        /// Open flag: Open in SWMR write
+        WriteSWMR = 0x80u,
         /// Derived open flag: common write mode (=ReadWrite|Create|Truncate)
         Overwrite = Truncate,
         /// Derived open flag: Opens RW or exclusively creates
@@ -54,6 +58,8 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
     constexpr static AccessMode Create = AccessMode::Create;
     constexpr static AccessMode Overwrite = AccessMode::Overwrite;
     constexpr static AccessMode OpenOrCreate = AccessMode::OpenOrCreate;
+    constexpr static AccessMode ReadSWMR = AccessMode::ReadSWMR;
+    constexpr static AccessMode WriteSWMR = AccessMode::WriteSWMR;
 
     ///
     /// \brief File
@@ -121,6 +127,11 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
     /// Flushes all buffers associated with a file to disk
     ///
     void flush();
+
+#if H5_VERSION_GE(1, 10, 0)
+    /// \brief Switches file to SWMR write mode
+    void startSWMRWrite();
+#endif
 
     /// \brief Get the list of properties for creation of this file
     FileCreateProps getCreatePropertyList() const {

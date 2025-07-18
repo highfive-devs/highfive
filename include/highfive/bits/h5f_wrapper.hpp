@@ -54,5 +54,16 @@ inline hssize_t h5f_get_freespace(hid_t file_id) {
     return free_space;
 }
 
+#if H5_VERSION_GE(1, 10, 0)
+inline herr_t h5f_start_swmr_write(hid_t file_id) {
+    herr_t err = H5Fstart_swmr_write(file_id);
+    if (err < 0) {
+        HDF5ErrMapper::ToException<FileException>(std::string("Failed to start SWMR write"));
+    }
+
+    return err;
+}
+#endif
+
 }  // namespace detail
 }  // namespace HighFive
