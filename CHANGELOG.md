@@ -1,5 +1,11 @@
 # Changes
-## Version 3.0.0-beta3 - 2025-06-30
+## Version 3.1.0 - 2025-07-18
+### New Features
+    - Support SWMR mode. (#68) Thanks to @radistmorse
+    - Support DataSet::{flush,refresh}. (#69) Thanks to @radistmorse
+    - Support AttributePhaseChange also for DataSet and File. (#67) Thanks to @radistmorse
+
+## Version 3.0.0 - 2025-07-01
 Same as 3.0.0-beta3.
 
 ## Version 3.0.0-beta3 - 2025-06-20

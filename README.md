@@ -46,6 +46,7 @@ target_link_libraries(foo HighFive::HighFive)
 - automatic conversion of `std::string` to/from variable- or fixed-length string dataset
 - simplified APIs for common selections and full support of (irregular) HyperSlabs
 - parallel HDF5 using MPI
+- Singe Writer, Multiple Reader (SMWR) mode
 - Advanced types: Compound, Enum, Arrays of Fixed-length strings, References
 - half-precision (16-bit) floating-point datasets
 - etc... (see [ChangeLog](./CHANGELOG.md))
@@ -221,25 +222,23 @@ where the headers can be found. The guessing can be overridded by setting
 `<xtensor/xtensor.hpp>` and `2` for `<xtensor/containers/xtensor.hpp>`.
 
 ## Versioning & Code Stability
-We use semantic versioning. Currently, we're preparing `v3` which contains a
-limited set of breaking changes required to eliminate undesireable behaviour or
-modernize outdated patterns. We provide a
-[Migration Guide](https://highfive-devs.github.io/highfive/md__2home_2runner_2work_2_high_five_2_high_five_2doc_2migration__guide.html),
-please report any missing or incorrect information to help others make the
-switch more easily.
+We use semantic versioning, all API breaking changes are considered bug, please
+report them as such.
 
-- `v2.x.y` are stable and any API breaking changes are considered bugs. There's
-  like not going to be very many releases of the `v2` line once `v3` is stable.
+We've recently released v3.0.0, see
+[Migration Guide](https://highfive-devs.github.io/highfive/md__2home_2runner_2work_2_high_five_2_high_five_2doc_2migration__guide.html).
+Please let us know if there's any missing or incorrect information in the
+Migration Guide, it'll help others make the switch more easily.
 
-- `v3.0.0-beta?` are pre-releases of `v3.0.0`. We predict that one more
-  breaking changes might happen: the string handling is confusing to some of the
-  maintainers and the default encoding is inconsistent (and will likely be made
-  consistent).
+We're unlikely to backport bug fixes or features to v2.x.y. Therefore, if
+you're affected by a bug, please update to v3.
 
-  For codes that either use `std::string` when dealing with strings, or that
-  don't use strings with HDF5 at all, we don't currently have any additional
-  breaking changes planned for 3.0.0.
-
+Since HighFive is reasonably mature, development typically happens in short
+bursts. Hence, waiting for "enough features" to accumulate on the main branch
+doesn't make sense for us; and we'll release shortly after any meaningful
+changes were made; but at most once a week. It seems better to risk three new
+versions within three weeks than to have useful features linger on main for
+half a year.
 
 ## Questions?
 

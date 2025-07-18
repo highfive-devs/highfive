@@ -12,6 +12,7 @@ Dmitri Bichko
 @eudoxos
 Fernando L. Pereira
 @guoxy
+George Sedov
 Haoran Ni
 Henry Schreiner
 @hn-sl
