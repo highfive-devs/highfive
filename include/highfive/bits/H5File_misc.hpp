@@ -140,7 +140,7 @@ inline void File::flush() {
 }
 
 #if H5_VERSION_GE(1, 10, 0)
-inline void File::startSWMR() {
+inline void File::startSWMRWrite() {
     detail::h5f_start_swmr_write(_hid);
 }
 #endif

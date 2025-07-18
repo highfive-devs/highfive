@@ -35,11 +35,12 @@ int main(void) {
     auto dataset =
         file.createDataSet<int>(dataset_name, DataSpace({0ul}, {DataSpace::UNLIMITED}), props);
 
-    // start the SWMR write
+    // Start the SWMR write
     // you are not allowed to create new data headers (i.e. DataSets, Groups, and Attributes) after
-    // that, you should also make sure all the Groups and Attributes are closed before calling this
-    // function see https://docs.hdfgroup.org/archive/support/HDF5/Tutor/swmr.html for details
-    file.startSWMR();
+    // that, you should also make sure all the Groups and Attributes are closed (i.e. the objects
+    // representing them are out of scope or destroyed) before calling this function
+    // see HDF5 SWMR tutorial for details
+    file.startSWMRWrite();
 
     // If you want to open an already-existing file for SWMR write, use
     // File file(file_name, File::WriteSWMR);

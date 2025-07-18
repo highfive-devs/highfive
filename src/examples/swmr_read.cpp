@@ -33,38 +33,42 @@ int main(void) {
 
     auto dataset = file.getDataSet(dataset_name);
     auto dims = dataset.getDimensions();
-    auto olddims = std::vector<size_t>{0ul};
+    auto old_dims = std::vector<size_t>{0ul};
     size_t max_dim = 10;
 
-    size_t count = 0;
+    size_t fail_count = 0;
     while (true) {
         // refresh is needed for SWMR read
         dataset.refresh();
 
         dims = dataset.getDimensions();
         // if dimensions changed, it means new data was written to a file
-        if (dims[0] != olddims[0]) {
-            std::vector<size_t> slice{dims[0] - olddims[0]};
-            auto values = dataset.select(olddims, slice).read<std::vector<int>>();
+        if (dims[0] != old_dims[0]) {
+            std::vector<size_t> slice{dims[0] - old_dims[0]};
+            auto values = dataset.select(old_dims, slice).read<std::vector<int>>();
             for (const auto& v: values) {
                 std::cout << v << " ";
             }
             std::cout << std::flush;
-            olddims = dims;
+            old_dims = dims;
+            fail_count = 0;
+        } else {
+            fail_count++;
         }
 
         // there is no way to know that the writer has stopped
-        // we know that our example writer writes exactly 100 values
+        // we know that our example writer writes exactly 10 values
         if (dims[0] >= max_dim) {
             break;
         }
 
-        if (count >= 100 * max_dim) {
+        // our example writer should add a value every 100 ms
+        // longer delay means something went wrong
+        if (fail_count >= 10) {
             throw std::runtime_error("SWMR reader timed out.");
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        ++count;
     }
 
     std::cout << std::endl;

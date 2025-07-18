@@ -129,10 +129,8 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
     void flush();
 
 #if H5_VERSION_GE(1, 10, 0)
-    /// \brief Starts SWMR write
-    ///
-    /// \see https://docs.hdfgroup.org/archive/support/HDF5/Tutor/swmr.html
-    void startSWMR();
+    /// \brief Switches file to SWMR write mode
+    void startSWMRWrite();
 #endif
 
     /// \brief Get the list of properties for creation of this file
