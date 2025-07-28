@@ -9,8 +9,8 @@
 #pragma once
 
 #define HIGHFIVE_VERSION_MAJOR 3
-#define HIGHFIVE_VERSION_MINOR 0
-#define HIGHFIVE_VERSION_PATCH 0
+#define HIGHFIVE_VERSION_MINOR 1
+#define HIGHFIVE_VERSION_PATCH 1
 
 /** \brief Concatenated representation of the HighFive version.
  *
@@ -24,10 +24,10 @@
  *  std::cout << STRINGIFY_VALUE(HIGHFIVE_VERSION) << "\n";
  *  \endcode
  */
-#define HIGHFIVE_VERSION 3.0.0
+#define HIGHFIVE_VERSION 3.1.1
 
 /** \brief String representation of the HighFive version.
  *
  *  \warning This macro only exists from 2.7.1 onwards.
  */
-#define HIGHFIVE_VERSION_STRING "3.0.0"
+#define HIGHFIVE_VERSION_STRING "3.1.1"
