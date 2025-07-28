@@ -226,7 +226,7 @@ We use semantic versioning, all API breaking changes are considered bug, please
 report them as such.
 
 We've recently released v3.0.0, see
-[Migration Guide](https://highfive-devs.github.io/highfive/md__2home_2runner_2work_2_high_five_2_high_five_2doc_2migration__guide.html).
+[Migration Guide](https://highfive-devs.github.io/highfive/md__2home_2runner_2work_2highfive_2highfive_2doc_2migration__guide.html).
 Please let us know if there's any missing or incorrect information in the
 Migration Guide, it'll help others make the switch more easily.
 
