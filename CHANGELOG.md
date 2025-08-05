@@ -1,4 +1,7 @@
 # Changes
+## Version 3.1.1 - 2025-07-28
+Same as v3.1.0, but with updated version numbers.
+
 ## Version 3.1.0 - 2025-07-18
 ### New Features
     - Support SWMR mode. (#68) Thanks to @radistmorse
