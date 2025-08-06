@@ -79,7 +79,7 @@ if(NOT TARGET HighFiveRestVol)
     endif()
     target_link_libraries(HighFiveRestVol INTERFACE "${RESTVOL_LIBRARY}")
     target_include_directories(HighFiveRestVol INTERFACE "${RESTVOL_INCLUDE_DIR}")
-    add_compile_definitions(HIGHFIVE_USE_RESTVOL)
+    target_compile_definitions(HighFiveRestVol INTERFACE HIGHFIVE_USE_RESTVOL)
   endif()
 endif()
 
