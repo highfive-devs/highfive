@@ -108,13 +108,13 @@ void check_single_string(File file, size_t string_length) {
     }
 
     SECTION("variable length") {
-#if defined(HIGHFIVE_USE_RESTVOL)
-        CHECK_THROWS(CreateTraits::create(file, "variable", dataspace, variable_length));
-#else
-        auto obj = CreateTraits::create(file, "variable", dataspace, variable_length);
-        obj.write(value);
-        REQUIRE(obj.template read<std::string>() == value);
-#endif
+        if (rest_vol_enabled()) {
+            CHECK_THROWS(CreateTraits::create(file, "variable", dataspace, variable_length));
+        } else {
+            auto obj = CreateTraits::create(file, "variable", dataspace, variable_length);
+            obj.write(value);
+            REQUIRE(obj.template read<std::string>() == value);
+        }
     }
 }
 
@@ -153,21 +153,21 @@ void check_multiple_string(File file, size_t string_length) {
 
     SECTION("automatic") {
         auto obj = CreateTraits::create(file, "auto", value);
-#if defined(HIGHFIVE_USE_RESTVOL)
-        check(obj.template read<value_t>(), make_padded_reference('\0', string_length + 1));
-#else
-        check(obj.template read<value_t>(), value);
-#endif
+        if (rest_vol_enabled()) {
+            check(obj.template read<value_t>(), make_padded_reference('\0', string_length + 1));
+        } else {
+            check(obj.template read<value_t>(), value);
+        }
     }
 
     SECTION("variable length") {
-#if defined(HIGHFIVE_USE_RESTVOL)
-        CHECK_THROWS(CreateTraits::create(file, "variable", dataspace, variable_length));
-#else
-        auto obj = CreateTraits::create(file, "variable", dataspace, variable_length);
-        obj.write(value);
-        check(obj.template read<value_t>(), value);
-#endif
+        if (rest_vol_enabled()) {
+            CHECK_THROWS(CreateTraits::create(file, "variable", dataspace, variable_length));
+        } else {
+            auto obj = CreateTraits::create(file, "variable", dataspace, variable_length);
+            obj.write(value);
+            check(obj.template read<value_t>(), value);
+        }
     }
 
     auto check_fixed_length = [&](const std::string& label, size_t length) {

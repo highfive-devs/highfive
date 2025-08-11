@@ -16,6 +16,13 @@ HIGHFIVE_INSTALL_DIR="${HIGHFIVE_BUILD_DIR}/install"
 export HIGHFIVE_GIT_REPOSITORY="file://$(realpath "$HIGHFIVE_DIR")"
 export HIGHFIVE_GIT_TAG=$(git rev-parse HEAD)
 
+# Common CMake arguments for enforcing C++17
+CMAKE_STD_ARGS=(
+    -DCMAKE_CXX_STANDARD=17
+    -DCMAKE_CXX_STANDARD_REQUIRED=ON
+    -DCMAKE_CXX_EXTENSIONS=OFF
+)
+
 make_submodule() {
     local project_dir="$1"
     local dep_dir="${project_dir}/deps/HighFive"
@@ -36,14 +43,13 @@ test_dependent_library() {
 
       rm -rf ${build_dir} || true
 
-      cmake "$@" \
+      cmake "${CMAKE_STD_ARGS[@]}" "$@" \
             -DUSE_BOOST=${use_boost} \
             -DCMAKE_PREFIX_PATH="${HIGHFIVE_INSTALL_DIR}" \
             -DCMAKE_INSTALL_PREFIX="${install_dir}" \
             -B "${build_dir}" "${project_dir}"
 
       cmake --build "${build_dir}" --verbose --target install
-
 
       for vendor in submodule fetch_content external none
       do
@@ -53,10 +59,10 @@ test_dependent_library() {
 
         make_submodule ${test_project}
 
-
         rm -rf ${test_build_dir} || true
 
-        cmake -DUSE_BOOST=${use_boost} \
+        cmake "${CMAKE_STD_ARGS[@]}" \
+              -DUSE_BOOST=${use_boost} \
               -DVENDOR_STRATEGY=${vendor} \
               -DCMAKE_PREFIX_PATH="${HIGHFIVE_INSTALL_DIR};${install_dir}" \
               -DCMAKE_INSTALL_PREFIX="${test_install_dir}" \
@@ -83,7 +89,7 @@ test_application() {
 
         rm -rf ${build_dir} || true
 
-        cmake "$@" \
+        cmake "${CMAKE_STD_ARGS[@]}" "$@" \
               -DUSE_BOOST=${use_boost} \
               -DVENDOR_STRATEGY=${vendor} \
               -DCMAKE_PREFIX_PATH="${HIGHFIVE_INSTALL_DIR}" \
@@ -97,7 +103,8 @@ test_application() {
     done
 }
 
-cmake -DHIGHFIVE_EXAMPLES=OFF \
+cmake "${CMAKE_STD_ARGS[@]}" \
+      -DHIGHFIVE_EXAMPLES=OFF \
       -DHIGHFIVE_UNIT_TESTS=OFF \
       -DCMAKE_INSTALL_PREFIX="${HIGHFIVE_INSTALL_DIR}" \
       -B "${HIGHFIVE_BUILD_DIR}" \

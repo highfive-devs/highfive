@@ -105,11 +105,6 @@ class Object {
 ///
 class ObjectInfo {
   public:
-    /// \brief Retrieve the address of the object (within its file)
-    /// \deprecated Deprecated since HighFive 2.2. Soon supporting VOL tokens
-    H5_DEPRECATED("Deprecated since HighFive 2.2. Soon supporting VOL tokens")
-    haddr_t getAddress() const HIGHFIVE_NOEXCEPT_IF_NOT_RESTVOL;
-
     /// \brief Retrieve the number of references to this object
     size_t getRefCount() const noexcept;
 
@@ -120,13 +115,10 @@ class ObjectInfo {
     time_t getModificationTime() const noexcept;
 
   protected:
-#if defined(HIGHFIVE_USE_RESTVOL)
-    H5O_info2_t raw_info;
-#elif (H5Oget_info_vers < 3)
+#if (H5Oget_info_vers < 3)
     H5O_info_t raw_info;
 #else
-    // Use compat H5O_info1_t while getAddress() is supported (deprecated)
-    H5O_info1_t raw_info;
+    H5O_info2_t raw_info;
 #endif
 
     friend class Object;

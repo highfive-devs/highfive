@@ -65,12 +65,12 @@ inline htri_t h5l_exists(hid_t loc_id, const char* name, hid_t lapl_id) {
 }
 
 inline herr_t h5l_delete(hid_t loc_id, const char* name, hid_t lapl_id) {
-#if defined(HIGHFIVE_USE_RESTVOL)
-    htri_t exists = h5l_exists(loc_id, name, lapl_id);
-    if (exists != 1) {
-        HDF5ErrMapper::ToException<GroupException>(std::string("Invalid name for unlink() "));
+    if (rest_vol_enabled()) {
+        htri_t exists = h5l_exists(loc_id, name, lapl_id);
+        if (exists != 1) {
+            HDF5ErrMapper::ToException<GroupException>(std::string("Invalid name for unlink() "));
+        }
     }
-#endif
     herr_t err = H5Ldelete(loc_id, name, lapl_id);
     if (err < 0) {
         HDF5ErrMapper::ToException<GroupException>(std::string("Invalid name for unlink() "));

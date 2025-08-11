@@ -22,6 +22,7 @@
 
 using namespace HighFive;
 
+#if HIGHFIVE_CXX_STD >= 20
 TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
     const std::string file_name(to_abs_if_rest_vol("rw_dataset_") + typeNameHelper<TestType>() +
                                 ".h5");
@@ -32,18 +33,18 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
         // Create a new file using the default property lists.
         File file(file_name, File::ReadWrite | File::Create | File::Truncate);
 
-#if defined(HIGHFIVE_USE_RESTVOL)
-        DataSet dataset = file.createDataSet(dataset_name, t1);
-#else
-        // Create the dataset
-        DataSet dataset =
-            file.createDataSet(dataset_name,
-                               DataSpace(1),
-                               create_datatype<typename details::inspector<TestType>::base_type>());
+        if (rest_vol_enabled()) {
+            DataSet dataset = file.createDataSet(dataset_name, t1);
+        } else {
+            // Create the dataset
+            DataSet dataset = file.createDataSet(
+                dataset_name,
+                DataSpace(1),
+                create_datatype<typename details::inspector<TestType>::base_type>());
 
-        // Write into the initial part of the dataset
-        dataset.write(t1);
-#endif
+            // Write into the initial part of the dataset
+            dataset.write(t1);
+        }
     }
 
     // read it back
@@ -57,7 +58,6 @@ TEMPLATE_TEST_CASE("Scalar in DataSet", "[Types]", bool, std::string) {
     }
 }
 
-#if HIGHFIVE_CXX_STD >= 17
 TEMPLATE_PRODUCT_TEST_CASE("Scalar in std::vector<std::byte>",
                            RESTVOL_DISABLED("[Types]"),
                            std::vector,
@@ -124,17 +124,18 @@ void check_read_regular(const std::string& file_name, const std::vector<size_t>&
     auto raw_expected = traits::create(dims);
     auto expected = testing::copy<reference_type>(raw_expected, dims);
 
-#if defined(HIGHFIVE_USE_RESTVOL)
-    auto attr = file.createAttribute("attr", expected);
-    auto dset = file.createDataSet("dset", expected);
-#else
-    auto dataspace = DataSpace(dims);
-    auto attr = testing::AttributeCreateTraits::create<base_type>(file, "dset", dataspace);
-    attr.write(expected);
+    DataSet dset;
+    Attribute attr = file.createAttribute("attr", expected);
+    if (rest_vol_enabled()) {
+        dset = file.createDataSet("dset", expected);
+    } else {
+        auto dataspace = DataSpace(dims);
+        attr = testing::AttributeCreateTraits::create<base_type>(file, "dset", dataspace);
+        attr.write(expected);
 
-    auto dset = testing::DataSetCreateTraits::create<base_type>(file, "attr", dataspace);
-    dset.write(expected);
-#endif
+        dset = testing::DataSetCreateTraits::create<base_type>(file, "attr", dataspace);
+        dset.write(expected);
+    }
 
     SECTION("dset.read<Container>()") {
         check_read_auto<Container>(expected, dims, dset);
@@ -243,23 +244,29 @@ void check_write_regular(const std::string& file_name, const std::vector<size_t>
         check_write_auto<testing::AttributeCreateTraits, Container>(file, "attr", dims);
     }
 
-#if !defined(HIGHFIVE_USE_RESTVOL)
     SECTION("createDataSet(name, container)") {
-        check_write_deduce_type<testing::DataSetCreateTraits, Container>(file, "dset", dims);
+        if (rest_vol_enabled()) {
+            check_write_deduce_type<testing::DataSetCreateTraits, Container>(file, "dset", dims);
+        }
     }
 
     SECTION("createDataSet(name, container)") {
-        check_write_manual<testing::DataSetCreateTraits, Container>(file, "dset", dims);
+        if (rest_vol_enabled()) {
+            check_write_manual<testing::DataSetCreateTraits, Container>(file, "dset", dims);
+        }
     }
 
     SECTION("createAttribute(name, container)") {
-        check_write_deduce_type<testing::AttributeCreateTraits, Container>(file, "attr", dims);
+        if (rest_vol_enabled()) {
+            check_write_deduce_type<testing::AttributeCreateTraits, Container>(file, "attr", dims);
+        }
     }
 
     SECTION("createAttribute(name, container)") {
-        check_write_manual<testing::AttributeCreateTraits, Container>(file, "attr", dims);
+        if (rest_vol_enabled()) {
+            check_write_manual<testing::AttributeCreateTraits, Container>(file, "attr", dims);
+        }
     }
-#endif
 }
 
 template <class Container>

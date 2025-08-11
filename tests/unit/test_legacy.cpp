@@ -68,11 +68,11 @@ TEST_CASE("Array of char pointers") {
 
     SECTION("variable length") {
         auto datatype = VariableLengthStringType();
-#if defined(HIGHFIVE_USE_RESTVOL)
-        REQUIRE_THROWS(file.createDataSet("dset", filespace, datatype));
-#else
-        auto dset = file.createDataSet("dset", filespace, datatype);
-        REQUIRE_THROWS(dset.write(strings));
-#endif
+        if (rest_vol_enabled()) {
+            REQUIRE_THROWS(file.createDataSet("dset", filespace, datatype));
+        } else {
+            auto dset = file.createDataSet("dset", filespace, datatype);
+            REQUIRE_THROWS(dset.write(strings));
+        }
     }
 }

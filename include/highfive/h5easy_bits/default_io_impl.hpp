@@ -28,23 +28,20 @@ struct default_io_impl {
                                const T& data,
                                const DumpOptions& options) {
         using value_type = typename inspector<T>::base_type;
-        DataSet dataset;
-#if defined(HIGHFIVE_USE_RESTVOL)
-        if constexpr (std::is_same_v<T, std::string>) {
-            if (file.exist(path) && !options.overwrite()) {
-                throw dump_error(file, path);
+        if (HighFive::rest_vol_enabled()) {
+            if constexpr (std::is_same_v<T, std::string>) {
+                if (file.exist(path) && !options.overwrite()) {
+                    throw dump_error(file, path);
+                }
+                if (file.exist(path)) {
+                    file.unlink(path);
+                }
+                return file.createDataSet(path, data);
             }
-            if (file.exist(path)) {
-                file.unlink(path);
-            }
-            dataset = file.createDataSet(path, data);
-        } else {
-#endif
-            dataset = initDataset<value_type>(file, path, shape(data), options);
-            dataset.write(data);
-#if defined(HIGHFIVE_USE_RESTVOL)
         }
-#endif
+
+        DataSet dataset = initDataset<value_type>(file, path, shape(data), options);
+        dataset.write(data);
         if (options.flush()) {
             file.flush();
         }
@@ -61,43 +58,41 @@ struct default_io_impl {
                                           const T& data,
                                           const DumpOptions& options) {
         using value_type = typename inspector<T>::base_type;
-#if defined(HIGHFIVE_USE_RESTVOL)
-        if constexpr (std::is_same_v<T, std::string>) {
-            auto get_attribute = [&](auto& obj) {
-                if (!obj.hasAttribute(key)) {
-                    return obj.createAttribute(key, data);
-                } else if (options.overwrite()) {
-                    Attribute attribute = obj.getAttribute(key);
-                    attribute.write(data);
-                    DataSpace dataspace = attribute.getSpace();
-                    if (dataspace.getElementCount() != 1) {
-                        throw error(file,
-                                    path,
-                                    "H5Easy::dumpAttribute: Existing field not a scalar");
+        if (HighFive::rest_vol_enabled()) {
+            if constexpr (std::is_same_v<T, std::string>) {
+                auto get_attribute = [&](auto& obj) {
+                    if (!obj.hasAttribute(key)) {
+                        return obj.createAttribute(key, data);
+                    } else if (options.overwrite()) {
+                        Attribute attribute = obj.getAttribute(key);
+                        attribute.write(data);
+                        DataSpace dataspace = attribute.getSpace();
+                        if (dataspace.getElementCount() != 1) {
+                            throw error(file,
+                                        path,
+                                        "H5Easy::dumpAttribute: Existing field not a scalar");
+                        }
+                        return attribute;
                     }
-                    return attribute;
+                    throw error(
+                        file,
+                        path,
+                        "H5Easy: Attribute exists, overwrite with H5Easy::DumpMode::Overwrite.");
+                };
+                if (!file.exist(path)) {
+                    throw error(file, path, "H5Easy::dumpAttribute: path does not exist");
                 }
-                throw error(
-                    file,
-                    path,
-                    "H5Easy: Attribute exists, overwrite with H5Easy::DumpMode::Overwrite.");
-            };
-            if (!file.exist(path)) {
-                throw error(file, path, "H5Easy::dumpAttribute: path does not exist");
-            }
 
-            return apply_attr_func(file, path, get_attribute);
-        } else {
-#endif
-            Attribute attribute = initAttribute<value_type>(file, path, key, shape(data), options);
-            attribute.write(data);
-            if (options.flush()) {
-                file.flush();
+                return apply_attr_func(file, path, get_attribute);
             }
-            return attribute;
-#if defined(HIGHFIVE_USE_RESTVOL)
         }
-#endif
+
+        Attribute attribute = initAttribute<value_type>(file, path, key, shape(data), options);
+        attribute.write(data);
+        if (options.flush()) {
+            file.flush();
+        }
+        return attribute;
     }
 
     inline static T loadAttribute(const File& file,

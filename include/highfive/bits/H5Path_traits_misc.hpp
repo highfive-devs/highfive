@@ -21,11 +21,9 @@ inline PathTraits<Derivate>::PathTraits() {
                       std::is_same<Derivate, Attribute>::value,
                   "PathTraits can only be applied to Group, DataSet and Attribute");
     const auto& obj = static_cast<const Derivate&>(*this);
-    if (obj.isValid()) {
-#if !defined(HIGHFIVE_USE_RESTVOL)
+    if (obj.isValid() && !rest_vol_enabled()) {
         const hid_t file_id = detail::h5i_get_file_id<PropertyException>(obj.getId());
         _file_obj.reset(new File(file_id));
-#endif
     }
 }
 
@@ -39,9 +37,9 @@ inline std::string PathTraits<Derivate>::getPath() const {
 template <typename Derivate>
 inline File& PathTraits<Derivate>::getFile() const {
     const auto& obj = static_cast<const Derivate&>(*this);
-#if defined(HIGHFIVE_USE_RESTVOL)
-    throw ObjectException("`PathTraits::getFile` is not supported with REST VOL.");
-#endif
+    if (rest_vol_enabled()) {
+        throw ObjectException("`PathTraits::getFile` is not supported with REST VOL.");
+    }
     if (!obj.isValid()) {
         throw ObjectException("Invalid call to `PathTraits::getFile` for invalid object");
     }

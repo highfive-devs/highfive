@@ -7,7 +7,7 @@ PROGRAMS:=hdf5_bench hdf5_bench_improved highfive_bench
 
 CXX?=g++
 COMPILE_OPTS=-g -O2 -Wall
-CXXFLAGS=-I ../../include/ `pkg-config --libs --cflags hdf5` -std=c++11 ${COMPILE_OPTS}
+CXXFLAGS=-I ../../include/ `pkg-config --libs --cflags hdf5` -std=c++17 ${COMPILE_OPTS}
 
 
 all: $(PROGRAMS)

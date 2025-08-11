@@ -18,8 +18,8 @@
         "ms-vscode.cpptools-extension-pack"
       ],
       "settings": {
-        "cmake.enableAutomaticKitScan": false,
-        "cmake.showSystemKits": false,
+        "cmake.enableAutomaticKitScan": true,
+        "cmake.showSystemKits": true,
         "C_Cpp.clang_format_style": "file:${workspaceRoot}/.clang-format",
         "C_Cpp.default.compilerPath": "/usr/bin/clang++",
         "C_Cpp.autoAddFileAssociations": false,

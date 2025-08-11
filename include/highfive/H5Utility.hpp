@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <cstdlib>
+#include <cstring>
 #include <functional>
 #include <string>
 #include <iostream>
@@ -70,6 +72,14 @@ inline std::string to_string(LogSeverity severity) {
     default:
         return "??";
     }
+}
+
+/**
+ * Return true if the HDF REST VOL CONNECTOR is enabled in the environment.
+ */
+inline bool rest_vol_enabled() {
+    const char* val = std::getenv("HDF5_VOL_CONNECTOR");
+    return val && std::strcmp(val, "REST") == 0;
 }
 
 /** \brief A logger with supporting basic functionality.

@@ -398,17 +398,17 @@ TEST_CASE("HighFiveReadType") {
     CompoundType t1 = create_compound_csl1();
     t1.commit(file, datatype_name1);
 
-#if defined(HIGHFIVE_USE_RESTVOL)
-    CHECK_THROWS_AS(CompoundType{file.getDataType(datatype_name1)}, DataTypeException);
-#else
-    CompoundType t2 = file.getDataType(datatype_name1);
+    if (rest_vol_enabled()) {
+        CHECK_THROWS_AS(CompoundType{file.getDataType(datatype_name1)}, DataTypeException);
+    } else {
+        CompoundType t2 = file.getDataType(datatype_name1);
 
-    auto t3 = create_enum_position();
-    t3.commit(file, datatype_name2);
+        auto t3 = create_enum_position();
+        t3.commit(file, datatype_name2);
 
-    DataType t4 = file.getDataType(datatype_name2);
+        DataType t4 = file.getDataType(datatype_name2);
 
-    CHECK(t2 == t1);
-    CHECK(t4 == t3);
-#endif
+        CHECK(t2 == t1);
+        CHECK(t4 == t3);
+    }
 }

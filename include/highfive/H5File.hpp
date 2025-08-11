@@ -113,11 +113,10 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
 
     /// \brief Get the list of properties for creation of this file
     FileCreateProps getCreatePropertyList() const {
-#if defined(HIGHFIVE_USE_RESTVOL)
-        throw FileException("H5Fget_create_plist is not supported with REST VOL.");
-#else
+        if (rest_vol_enabled()) {
+            throw FileException("H5Fget_create_plist is not supported with REST VOL.");
+        }
         return details::get_plist<FileCreateProps>(*this, H5Fget_create_plist);
-#endif
     }
 
     /// \brief Get the list of properties for accession of this file

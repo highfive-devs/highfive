@@ -90,25 +90,16 @@ inline ObjectType Object::getType() const {
 
 inline ObjectInfo Object::getInfo() const {
     ObjectInfo info;
-#if defined(HIGHFIVE_USE_RESTVOL)
-    if (H5Oget_info3(_hid, &info.raw_info, H5O_INFO_BASIC | H5O_INFO_TIME) < 0) {
-#elif (H5Oget_info_vers < 3)
+#if (H5Oget_info_vers < 3)
     if (H5Oget_info(_hid, &info.raw_info) < 0) {
 #else
-    if (H5Oget_info1(_hid, &info.raw_info) < 0) {
+    if (H5Oget_info3(_hid, &info.raw_info, H5O_INFO_BASIC | H5O_INFO_TIME) < 0) {
 #endif
         HDF5ErrMapper::ToException<ObjectException>("Unable to obtain info for object");
     }
     return info;
 }
 
-inline haddr_t ObjectInfo::getAddress() const HIGHFIVE_NOEXCEPT_IF_NOT_RESTVOL {
-#if defined(HIGHFIVE_USE_RESTVOL)
-    throw ObjectException("Unable to obtain addr info with REST VOL.");
-#else
-    return raw_info.addr;
-#endif
-}
 inline size_t ObjectInfo::getRefCount() const noexcept {
     return raw_info.rc;
 }

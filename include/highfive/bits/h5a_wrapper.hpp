@@ -12,13 +12,13 @@ inline hid_t h5a_create2(hid_t loc_id,
                          hid_t space_id,
                          hid_t acpl_id,
                          hid_t aapl_id) {
-#if defined(HIGHFIVE_USE_RESTVOL)
     // Check if the type is a variable-length string
-    if (H5Tget_class(type_id) == H5T_STRING && H5Tis_variable_str(type_id) > 0) {
+    if (rest_vol_enabled() && H5Tget_class(type_id) == H5T_STRING &&
+        H5Tis_variable_str(type_id) > 0) {
         throw AttributeException(
             "Variable-length string attributes are not supported with REST VOL");
     }
-#endif
+
     auto attr_id = H5Acreate2(loc_id, attr_name, type_id, space_id, acpl_id, aapl_id);
     if (attr_id < 0) {
         HDF5ErrMapper::ToException<AttributeException>(

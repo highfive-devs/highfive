@@ -32,7 +32,6 @@
 
 namespace HighFive {
 
-#if defined(HIGHFIVE_USE_RESTVOL)
 template <typename Derivate>
 void create_parent_group(NodeTraits<Derivate>* node,
                          const std::string& path,
@@ -51,7 +50,6 @@ void create_parent_group(NodeTraits<Derivate>* node,
         }
     }
 }
-#endif
 
 template <typename Derivate>
 inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
@@ -60,11 +58,10 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
                                                    const DataSetCreateProps& createProps,
                                                    const DataSetAccessProps& accessProps,
                                                    bool parents) {
-#if defined(HIGHFIVE_USE_RESTVOL)
-    if (parents) {
+    if (rest_vol_enabled() && parents) {
         create_parent_group(this, dataset_name, accessProps);
     }
-#endif
+
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
     return DataSet(detail::h5d_create2(static_cast<Derivate*>(this)->getId(),
@@ -95,39 +92,37 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
                                                    const DataSetAccessProps& accessProps,
                                                    bool parents) {
     auto dataspace = DataSpace::From(data);
-#if defined(HIGHFIVE_USE_RESTVOL)
-    if constexpr (std::is_same_v<T, std::string>) {
-        auto datatype = FixedLengthStringType(data.size() + 1, StringPadding::NullTerminated);
-        DataSet ds =
-            createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
-        ds.write(data);
-        return ds;
-    } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type, std::string>) {
-        auto string_length = std::max_element(data.begin(),
-                                              data.end(),
-                                              [](const std::string& a, const std::string& b) {
-                                                  return a.size() < b.size();
-                                              })
-                                 ->size();
-        auto datatype = FixedLengthStringType(string_length + 1, StringPadding::NullPadded);
-        DataSet ds =
-            createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
-        ds.write(data);
-        return ds;
-    } else {
-#endif
-        DataSet ds =
-            createDataSet(dataset_name,
-                          dataspace,
-                          create_and_check_datatype<typename details::inspector<T>::base_type>(),
-                          createProps,
-                          accessProps,
-                          parents);
-        ds.write(data);
-        return ds;
-#if defined(HIGHFIVE_USE_RESTVOL)
+    if (rest_vol_enabled()) {
+        if constexpr (std::is_same_v<T, std::string>) {
+            auto datatype = FixedLengthStringType(data.size() + 1, StringPadding::NullTerminated);
+            DataSet ds =
+                createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
+            ds.write(data);
+            return ds;
+        } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type,
+                                            std::string>) {
+            auto string_length = std::max_element(data.begin(),
+                                                  data.end(),
+                                                  [](const std::string& a, const std::string& b) {
+                                                      return a.size() < b.size();
+                                                  })
+                                     ->size();
+            auto datatype = FixedLengthStringType(string_length + 1, StringPadding::NullPadded);
+            DataSet ds =
+                createDataSet(dataset_name, dataspace, datatype, createProps, accessProps, parents);
+            ds.write(data);
+            return ds;
+        }
     }
-#endif
+    DataSet ds =
+        createDataSet(dataset_name,
+                      dataspace,
+                      create_and_check_datatype<typename details::inspector<T>::base_type>(),
+                      createProps,
+                      accessProps,
+                      parents);
+    ds.write(data);
+    return ds;
 }
 
 template <typename Derivate>

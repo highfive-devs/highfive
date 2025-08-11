@@ -37,15 +37,12 @@ template <typename Derivate>
 template <typename Type>
 inline Attribute AnnotateTraits<Derivate>::createAttribute(const std::string& attribute_name,
                                                            const DataSpace& space) {
-#if defined(HIGHFIVE_USE_RESTVOL)
-    if constexpr (std::is_same_v<Type, std::string>) {
-        throw AttributeException("Variable length strings not supported with REST VOL.");
-    } else {
-#endif
-        return createAttribute(attribute_name, space, create_and_check_datatype<Type>());
-#if defined(HIGHFIVE_USE_RESTVOL)
+    if (rest_vol_enabled()) {
+        if constexpr (std::is_same_v<Type, std::string>) {
+            throw AttributeException("Variable length strings not supported with REST VOL.");
+        }
     }
-#endif
+    return createAttribute(attribute_name, space, create_and_check_datatype<Type>());
 }
 
 template <typename Derivate>
@@ -53,34 +50,32 @@ template <typename T>
 inline Attribute AnnotateTraits<Derivate>::createAttribute(const std::string& attribute_name,
                                                            const T& data) {
     auto dataspace = DataSpace::From(data);
-#if defined(HIGHFIVE_USE_RESTVOL)
-    if constexpr (std::is_same_v<T, std::string>) {
-        auto datatype = FixedLengthStringType(data.size() + 1, StringPadding::NullTerminated);
-        Attribute att = createAttribute(attribute_name, dataspace, datatype);
-        att.write(data);
-        return att;
-    } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type, std::string>) {
-        auto string_length = std::max_element(data.begin(),
-                                              data.end(),
-                                              [](const std::string& a, const std::string& b) {
-                                                  return a.size() < b.size();
-                                              })
-                                 ->size();
-        auto datatype = FixedLengthStringType(string_length + 1, StringPadding::NullPadded);
-        Attribute att = createAttribute(attribute_name, dataspace, datatype);
-        att.write(data);
-        return att;
-    } else {
-#endif
-        Attribute att =
-            createAttribute(attribute_name,
-                            dataspace,
-                            create_and_check_datatype<typename details::inspector<T>::base_type>());
-        att.write(data);
-        return att;
-#if defined(HIGHFIVE_USE_RESTVOL)
+    if (rest_vol_enabled()) {
+        if constexpr (std::is_same_v<T, std::string>) {
+            auto datatype = FixedLengthStringType(data.size() + 1, StringPadding::NullTerminated);
+            Attribute att = createAttribute(attribute_name, dataspace, datatype);
+            att.write(data);
+            return att;
+        } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type,
+                                            std::string>) {
+            auto string_length = std::max_element(data.begin(),
+                                                  data.end(),
+                                                  [](const std::string& a, const std::string& b) {
+                                                      return a.size() < b.size();
+                                                  })
+                                     ->size();
+            auto datatype = FixedLengthStringType(string_length + 1, StringPadding::NullPadded);
+            Attribute att = createAttribute(attribute_name, dataspace, datatype);
+            att.write(data);
+            return att;
+        }
     }
-#endif
+    Attribute att =
+        createAttribute(attribute_name,
+                        dataspace,
+                        create_and_check_datatype<typename details::inspector<T>::base_type>());
+    att.write(data);
+    return att;
 }
 
 template <typename Derivate>
