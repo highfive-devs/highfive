@@ -26,7 +26,7 @@ RUN git clone https://github.com/HDFGroup/vol-rest
 WORKDIR /HDFGroup/vol-rest
 RUN git checkout ${REST_VOL_COMMIT}
 RUN mkdir build && cd build && \
-    cmake -G Ninja -DHDF5_VOL_REST_ENABLE_CURL_DEBUG=ON -DHDF5_VOL_REST_ENABLE_DEBUG=ON -DCMAKE_INSTALL_PREFIX=/usr/local/vol-rest -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DHDF5_VOL_REST_ENABLE_EXAMPLES=OFF .. && \
+    cmake -G Ninja -DHDF5_VOL_REST_ENABLE_CURL_DEBUG=OFF -DHDF5_VOL_REST_ENABLE_DEBUG=OFF -DCMAKE_INSTALL_PREFIX=/usr/local/vol-rest -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DHDF5_VOL_REST_ENABLE_EXAMPLES=OFF .. && \
     cmake --build . && cmake --install .
 RUN ln -s /usr/local/vol-rest/lib/libhdf5_vol_rest.so  /usr/local/vol-rest/lib/librest_vol.so
 
