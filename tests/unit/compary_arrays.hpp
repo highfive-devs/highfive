@@ -74,9 +74,7 @@ void compare_arrays(const Actual& actual,
                     const Expected& expected,
                     const std::vector<size_t>& dims) {
     using base_type = typename testing::ContainerTraits<Actual>::base_type;
-    compare_arrays(expected, actual, dims, [](base_type a, base_type b) {
-        return trim_if_rest_vol(a) == trim_if_rest_vol(b);
-    });
+    compare_arrays(expected, actual, dims, [](base_type a, base_type b) { return a == b; });
 }
 
 }  // namespace testing

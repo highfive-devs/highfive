@@ -79,8 +79,8 @@ CompoundType create_compound_csl2() {
 HIGHFIVE_REGISTER_TYPE(CSL1, create_compound_csl1)
 HIGHFIVE_REGISTER_TYPE(CSL2, create_compound_csl2)
 
-TEST_CASE("HighFiveCompounds", RESTVOL_UNSUPPORTED("")) {
-    const std::string file_name(to_abs_if_rest_vol("compounds_test.h5"));
+TEST_CASE("HighFiveCompounds") {
+    const std::string file_name("compounds_test.h5");
     const std::string dataset_name1("/a");
     const std::string dataset_name2("/b");
 
@@ -193,8 +193,8 @@ HIGHFIVE_REGISTER_TYPE(GrandChild, create_compound_GrandChild)
 HIGHFIVE_REGISTER_TYPE(Child, create_compound_Child)
 HIGHFIVE_REGISTER_TYPE(Parent, create_compound_Parent)
 
-TEST_CASE("HighFiveCompoundsNested", RESTVOL_UNSUPPORTED("")) {
-    const std::string file_name(to_abs_if_rest_vol("nested_compounds_test.h5"));
+TEST_CASE("HighFiveCompoundsNested") {
+    const std::string file_name("nested_compounds_test.h5");
     const std::string dataset_name("/a");
 
     {  // Write
@@ -274,8 +274,8 @@ std::string check(File& f) {
     return std::string(recs[0].s);
 }
 
-TEST_CASE("HighFiveCompoundsSeveralPadding", RESTVOL_UNSUPPORTED("")) {
-    const std::string file_name(to_abs_if_rest_vol("padded_compounds_test.h5"));
+TEST_CASE("HighFiveCompoundsSeveralPadding") {
+    const std::string file_name("padded_compounds_test.h5");
 
     File file(file_name, File::ReadWrite | File::Create | File::Truncate);
     {  // Write
@@ -342,7 +342,7 @@ EnumType<Direction> create_enum_direction() {
 HIGHFIVE_REGISTER_TYPE(Direction, create_enum_direction)
 
 TEST_CASE("HighFiveEnum") {
-    const std::string file_name(to_abs_if_rest_vol("enum_test.h5"));
+    const std::string file_name("enum_test.h5");
     const std::string dataset_name1("/a");
     const std::string dataset_name2("/b");
 
@@ -389,7 +389,7 @@ TEST_CASE("HighFiveEnum") {
 }
 
 TEST_CASE("HighFiveReadType") {
-    const std::string file_name(to_abs_if_rest_vol("readtype_test.h5"));
+    const std::string file_name("readtype_test.h5");
     const std::string datatype_name1("my_type");
     const std::string datatype_name2("position");
 

@@ -212,47 +212,13 @@ inline HighFive::DataSet readWriteDataset(const DataT& ndvec,
     return dataset;
 }
 
-#if defined(HIGHFIVE_USE_RESTVOL)
-std::string to_abs_if_rest_vol(const std::string& path) {
-    return "/" + path;
-}
-#define RESTVOL_UNSUPPORTED(label) "[.restvol-unsupported]"
-#define RESTVOL_DISABLED(label)    "[.restvol-disabled]"
-#else
-std::string to_abs_if_rest_vol(const std::string& path) {
-    return path;
-}
-#define RESTVOL_UNSUPPORTED(label) label
-#define RESTVOL_DISABLED(label)    label
-#endif
-
 void delete_file_if_exists(const std::string& name) {
-#ifdef HIGHFIVE_USE_RESTVOL
-    hid_t fapl = H5Pcreate(H5P_FILE_ACCESS);
-    H5Pset_fapl_rest_vol(fapl);
-    H5Fdelete(name.c_str(), fapl);
-    H5Pclose(fapl);
-#else
+    // if (rest_vol_enabled()) {
+    // hid_t fapl = H5Pcreate(H5P_FILE_ACCESS);
+    // H5Pset_fapl_rest_vol(fapl);
+    // H5Fdelete(name.c_str(), fapl);
+    // H5Pclose(fapl);
+    // } else {
     std::remove(name.c_str());
-#endif
-}
-
-template <typename T>
-T& trim_if_rest_vol(T& var) {
-#if defined(HIGHFIVE_USE_RESTVOL)
-    if constexpr (std::is_same_v<T, std::string>) {
-        while (!var.empty() && var.back() == '\0')
-            var.pop_back();
-    }
-#endif
-    return var;
-}
-
-template <>
-std::vector<std::string>& trim_if_rest_vol<std::vector<std::string>>(
-    std::vector<std::string>& var) {
-#if defined(HIGHFIVE_USE_RESTVOL)
-    std::for_each(var.begin(), var.end(), &trim_if_rest_vol<std::string>);
-#endif
-    return var;
+    // }
 }

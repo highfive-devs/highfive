@@ -119,7 +119,7 @@ template <class ReadWriteInterface, class CreateContainer>
 void check_empty_read_write_cycle(const std::vector<size_t>& dims) {
     using container_type = typename CreateContainer::container_type;
 
-    const std::string file_name(to_abs_if_rest_vol("h5_empty_attr.h5"));
+    const std::string file_name("h5_empty_attr.h5");
     const std::string dataset_name("dset");
     File file(file_name, File::Truncate);
 
@@ -219,7 +219,7 @@ void check_empty(const std::vector<size_t>& dims) {
 #endif
 }
 
-TEST_CASE("Empty arrays", RESTVOL_DISABLED("")) {
+TEST_CASE("Empty arrays") {
     SECTION("one-dimensional") {
         check_empty<1>({0ul});
     }

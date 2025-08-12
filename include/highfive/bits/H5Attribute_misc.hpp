@@ -90,18 +90,25 @@ inline void Attribute::read(T& array) const {
 
     auto r = details::data_converter::get_reader<T>(dims, array, file_datatype);
     read_raw(r.getPointer(), buffer_info.data_type);
-    // re-arrange results
     r.unserialize(array);
+
+    // --- Trim trailing '\0' for strings ---
+    if constexpr (std::is_same_v<T, std::string>) {
+        array.erase(std::find(array.begin(), array.end(), '\0'), array.end());
+    } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type, std::string>) {
+        for (auto& s: array) {
+            s.erase(std::find(s.begin(), s.end(), '\0'), s.end());
+        }
+    }
+    // --------------------------------------
 
     auto t = buffer_info.data_type;
     auto c = t.getClass();
 
     if (c == DataTypeClass::VarLen || t.isVariableStr()) {
 #if H5_VERSION_GE(1, 12, 0)
-        // This one have been created in 1.12.0
         (void) detail::h5t_reclaim(t.getId(), mem_space.getId(), H5P_DEFAULT, r.getPointer());
 #else
-        // This one is deprecated since 1.12.0
         (void) detail::h5d_vlen_reclaim(t.getId(), mem_space.getId(), H5P_DEFAULT, r.getPointer());
 #endif
     }

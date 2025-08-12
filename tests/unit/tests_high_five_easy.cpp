@@ -75,7 +75,7 @@ TEST_CASE("H5Easy_Compression") {
 }
 
 TEST_CASE("H5Easy_scalar") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_scalar.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_scalar.h5", H5Easy::File::Overwrite);
 
     double a = 1.2345;
     int b = 12345;
@@ -98,13 +98,13 @@ TEST_CASE("H5Easy_scalar") {
 
     CHECK(a == a_r);
     CHECK(b == b_r);
-    CHECK(c == trim_if_rest_vol(c_r));
+    CHECK(c == c_r);
     CHECK(d == d_r);
     CHECK(e == e_r);
 }
 
 TEST_CASE("H5Easy_vector1d") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_vector1d.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_vector1d.h5", H5Easy::File::Overwrite);
 
     std::vector<size_t> a = {1, 2, 3, 4, 5};
     std::vector<std::complex<double>> b = {std::complex<double>(1, .1),
@@ -134,7 +134,7 @@ TEST_CASE("H5Easy_vector1d") {
 }
 
 TEST_CASE("H5Easy_vector2d") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_vector2d.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_vector2d.h5", H5Easy::File::Overwrite);
 
     std::vector<std::vector<size_t>> a({{0, 1}, {2, 3}, {4, 5}});
 
@@ -146,8 +146,7 @@ TEST_CASE("H5Easy_vector2d") {
 }
 
 TEST_CASE("H5Easy_vector2d_compression") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_vector2d_compression.h5"),
-                      H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_vector2d_compression.h5", H5Easy::File::Overwrite);
 
     std::vector<std::vector<size_t>> a({{0, 1}, {2, 3}, {4, 5}});
 
@@ -164,7 +163,7 @@ TEST_CASE("H5Easy_vector2d_compression") {
 }
 
 TEST_CASE("H5Easy_vector3d") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_vector3d.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_vector3d.h5", H5Easy::File::Overwrite);
 
     using type = std::vector<std::vector<std::vector<size_t>>>;
 
@@ -196,7 +195,7 @@ void check_attribute(H5Easy::File& file, const std::string& path) {
 
     CHECK(a == a_r);
     CHECK(b == b_r);
-    CHECK(c == trim_if_rest_vol(c_r));
+    CHECK(c == c_r);
     REQUIRE(d.size() == d_r.size());
     for (size_t i = 0; i < d.size(); ++i) {
         REQUIRE(d[i] == d_r[i]);
@@ -204,7 +203,7 @@ void check_attribute(H5Easy::File& file, const std::string& path) {
 }
 
 TEST_CASE("H5Easy_Attribute_scalar") {
-    H5Easy::File file(to_abs_if_rest_vol("h5easy_attribute_scalar.h5"), H5Easy::File::Overwrite);
+    H5Easy::File file("h5easy_attribute_scalar.h5", H5Easy::File::Overwrite);
 
     std::string path = "/path/to/x";
     H5Easy::dump(file, path, 1.0);
