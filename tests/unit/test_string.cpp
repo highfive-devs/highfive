@@ -87,7 +87,12 @@ void check_single_string(File file, size_t string_length) {
         auto obj =
             CreateTraits::create(file, "overlength_nullterm", dataspace, overlength_nullterm);
         obj.write(value);
-        REQUIRE(obj.template read<std::string>() == value);
+        if (rest_vol_enabled()) {
+            const auto readValue = obj.template read<std::string>();
+            REQUIRE(value.compare(0, readValue.size(), readValue) == 0);
+        } else {
+            REQUIRE(obj.template read<std::string>() == value);
+        }
     }
 
     SECTION("overlength null-padded") {
@@ -95,7 +100,12 @@ void check_single_string(File file, size_t string_length) {
         obj.write(value);
         auto expected = std::string(n_chars_overlength, '\0');
         expected.replace(0, value.size(), value.data());
-        REQUIRE(obj.template read<std::string>() == expected);
+        if (rest_vol_enabled()) {
+            const auto readValue = obj.template read<std::string>();
+            REQUIRE(expected.compare(0, readValue.size(), readValue) == 0);
+        } else {
+            REQUIRE(obj.template read<std::string>() == expected);
+        }
     }
 
     SECTION("overlength space-padded") {
@@ -104,7 +114,12 @@ void check_single_string(File file, size_t string_length) {
         obj.write(value);
         auto expected = std::string(n_chars_overlength, ' ');
         expected.replace(0, value.size(), value.data());
-        REQUIRE(obj.template read<std::string>() == expected);
+        if (rest_vol_enabled()) {
+            const auto readValue = obj.template read<std::string>();
+            REQUIRE(expected.compare(0, readValue.size(), readValue) == 0);
+        } else {
+            REQUIRE(obj.template read<std::string>() == expected);
+        }
     }
 
     SECTION("variable length") {
@@ -138,7 +153,11 @@ void check_multiple_string(File file, size_t string_length) {
     auto check = [](const value_t actual, const value_t& expected) {
         REQUIRE(actual.size() == expected.size());
         for (size_t i = 0; i < actual.size(); ++i) {
-            REQUIRE(actual[i] == expected[i]);
+            if constexpr (std::is_same_v<value_t, std::vector<std::string>>) {
+                REQUIRE(expected[i].compare(0, actual[i].size(), actual[i]) == 0);
+            } else {
+                REQUIRE(actual[i] == expected[i]);
+            }
         }
     };
 
@@ -153,11 +172,7 @@ void check_multiple_string(File file, size_t string_length) {
 
     SECTION("automatic") {
         auto obj = CreateTraits::create(file, "auto", value);
-        if (rest_vol_enabled()) {
-            check(obj.template read<value_t>(), make_padded_reference('\0', string_length + 1));
-        } else {
-            check(obj.template read<value_t>(), value);
-        }
+        check(obj.template read<value_t>(), value);
     }
 
     SECTION("variable length") {

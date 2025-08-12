@@ -104,6 +104,10 @@ TEST_CASE("selectionArraySimpleString") {
 }
 
 TEMPLATE_LIST_TEST_CASE("selectionArraySimple", "[template]", dataset_test_types) {
+    if (rest_vol_enabled()) {
+        // Hyperslab is not supported in the REST VOL
+        return;
+    }
     selectionArraySimpleTest<TestType>();
 }
 
