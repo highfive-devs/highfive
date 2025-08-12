@@ -250,6 +250,11 @@ TEST_CASE("Test file space page size") {
 
 #ifndef H5_HAVE_PARALLEL
 TEST_CASE("Test page buffer size") {
+    if (rest_vol_enabled()) {
+        // Stats for page buffering are not supported in the REST VOL
+        return;
+    }
+
     const std::string file_name = "h5_page_buffer_size.h5";
     hsize_t page_size = 1024;
     {
@@ -691,6 +696,11 @@ TEST_CASE("Test extensible datasets") {
     constexpr long double t2[1][3] = {{4.0l, 8.0l, 6.0l}};
 
     {
+        if (rest_vol_enabled()) {
+            // Extensible datasets are not supported in the REST VOL
+            return;
+        }
+
         // Create a new file using the default property lists.
         File file(file_name, File::ReadWrite | File::Create | File::Truncate);
 
@@ -1510,10 +1520,14 @@ void attribute_scalar_rw() {
     CHECK(!g.hasAttribute("family"));
 
     // write a scalar attribute
+    T out(attribute_value);
     {
-        T out(attribute_value);
-        Attribute att = g.createAttribute<T>("family", DataSpace::From(out));
-        att.write(out);
+        if (rest_vol_enabled()) {
+            Attribute att = g.createAttribute("family", out);
+        } else {
+            Attribute att = g.createAttribute<T>("family", DataSpace::From(out));
+            att.write(out);
+        }
     }
 
     h5file.flush();
@@ -1863,7 +1877,12 @@ TEST_CASE("HighFiveRecursiveGroups") {
     // Create a new file using the default property lists.
     File file(file_name, File::ReadWrite | File::Create | File::Truncate);
 
-    CHECK(file.getName() == file_name);
+    if (rest_vol_enabled()) {
+        CHECK(file.getName() == "/" + file_name);
+    } else {
+        CHECK(file.getName() == file_name);
+    }
+
 
     // Without parents creating both groups will fail
     {
@@ -1876,6 +1895,7 @@ TEST_CASE("HighFiveRecursiveGroups") {
     g2.createDataSet(ds_name, some_data);
 
     CHECK(file.exist(group_1));
+
 
     Group g1 = file.getGroup(group_1);
     CHECK(g1.exist(group_2));
@@ -2091,6 +2111,10 @@ TEST_CASE("HighFiveHardLinks Group") {
 }
 
 TEST_CASE("HighFiveRename") {
+    if (rest_vol_enabled()) {
+        // H5Lmove is not supported in the REST VOL
+        return;
+    }
     File file("h5_rename.h5", File::ReadWrite | File::Create | File::Truncate);
 
     int number = 100;
@@ -2114,6 +2138,11 @@ TEST_CASE("HighFiveRename") {
 }
 
 TEST_CASE("HighFiveRenameRelative") {
+    if (rest_vol_enabled()) {
+        // H5Lmove is not supported in the REST VOL
+        return;
+    }
+
     File file("h5_rename_relative.h5", File::ReadWrite | File::Create | File::Truncate);
     Group group = file.createGroup("group");
 
@@ -2297,6 +2326,11 @@ TEST_CASE("DirectWriteBool") {
 
 
 TEST_CASE("HighFiveReference") {
+    if (rest_vol_enabled()) {
+        // H5Rcreate(): must use native VOL connector to create reference
+        return;
+    }
+
     const std::string file_name = "h5_ref_test.h5";
     const std::string dataset1_name("dset1");
     const std::string dataset2_name("dset2");

@@ -8,10 +8,6 @@
  */
 #pragma once
 
-#if defined(HIGHFIVE_USE_RESTVOL)
-#include <rest_vol_public.h>
-#endif
-
 #include <complex>
 #include <random>
 #include <string>
@@ -213,12 +209,14 @@ inline HighFive::DataSet readWriteDataset(const DataT& ndvec,
 }
 
 void delete_file_if_exists(const std::string& name) {
-    // if (rest_vol_enabled()) {
-    // hid_t fapl = H5Pcreate(H5P_FILE_ACCESS);
-    // H5Pset_fapl_rest_vol(fapl);
-    // H5Fdelete(name.c_str(), fapl);
-    // H5Pclose(fapl);
-    // } else {
-    std::remove(name.c_str());
-    // }
+    if (HighFive::rest_vol_enabled()) {
+        auto _name = name;
+        if (!std::filesystem::path(name).is_absolute()) {
+            _name = "/" + name;
+        }
+        std::string command = "hsrm " + _name;
+        system(command.c_str());
+    } else {
+        std::remove(name.c_str());
+    }
 }
