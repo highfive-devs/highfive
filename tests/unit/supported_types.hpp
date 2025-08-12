@@ -149,9 +149,10 @@ using all_numeric_scalar_types = std::tuple<
 // suffice.
 using some_numeric_scalar_types = std::tuple<char, int, double>;
 
-using all_scalar_types = typename ConcatenateTuples<all_numeric_scalar_types, std::tuple<bool, std::string>>::type;
+// using all_scalar_types = typename ConcatenateTuples<all_numeric_scalar_types, std::tuple<bool, std::string>>::type;
 // using some_scalar_types = typename ConcatenateTuples<some_numeric_scalar_types, std::tuple<bool, std::string>>::type;
 // Reducing the supporting types for rest vol support.
+using all_scalar_types = all_numeric_scalar_types;
 using some_scalar_types = typename std::tuple<char, int, double, bool>;
 using scalar_types_boost = some_numeric_scalar_types;
 using scalar_types_eigen = some_numeric_scalar_types;

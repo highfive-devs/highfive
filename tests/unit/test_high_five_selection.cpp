@@ -100,6 +100,10 @@ void selectionArraySimpleTest() {
 }
 
 TEST_CASE("selectionArraySimpleString") {
+    if (rest_vol_enabled()) {
+        // Hyperslab is not supported in the REST VOL
+        return;
+    }
     selectionArraySimpleTest<std::string>();
 }
 
@@ -112,6 +116,11 @@ TEMPLATE_LIST_TEST_CASE("selectionArraySimple", "[template]", dataset_test_types
 }
 
 TEST_CASE("selectionByElementMultiDim") {
+    if (rest_vol_enabled()) {
+        // Hyperslab is not supported in the REST VOL
+        return;
+    }
+
     const std::string file_name("h5_test_selection_multi_dim.h5");
     // Create a 2-dim dataset
     File file(file_name, File::ReadWrite | File::Create | File::Truncate);
