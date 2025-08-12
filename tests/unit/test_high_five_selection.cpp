@@ -206,14 +206,26 @@ void check_column_selection() {
 }
 
 TEST_CASE("columnSelectionVectorDouble") {
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
+    }
     check_column_selection<std::vector<double>>();
 }
 
 TEST_CASE("columnSelectionVector2DDouble") {
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
+    }
     check_column_selection<std::vector<std::vector<double>>>();
 }
 
 TEST_CASE("columnSelectionVector3DDouble") {
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
+    }
     check_column_selection<std::vector<std::vector<std::vector<double>>>>();
 }
 
@@ -598,6 +610,10 @@ void check_selected(const std::vector<int>& selected,
 }
 
 TEST_CASE("select_multiple_ors", "[hyperslab]") {
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
+    }
     size_t n = 100, m = 20;
     size_t nsel = 30;
     auto x = testing::DataGenerator<std::vector<std::vector<int>>>::create({n, m});
@@ -644,6 +660,11 @@ TEST_CASE("select_multiple_ors", "[hyperslab]") {
 }
 
 TEST_CASE("select_multiple_ors_edge_cases", "[hyperslab]") {
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
+    }
+
     size_t n = 100, m = 20;
 
     auto x = testing::DataGenerator<std::vector<std::vector<int>>>::create({n, m});

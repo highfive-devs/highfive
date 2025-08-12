@@ -40,9 +40,7 @@ using base_test_types = std::tuple<int,
                                    double,
                                    long long,
                                    unsigned long long,
-#if !defined(HIGHFIVE_USE_RESTVOL)  // TODO
                                    ldcomplex,
-#endif
                                    dcomplex,
                                    fcomplex>;
 

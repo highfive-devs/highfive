@@ -1640,6 +1640,11 @@ void readWriteShuffleDeflateTest() {
 }
 
 TEMPLATE_LIST_TEST_CASE("ReadWriteShuffleDeflate", "[template]", numerical_test_types) {
+    if (rest_vol_enabled()) {
+        if constexpr (std::is_same_v<TestType, ldcomplex>) {
+            return;
+        }
+    }
     readWriteShuffleDeflateTest<TestType>();
 }
 
