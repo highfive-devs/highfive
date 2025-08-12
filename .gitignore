@@ -4,3 +4,4 @@ tests/test_project
 
 .vs/
 *.log
+*.h5
