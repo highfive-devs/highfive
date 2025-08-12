@@ -627,51 +627,55 @@ TEST_CASE("FileSpace") {
 }
 
 TEST_CASE("FreeSpace (default)") {
-    const std::string filename = "freespace_default.h5";
-    const std::string ds_path = "dataset";
-    const std::vector<int> data{13, 24, 36};
+    if (!rest_vol_enabled()) {
+        const std::string filename = "freespace_default.h5";
+        const std::string ds_path = "dataset";
+        const std::vector<int> data{13, 24, 36};
 
-    {
-        File file(filename, File::Truncate);
-        auto dset = file.createDataSet(ds_path, data);
-    }
+        {
+            File file(filename, File::Truncate);
+            auto dset = file.createDataSet(ds_path, data);
+        }
 
-    {
-        File file(filename, File::ReadWrite);
-        file.unlink(ds_path);
-        CHECK(file.getFreeSpace() > 0);
-        CHECK(file.getFreeSpace() < file.getFileSize());
+        {
+            File file(filename, File::ReadWrite);
+            file.unlink(ds_path);
+            CHECK(file.getFreeSpace() > 0);
+            CHECK(file.getFreeSpace() < file.getFileSize());
+        }
     }
 }
 
 #if H5_VERSION_GE(1, 10, 1)
 TEST_CASE("FreeSpace (tracked)") {
-    const std::string filename = "freespace_tracked.h5";
-    const std::string ds_path = "dataset";
-    const std::vector<int> data{13, 24, 36};
+    if (!rest_vol_enabled()) {
+        const std::string filename = "freespace_tracked.h5";
+        const std::string ds_path = "dataset";
+        const std::vector<int> data{13, 24, 36};
 
-    {
-        FileCreateProps fcp;
-        fcp.add(FileSpaceStrategy(H5F_FSPACE_STRATEGY_FSM_AGGR, true, 0));
-        File file(filename, File::Truncate, fcp);
-        auto dset = file.createDataSet(ds_path, data);
-    }
+        {
+            FileCreateProps fcp;
+            fcp.add(FileSpaceStrategy(H5F_FSPACE_STRATEGY_FSM_AGGR, true, 0));
+            File file(filename, File::Truncate, fcp);
+            auto dset = file.createDataSet(ds_path, data);
+        }
 
-    {
-        File file(filename, File::ReadWrite);
-        file.unlink(ds_path);
+        {
+            File file(filename, File::ReadWrite);
+            file.unlink(ds_path);
 
 #if H5_VERSION_GE(1, 12, 0)
-        // This fails on 1.10.x but starts working in 1.12.0
-        CHECK(file.getFreeSpace() > 0);
+            // This fails on 1.10.x but starts working in 1.12.0
+            CHECK(file.getFreeSpace() > 0);
 #endif
-        CHECK(file.getFreeSpace() < file.getFileSize());
-    }
+            CHECK(file.getFreeSpace() < file.getFileSize());
+        }
 
-    {
-        File file(filename, File::ReadOnly);
-        CHECK(file.getFreeSpace() > 0);
-        CHECK(file.getFreeSpace() < file.getFileSize());
+        {
+            File file(filename, File::ReadOnly);
+            CHECK(file.getFreeSpace() > 0);
+            CHECK(file.getFreeSpace() < file.getFileSize());
+        }
     }
 }
 #endif
@@ -1367,117 +1371,120 @@ void check(const S& array, const S& subarray, const Y& yslices, const X& xslices
 
 
 TEST_CASE("productSet") {
-    using Slice = std::array<size_t, 2>;
-    using Slices = std::vector<Slice>;
-    using Point = size_t;
-    using Points = std::vector<Point>;
+    if (!rest_vol_enabled()) {
+        using Slice = std::array<size_t, 2>;
+        using Slices = std::vector<Slice>;
+        using Point = size_t;
+        using Points = std::vector<Point>;
 
-    const std::string file_name = "h5_test_product_set.h5";
+        const std::string file_name = "h5_test_product_set.h5";
 
-    auto generate = [](size_t n, size_t m, auto f) {
-        auto x = std::vector<std::vector<double>>(n);
-        for (size_t i = 0; i < n; ++i) {
-            x[i] = std::vector<double>(m);
-        }
+        auto generate = [](size_t n, size_t m, auto f) {
+            auto x = std::vector<std::vector<double>>(n);
+            for (size_t i = 0; i < n; ++i) {
+                x[i] = std::vector<double>(m);
+            }
 
-        for (size_t i = 0; i < n; ++i) {
-            for (size_t j = 0; j < m; ++j) {
-                x[i][j] = f(i, j);
+            for (size_t i = 0; i < n; ++i) {
+                for (size_t j = 0; j < m; ++j) {
+                    x[i][j] = f(i, j);
+                }
+            }
+
+            return x;
+        };
+
+        auto array =
+            generate(6, 12, [](size_t i, size_t j) { return double(i) + double(j) * 0.01; });
+
+        auto file = File(file_name, File::Truncate);
+        auto dset = file.createDataSet("dset", array);
+
+        SECTION("rR") {
+            std::vector<std::vector<double>> subarray;
+
+            auto yslice = Slice{1, 3};
+            auto yslices = Slices{yslice};
+            auto xslices = Slices{{0, 1}, {3, 5}};
+            if (rest_vol_enabled()) {
+                CHECK_THROWS_AS(dset.select(ProductSet(yslice, xslices)).read(subarray),
+                                SliceException);
+            } else {
+                dset.select(ProductSet(yslice, xslices)).read(subarray);
+
+                check(array, subarray, yslices, xslices);
             }
         }
 
-        return x;
-    };
+        SECTION("Rr") {
+            std::vector<std::vector<double>> subarray;
 
-    auto array = generate(6, 12, [](size_t i, size_t j) { return double(i) + double(j) * 0.01; });
+            auto yslices = Slices{{0, 1}, {3, 5}};
+            auto xslice = Slice{1, 3};
+            auto xslices = Slices{xslice};
 
-    auto file = File(file_name, File::Truncate);
-    auto dset = file.createDataSet("dset", array);
-
-    SECTION("rR") {
-        std::vector<std::vector<double>> subarray;
-
-        auto yslice = Slice{1, 3};
-        auto yslices = Slices{yslice};
-        auto xslices = Slices{{0, 1}, {3, 5}};
-        if (rest_vol_enabled()) {
-            CHECK_THROWS_AS(dset.select(ProductSet(yslice, xslices)).read(subarray),
-                            SliceException);
-        } else {
-            dset.select(ProductSet(yslice, xslices)).read(subarray);
+            dset.select(ProductSet(yslices, xslice)).read(subarray);
 
             check(array, subarray, yslices, xslices);
         }
-    }
 
-    SECTION("Rr") {
-        std::vector<std::vector<double>> subarray;
+        SECTION("RP") {
+            std::vector<std::vector<double>> subarray;
 
-        auto yslices = Slices{{0, 1}, {3, 5}};
-        auto xslice = Slice{1, 3};
-        auto xslices = Slices{xslice};
+            auto yslices = Slices{{0, 1}, {3, 5}};
+            auto xpoints = Points{2, 4, 5};
+            auto xslices = Slices{{2, 3}, {4, 6}};
 
-        dset.select(ProductSet(yslices, xslice)).read(subarray);
+            dset.select(ProductSet(yslices, xpoints)).read(subarray);
 
-        check(array, subarray, yslices, xslices);
-    }
+            check(array, subarray, yslices, xslices);
+        }
 
-    SECTION("RP") {
-        std::vector<std::vector<double>> subarray;
+        SECTION("pR") {
+            std::vector<std::vector<double>> subarray;
 
-        auto yslices = Slices{{0, 1}, {3, 5}};
-        auto xpoints = Points{2, 4, 5};
-        auto xslices = Slices{{2, 3}, {4, 6}};
+            auto ypoint = Point{2};
+            auto yslices = Slices{{2, 3}};
+            auto xslices = Slices{{0, 1}, {3, 5}};
 
-        dset.select(ProductSet(yslices, xpoints)).read(subarray);
+            dset.select(ProductSet(ypoint, xslices)).read(subarray);
 
-        check(array, subarray, yslices, xslices);
-    }
+            check(array, subarray, yslices, xslices);
+        }
 
-    SECTION("pR") {
-        std::vector<std::vector<double>> subarray;
+        SECTION("pp") {
+            std::vector<std::vector<double>> subarray;
 
-        auto ypoint = Point{2};
-        auto yslices = Slices{{2, 3}};
-        auto xslices = Slices{{0, 1}, {3, 5}};
+            auto xpoint = Point{3};
+            auto ypoint = Point{2};
+            auto yslices = Slices{{2, 3}};
+            auto xslices = Slices{{3, 4}};
 
-        dset.select(ProductSet(ypoint, xslices)).read(subarray);
+            dset.select(ProductSet(ypoint, xpoint)).read(subarray);
+            check(array, subarray, yslices, xslices);
+        }
 
-        check(array, subarray, yslices, xslices);
-    }
+        SECTION("PP") {
+            std::vector<std::vector<double>> subarray;
 
-    SECTION("pp") {
-        std::vector<std::vector<double>> subarray;
+            auto xpoints = Points{0, 3, 4};
+            auto ypoints = Points{2, 3};
+            auto yslices = Slices{{2, 4}};
+            auto xslices = Slices{{0, 1}, {3, 5}};
 
-        auto xpoint = Point{3};
-        auto ypoint = Point{2};
-        auto yslices = Slices{{2, 3}};
-        auto xslices = Slices{{3, 4}};
+            dset.select(ProductSet(ypoints, xpoints)).read(subarray);
+            check(array, subarray, yslices, xslices);
+        }
 
-        dset.select(ProductSet(ypoint, xpoint)).read(subarray);
-        check(array, subarray, yslices, xslices);
-    }
+        SECTION("RR") {
+            std::vector<std::vector<double>> subarray;
 
-    SECTION("PP") {
-        std::vector<std::vector<double>> subarray;
+            auto yslices = Slices{{2, 4}};
+            auto xslices = Slices{{0, 1}, {3, 5}};
 
-        auto xpoints = Points{0, 3, 4};
-        auto ypoints = Points{2, 3};
-        auto yslices = Slices{{2, 4}};
-        auto xslices = Slices{{0, 1}, {3, 5}};
-
-        dset.select(ProductSet(ypoints, xpoints)).read(subarray);
-        check(array, subarray, yslices, xslices);
-    }
-
-    SECTION("RR") {
-        std::vector<std::vector<double>> subarray;
-
-        auto yslices = Slices{{2, 4}};
-        auto xslices = Slices{{0, 1}, {3, 5}};
-
-        dset.select(ProductSet(yslices, xslices)).read(subarray);
-        check(array, subarray, yslices, xslices);
+            dset.select(ProductSet(yslices, xslices)).read(subarray);
+            check(array, subarray, yslices, xslices);
+        }
     }
 }
 

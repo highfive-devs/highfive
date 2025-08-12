@@ -132,6 +132,10 @@ inline void File::flush() {
 }
 
 inline size_t File::getFileSize() const {
+    if (rest_vol_enabled()) {
+        // The REST VOL plugin requires a flush to get the correct file size
+        detail::h5f_flush(_hid, H5F_SCOPE_GLOBAL);
+    }
     hsize_t sizeValue = 0;
     detail::h5f_get_filesize(_hid, &sizeValue);
     return static_cast<size_t>(sizeValue);
