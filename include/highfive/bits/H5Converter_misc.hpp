@@ -228,11 +228,28 @@ struct StringBuffer {
         /// null-terminated string, the destination buffer needs to be at least
         /// `length() + 1` bytes long.
         size_t length() const {
+            // Start with HDF5's idea of "real" length
+            size_t len;
             if (buffer.isNullTerminated()) {
-                return char_buffer_length(data(), buffer.string_size);
+                // Stops at first '\0'
+                len = char_buffer_length(data(), buffer.string_size);
             } else {
-                return buffer.string_max_length;
+                // Fixed-length, no null-terminator, take max
+                len = buffer.string_max_length;
             }
+
+            // --- Trim trailing padding characters ---
+            if (buffer.padding == StringPadding::SpacePadded) {
+                while (len > 0 && data()[len - 1] == ' ') {
+                    --len;
+                }
+            } else if (buffer.padding == StringPadding::NullPadded ||
+                       buffer.padding == StringPadding::NullTerminated) {
+                while (len > 0 && data()[len - 1] == '\0') {
+                    --len;
+                }
+            }
+            return len;
         }
 
       private:

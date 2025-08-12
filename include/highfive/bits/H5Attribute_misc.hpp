@@ -92,16 +92,6 @@ inline void Attribute::read(T& array) const {
     read_raw(r.getPointer(), buffer_info.data_type);
     r.unserialize(array);
 
-    // --- Trim trailing '\0' for strings ---
-    if constexpr (std::is_same_v<T, std::string>) {
-        array.erase(std::find(array.begin(), array.end(), '\0'), array.end());
-    } else if constexpr (std::is_same_v<typename details::inspector<T>::base_type, std::string>) {
-        for (auto& s: array) {
-            s.erase(std::find(s.begin(), s.end(), '\0'), s.end());
-        }
-    }
-    // --------------------------------------
-
     auto t = buffer_info.data_type;
     auto c = t.getClass();
 
