@@ -400,9 +400,11 @@ void regularHyperSlabSelectionTest() {
 }
 
 TEMPLATE_LIST_TEST_CASE("hyperSlabSelection", "[template]", numerical_test_types) {
-    if (!rest_vol_enabled()) {
-        regularHyperSlabSelectionTest<TestType>();
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
     }
+    regularHyperSlabSelectionTest<TestType>();
 }
 
 struct IrregularHyperSlabAnswer {
@@ -517,9 +519,11 @@ void irregularHyperSlabSelectionReadTest() {
 }
 
 TEMPLATE_LIST_TEST_CASE("irregularHyperSlabSelectionRead", "[template]", numerical_test_types) {
-    if (!rest_vol_enabled()) {
-        irregularHyperSlabSelectionReadTest<TestType>();
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
     }
+    irregularHyperSlabSelectionReadTest<TestType>();
 }
 
 template <typename T>
@@ -571,9 +575,11 @@ void irregularHyperSlabSelectionWriteTest() {
 }
 
 TEMPLATE_LIST_TEST_CASE("irregularHyperSlabSelectionWrite", "[template]", std::tuple<int>) {
-    if (!rest_vol_enabled()) {
-        irregularHyperSlabSelectionWriteTest<TestType>();
+    if (rest_vol_enabled()) {
+        // Hyperslabs are not supported in the REST VOL
+        return;
     }
+    irregularHyperSlabSelectionWriteTest<TestType>();
 }
 
 void check_selected(const std::vector<int>& selected,

@@ -80,6 +80,11 @@ HIGHFIVE_REGISTER_TYPE(CSL1, create_compound_csl1)
 HIGHFIVE_REGISTER_TYPE(CSL2, create_compound_csl2)
 
 TEST_CASE("HighFiveCompounds") {
+    if (rest_vol_enabled()) {
+        // Members are not supported in the REST VOL
+        return;
+    }
+
     const std::string file_name("compounds_test.h5");
     const std::string dataset_name1("/a");
     const std::string dataset_name2("/b");
@@ -194,6 +199,10 @@ HIGHFIVE_REGISTER_TYPE(Child, create_compound_Child)
 HIGHFIVE_REGISTER_TYPE(Parent, create_compound_Parent)
 
 TEST_CASE("HighFiveCompoundsNested") {
+    if (rest_vol_enabled()) {
+        // Members are not supported in the REST VOL
+        return;
+    }
     const std::string file_name("nested_compounds_test.h5");
     const std::string dataset_name("/a");
 
