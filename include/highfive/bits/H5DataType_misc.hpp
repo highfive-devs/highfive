@@ -73,6 +73,18 @@ inline StringType DataType::asStringType() const {
     return StringType(_hid);
 }
 
+inline IntegerType DataType::asIntegerType() const {
+    if (getClass() != DataTypeClass::Integer) {
+        throw DataTypeException("Invalid conversion to IntegerType.");
+    }
+
+    if (isValid()) {
+        detail::h5i_inc_ref(_hid);
+    }
+
+    return IntegerType(_hid);
+}
+
 inline std::string DataType::string() const {
     return type_class_string(getClass()) + std::to_string(getSize() * 8);
 }

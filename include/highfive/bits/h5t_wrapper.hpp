@@ -24,6 +24,14 @@ inline hsize_t h5t_get_size(hid_t hid) {
     return size;
 }
 
+inline H5T_sign_t h5t_get_sign(hid_t type_id) {
+    auto sign = H5Tget_sign(type_id);
+    if (sign == H5T_SGN_ERROR) {
+        HDF5ErrMapper::ToException<DataTypeException>("Error getting the sign of datatype.");
+    }
+    return sign;
+}
+
 inline H5T_cset_t h5t_get_cset(hid_t hid) {
     auto cset = H5Tget_cset(hid);
     if (cset == H5T_CSET_ERROR) {

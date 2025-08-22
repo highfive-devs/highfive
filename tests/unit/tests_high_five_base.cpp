@@ -2332,6 +2332,21 @@ TEST_CASE("HighFiveDataTypeClass") {
     CHECK(((Float | String) & String) == String);
 }
 
+TEST_CASE("HighFiveIntegerType") {
+    SECTION("signed int") {
+        auto dtype = create_datatype<int>().asIntegerType();
+        CHECK(dtype.isSigned());
+    }
+    SECTION("unsigned int") {
+        auto dtype = create_datatype<unsigned int>().asIntegerType();
+        CHECK(!dtype.isSigned());
+    }
+    SECTION("invalid conversion") {
+        auto dtype = create_datatype<double>();
+        CHECK_THROWS(dtype.asIntegerType());
+    }
+}
+
 #ifdef HIGHFIVE_TEST_EIGEN
 
 template <typename T>
