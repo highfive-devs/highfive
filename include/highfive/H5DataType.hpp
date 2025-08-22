@@ -54,6 +54,7 @@ inline DataTypeClass operator&(DataTypeClass lhs, DataTypeClass rhs) {
 }
 
 class StringType;
+class IntegerType;
 
 ///
 /// \brief HDF5 Data Type
@@ -96,6 +97,11 @@ class DataType: public Object {
     /// \brief Returns this datatype as a `StringType`.
     ///
     StringType asStringType() const;
+
+    ///
+    /// \brief Returns this datatype as a `IntegerType`.
+    ///
+    IntegerType asIntegerType() const;
 
     ///
     /// \brief Check the DataType was default constructed.
@@ -179,6 +185,22 @@ class VariableLengthStringType: public StringType {
     explicit VariableLengthStringType(CharacterSet character_set = CharacterSet::Ascii);
 };
 
+///
+/// \brief An Integer datatype (i.e. H5T_INTEGER).
+///
+/// Provides access to the API that's only valid for integers. Use
+/// DataType::asIntegerType to convert from a generic DataType.
+///
+class IntegerType: public DataType {
+  public:
+    bool isSigned() {
+        return detail::h5t_get_sign(getId()) != H5T_SGN_NONE;
+    }
+
+  protected:
+    using DataType::DataType;
+    friend class DataType;
+};
 
 ///
 /// \brief create an HDF5 DataType from a C++ type
