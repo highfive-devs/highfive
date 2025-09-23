@@ -69,6 +69,7 @@ option(HIGHFIVE_TEST_EIGEN "Enable testing Eigen" OFF)
 option(HIGHFIVE_TEST_OPENCV "Enable testing OpenCV" OFF)
 option(HIGHFIVE_TEST_XTENSOR "Enable testing xtensor" OFF)
 option(HIGHFIVE_TEST_HALF_FLOAT "Enable testing half-precision floats" OFF)
+option(HIGHFIVE_USE_LIBCXX "Use libc++ for tests/examples (clang only)" OFF)
 
 set(HIGHFIVE_MAX_ERRORS 0 CACHE STRING "Maximum number of compiler errors.")
 option(HIGHFIVE_HAS_WERROR "Convert warnings to errors." OFF)
@@ -174,6 +175,9 @@ if(HIGHFIVE_EXAMPLES OR HIGHFIVE_UNIT_TESTS)
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveFlags.cmake)
   include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveOptionalDependencies.cmake)
 endif()
+
+# Include libc++ configuration for examples and tests
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/HighFiveLibCXX.cmake)
 
 if(HIGHFIVE_EXAMPLES)
   add_subdirectory(src/examples)
