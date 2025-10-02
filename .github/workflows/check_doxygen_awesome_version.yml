@@ -1,4 +1,6 @@
 name: Auto-update doxygen-awesome
+permissions:
+  contents: write
 
 on:
   workflow_dispatch:
