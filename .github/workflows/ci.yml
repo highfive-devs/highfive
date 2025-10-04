@@ -309,8 +309,16 @@ jobs:
           TEST_XTENSOR=Off
         fi
 
+        if (( ${{ matrix.os }} == "macOS-13" ))
+        then
+          HAS_WERROR=Off
+        else
+          HAS_WERROR=On
+        fi
+
         CMAKE_OPTIONS=(
           -GNinja
+          -DHIGHFIVE_HAS_WERROR:BOOL=${HAS_WERROR}
           -DHIGHFIVE_TEST_BOOST:BOOL=ON
           -DHIGHFIVE_TEST_EIGEN:BOOL=ON
           -DHIGHFIVE_TEST_XTENSOR:BOOL=${TEST_XTENSOR}
