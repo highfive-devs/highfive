@@ -1,4 +1,8 @@
 # Changes
+## Version 3.2.0 - 2025-09-23
+### New Feature
+    - Support check if an integer is signed. (#78)
+
 ## Version 3.1.1 - 2025-07-28
 Same as v3.1.0, but with updated version numbers.
 
