@@ -1,6 +1,7 @@
 name: Auto-update doxygen-awesome
 permissions:
   contents: write
+  pull-requests: write
 
 on:
   workflow_dispatch:
