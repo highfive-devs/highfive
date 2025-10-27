@@ -235,11 +235,20 @@ inline EnumType<details::Boolean> create_enum_boolean() {
     return {{"FALSE", details::Boolean::HighFiveFalse}, {"TRUE", details::Boolean::HighFiveTrue}};
 }
 
+
+namespace detail {
+template <class T>
+struct FalseType {
+    static constexpr const bool value = false;
+};
+}  // namespace detail
+
 // Other cases not supported. Fail early with a user message
 template <typename T>
 AtomicType<T>::AtomicType() {
+    // Certain compilers reject a plain `false`.
     static_assert(
-        true,
+        ::HighFive::detail::FalseType<T>::value,
         "Missing specialization of AtomicType<T>. Therefore, type T is not supported by HighFive.");
 }
 
