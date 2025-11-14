@@ -647,8 +647,9 @@ TEST_CASE("FreeSpace (tracked)") {
         File file(filename, File::ReadWrite);
         file.unlink(ds_path);
 
-#if H5_VERSION_GE(1, 12, 0)
+#if H5_VERSION_GE(1, 12, 0) && !H5_VERSION_GE(2, 0, 0)
         // This fails on 1.10.x but starts working in 1.12.0
+        // and then fails again under 2.0.0.
         CHECK(file.getFreeSpace() > 0);
 #endif
         CHECK(file.getFreeSpace() < file.getFileSize());
@@ -656,7 +657,10 @@ TEST_CASE("FreeSpace (tracked)") {
 
     {
         File file(filename, File::ReadOnly);
+#if !H5_VERSION_GE(2, 0, 0)
+        // This fails under 2.0.0
         CHECK(file.getFreeSpace() > 0);
+#endif
         CHECK(file.getFreeSpace() < file.getFileSize());
     }
 }
