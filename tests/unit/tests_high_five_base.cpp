@@ -634,17 +634,24 @@ TEST_CASE("FreeSpace (default)") {
     }
 }
 
-#if H5_VERSION_GE(1, 10, 1) && !H5_VERSION_GE(2, 0, 0)
+#if H5_VERSION_GE(1, 10, 1)
 TEST_CASE("FreeSpace (tracked)") {
     const std::string filename = "freespace_tracked.h5";
     const std::string ds_path = "dataset";
     const std::vector<int> data{13, 24, 36};
 
     {
+        // Depending on the HDF5 file version, the file can shrink on close.
+        // Therefore, we must pin the file version and put a "blocker" dataset
+        // after the dataset we'll remove. This ensures that the free space
+        // isn't at the end of the file and therefore can't be stripped.
         FileCreateProps fcp;
         fcp.add(FileSpaceStrategy(H5F_FSPACE_STRATEGY_FSM_AGGR, true, 0));
-        File file(filename, File::Truncate, fcp);
+        FileAccessProps fapl;
+        fapl.add(FileVersionBounds(H5F_LIBVER_V110, H5F_LIBVER_V110));
+        File file(filename, File::Truncate, fcp, fapl);
         auto dset = file.createDataSet(ds_path, data);
+        file.createDataSet("capstone", data);
     }
 
     {
