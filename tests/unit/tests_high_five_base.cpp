@@ -180,7 +180,11 @@ TEST_CASE("Test file version bounds") {
     {
         File file(file_name, File::Truncate);
         auto bounds = file.getVersionBounds();
+#if H5_VERSION_GE(2, 0, 0)
+        CHECK(bounds.first == H5F_LIBVER_V18);
+#else
         CHECK(bounds.first == H5F_LIBVER_EARLIEST);
+#endif
         CHECK(bounds.second == H5F_LIBVER_LATEST);
     }
 
@@ -630,7 +634,7 @@ TEST_CASE("FreeSpace (default)") {
     }
 }
 
-#if H5_VERSION_GE(1, 10, 1)
+#if H5_VERSION_GE(1, 10, 1) && !H5_VERSION_GE(2, 0, 0)
 TEST_CASE("FreeSpace (tracked)") {
     const std::string filename = "freespace_tracked.h5";
     const std::string ds_path = "dataset";
