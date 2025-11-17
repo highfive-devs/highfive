@@ -52,6 +52,13 @@ if(NOT TARGET HighFiveSpanDependency)
   endif()
 endif()
 
+if(NOT TARGET HighFiveMdspanDependency)
+  add_library(HighFiveMdspanDependency INTERFACE)
+  if(HIGHFIVE_TEST_MDSPAN)
+    target_compile_definitions(HighFiveMdspanDependency INTERFACE HIGHFIVE_TEST_MDSPAN=1)
+  endif()
+endif()
+
 if(NOT TARGET HighFiveOptionalDependencies)
   add_library(HighFiveOptionalDependencies INTERFACE)
   target_link_libraries(HighFiveOptionalDependencies INTERFACE
@@ -60,5 +67,6 @@ if(NOT TARGET HighFiveOptionalDependencies)
     HighFiveXTensorDependency
     HighFiveOpenCVDependency
     HighFiveSpanDependency
+    HighFiveMdspanDependency
   )
 endif()

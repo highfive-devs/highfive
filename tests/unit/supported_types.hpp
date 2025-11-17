@@ -18,6 +18,10 @@
 #include <Eigen/Dense>
 #endif
 
+#ifdef HIGHFIVE_TEST_MDSPAN
+#include <mdspan>
+#endif
+
 namespace HighFive {
 namespace testing {
 
@@ -108,6 +112,25 @@ struct XArray {
 };
 #endif
 
+#ifdef HIGHFIVE_TEST_MDSPAN
+template <class Extents, class Layout, class C = type_identity>
+struct STDMdspan {
+    template <class T>
+    using type = std::mdspan<typename C::template type<T>, Extents, Layout>;
+};
+
+#ifdef __cpp_lib_aligned_accessor
+template <class Extents, class Layout, size_t Alignment = 16, class C = type_identity>
+struct STDMdspanAligned {
+    template <class T>
+    using type = std::mdspan<typename C::template type<T>,
+                             Extents,
+                             Layout,
+                             std::aligned_accessor<typename C::template type<T>, Alignment>>;
+};
+#endif
+#endif
+
 template <class C, class Tuple>
 struct ContainerProduct;
 
@@ -154,6 +177,7 @@ using some_scalar_types = typename ConcatenateTuples<some_numeric_scalar_types, 
 
 using scalar_types_boost = some_numeric_scalar_types;
 using scalar_types_eigen = some_numeric_scalar_types;
+using scalar_types_mdspan = some_numeric_scalar_types;
 
 using supported_array_types = typename ConcatenateTuples<
 #ifdef HIGHFIVE_TEST_BOOST
@@ -206,6 +230,40 @@ using supported_array_types = typename ConcatenateTuples<
   typename ContainerProduct<STDVector<XArray<xt::layout_type::row_major>>, scalar_types_eigen>::type,
   typename ContainerProduct<STDArray<5, XArray<xt::layout_type::row_major>>, scalar_types_eigen>::type,
   typename ContainerProduct<XArray<xt::layout_type::column_major>, scalar_types_eigen>::type,
+#endif
+#ifdef HIGHFIVE_TEST_MDSPAN
+  typename ContainerProduct<STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, 3, 5>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, std::dynamic_extent>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, 7>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDVector<STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_left>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDArray<5, STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_left>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, 3, 5>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, std::dynamic_extent>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, 7>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDVector<STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_right>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDArray<5, STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_right>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_stride>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, 3, 5>, std::layout_stride>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, std::dynamic_extent>, std::layout_stride>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspan<std::extents<size_t, 7>, std::layout_stride>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDVector<STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_stride>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDArray<5, STDMdspan<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_stride>>, scalar_types_mdspan>::type,
+#ifdef __cpp_lib_aligned_accessor
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, 3, 5>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, std::dynamic_extent>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, 7>, std::layout_left>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDVector<STDMdspanAligned<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_left>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDArray<5, STDMdspanAligned<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_left>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, 3, 5>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, std::dynamic_extent>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDMdspanAligned<std::extents<size_t, 7>, std::layout_right>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDVector<STDMdspanAligned<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_right>>, scalar_types_mdspan>::type,
+  typename ContainerProduct<STDArray<5, STDMdspanAligned<std::extents<size_t, std::dynamic_extent, std::dynamic_extent>, std::layout_right>>, scalar_types_mdspan>::type,
+#endif
 #endif
   typename ContainerProduct<STDVector<>, all_scalar_types>::type,
   typename ContainerProduct<STDVector<STDVector<>>, some_scalar_types>::type,

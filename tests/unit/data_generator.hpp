@@ -4,8 +4,11 @@
 #include <numeric>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 #include <vector>
 #include <array>
+#include <cstdlib>
+#include <new>
 
 #include <highfive/bits/H5Inspector_misc.hpp>
 
@@ -27,6 +30,10 @@
 
 #ifdef HIGHFIVE_TEST_XTENSOR
 #include <highfive/xtensor.hpp>
+#endif
+
+#ifdef HIGHFIVE_TEST_MDSPAN
+#include <highfive/mdspan.hpp>
 #endif
 
 
@@ -600,6 +607,149 @@ struct ContainerTraits<Eigen::Map<PlainObjectType, MapOptions>>
     }
 };
 
+
+#endif
+
+// -- mdspan  ------------------------------------------------------------------
+#ifdef HIGHFIVE_TEST_MDSPAN
+
+template <class Acc>
+constexpr const size_t accessor_alignment = alignof(typename Acc::element_type);
+
+#ifdef __cpp_lib_aligned_accessor
+template <class T, size_t Align>
+constexpr const size_t accessor_alignment<std::aligned_accessor<T, Align>> = Align;
+#endif
+
+template <class ElementType, class Extents, class LayoutPolicy, class AccessorPolicy>
+struct ContainerTraits<std::mdspan<ElementType, Extents, LayoutPolicy, AccessorPolicy>> {
+    using container_type = std::mdspan<ElementType, Extents, LayoutPolicy, AccessorPolicy>;
+    using value_type = typename container_type::element_type;
+    using base_type = typename ContainerTraits<value_type>::base_type;
+    using extents_type = typename container_type::extents_type;
+    using layout_type = typename container_type::layout_type;
+    using accessor_type = typename container_type::accessor_type;
+    using index_type = typename extents_type::index_type;
+
+    static constexpr bool is_view = true;
+    static constexpr size_t rank = container_type::rank();
+    static constexpr bool is_layout_stride = std::is_same_v<layout_type, std::layout_stride>;
+
+    static void set(container_type& array,
+                    const std::vector<size_t>& indices,
+                    const base_type& value) {
+        auto local_indices = extract_local_indices(indices);
+        return ContainerTraits<value_type>::set(array[local_indices], lstrip(indices, rank), value);
+    }
+
+    static base_type get(const container_type& array, const std::vector<size_t>& indices) {
+        auto local_indices = extract_local_indices(indices);
+        return ContainerTraits<value_type>::get(array[local_indices], lstrip(indices, rank));
+    }
+
+    static void assign(container_type& dst, const container_type& src) {
+        dst = src;
+    }
+
+    static std::array<index_type, rank> make_strides(const std::vector<size_t>& dims) {
+        std::array<index_type, rank> strides{};
+        if constexpr (rank > 0) {
+            // Start with padded left-most stride to ensure non-contiguous layout
+            strides[0] = 2;  // 1 + padding
+            for (size_t i = 1; i < rank; ++i) {
+                strides[i] = strides[i - 1] * static_cast<index_type>(dims[i - 1]);
+            }
+        }
+        return strides;
+    }
+
+    static size_t container_size(const std::vector<size_t>& local_dims) {
+        if constexpr (is_layout_stride && rank > 0) {
+            auto strides = make_strides(local_dims);
+            // Calculate max offset: sum of (extent[i]-1) * stride[i] for all i
+            size_t max_offset = 0;
+            for (size_t i = 0; i < rank; ++i) {
+                max_offset += (local_dims[i] - 1) * static_cast<size_t>(strides[i]);
+            }
+            return max_offset + 1;
+        } else {
+            return flat_size(local_dims);
+        }
+    }
+
+    static container_type make_container(value_type* ptr, const std::vector<size_t>& local_dims) {
+        extents_type extents = make_extents(local_dims);
+        if constexpr (is_layout_stride) {
+            auto strides = make_strides(local_dims);
+            typename layout_type::mapping mapping(extents, strides);
+            return container_type(ptr, mapping);
+        } else {
+            return container_type(ptr, extents);
+        }
+    }
+
+    static container_type allocate(const std::vector<size_t>& dims) {
+        auto local_dims = std::vector<size_t>(dims.begin(), dims.begin() + rank);
+        size_t n_elements = container_size(local_dims);
+
+        size_t size = n_elements * sizeof(value_type);
+        size_t alignment = accessor_alignment<accessor_type>;
+        // aligned_alloc requires size to be a multiple of alignment
+        size_t aligned_size = ((size + alignment - 1) / alignment) * alignment;
+        void* aligned_ptr = std::aligned_alloc(alignment, aligned_size);
+        if (!aligned_ptr) {
+            throw std::bad_alloc();
+        }
+        value_type* ptr = static_cast<value_type*>(aligned_ptr);
+
+        container_type array = make_container(ptr, local_dims);
+
+        for (size_t i = 0; i < flat_size(local_dims); ++i) {
+            auto element = ContainerTraits<value_type>::allocate(lstrip(dims, rank));
+            set(array, unravel(i, local_dims), element);
+        }
+
+        return array;
+    }
+
+    static void deallocate(container_type& array, const std::vector<size_t>& dims) {
+        auto local_dims = std::vector<size_t>(dims.begin(), dims.begin() + rank);
+        size_t n_elements = flat_size(local_dims);
+        for (size_t i = 0; i < n_elements; ++i) {
+            auto indices = unravel(i, local_dims);
+            auto local_indices = extract_local_indices(indices);
+            ContainerTraits<value_type>::deallocate(array[local_indices], lstrip(dims, rank));
+        }
+
+        std::free(array.data_handle());
+    }
+
+    static void sanitize_dims(std::vector<size_t>& dims, size_t axis) {
+        // Check each extent and update dims if it's static
+        for (size_t r = 0; r < rank; ++r) {
+            if (extents_type::static_extent(r) != std::dynamic_extent) {
+                dims[axis + r] = static_cast<size_t>(extents_type::static_extent(r));
+            }
+        }
+        ContainerTraits<value_type>::sanitize_dims(dims, axis + rank);
+    }
+
+  private:
+    static std::array<index_type, rank> extract_local_indices(const std::vector<size_t>& indices) {
+        std::array<index_type, rank> local_indices;
+        for (size_t i = 0; i < rank; ++i) {
+            local_indices[i] = static_cast<index_type>(indices[i]);
+        }
+        return local_indices;
+    }
+
+    static extents_type make_extents(const std::vector<size_t>& dims) {
+        auto impl = [&dims]<size_t... Is>(std::index_sequence<Is...>) {
+            return extents_type{dims[Is]...};
+        };
+        return impl(std::make_index_sequence<rank>{});
+    }
+};
 
 #endif
 

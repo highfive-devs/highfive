@@ -58,11 +58,19 @@ else()
   set(HIGHFIVE_TEST_SPAN_DEFAULT Off)
 endif()
 
+if (CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+  include(CheckIncludeFileCXX)
+  CHECK_INCLUDE_FILE_CXX(mdspan HIGHFIVE_TEST_MDSPAN_DEFAULT)
+else()
+  set(HIGHFIVE_TEST_MDSPAN_DEFAULT Off)
+endif()
+
 option(HIGHFIVE_UNIT_TESTS "Compile unit-tests" ${HIGHFIVE_EXTRAS_DEFAULT})
 option(HIGHFIVE_EXAMPLES "Compile examples" ${HIGHFIVE_EXTRAS_DEFAULT})
 option(HIGHFIVE_BUILD_DOCS "Build documentation" ${HIGHFIVE_EXTRAS_DEFAULT})
 
 option(HIGHFIVE_TEST_SPAN "Enable testing std::span, requires C++20" ${HIGHFIVE_TEST_SPAN_DEFAULT})
+option(HIGHFIVE_TEST_MDSPAN "Enable testing std::mdspan, requires C++23 and libc++" ${HIGHFIVE_TEST_MDSPAN_DEFAULT})
 option(HIGHFIVE_TEST_BOOST "Enable testing Boost features" OFF)
 option(HIGHFIVE_TEST_BOOST_SPAN "Additionally, enable testing `boost::span`" OFF)
 option(HIGHFIVE_TEST_EIGEN "Enable testing Eigen" OFF)
@@ -90,6 +98,10 @@ endif()
 
 if(CMAKE_CXX_STANDARD EQUAL 98 OR CMAKE_CXX_STANDARD LESS ${HIGHFIVE_CXX_STANDARD_DEFAULT})
   message(FATAL_ERROR "HighFive needs to be compiled with at least C++${HIGHFIVE_CXX_STANDARD_DEFAULT}")
+endif()
+
+if(HIGHFIVE_TEST_MDSPAN AND CMAKE_CXX_STANDARD LESS 23)
+  message(FATAL_ERROR "HIGHFIVE_TEST_MDSPAN requires C++23 or newer, but CMAKE_CXX_STANDARD is ${CMAKE_CXX_STANDARD}")
 endif()
 
 add_compile_definitions(HIGHFIVE_CXX_STD=${CMAKE_CXX_STANDARD})
