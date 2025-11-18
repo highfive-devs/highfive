@@ -1,4 +1,9 @@
 # Changes
+## Version 3.3.0 
+### New Feature
+    - Support HDF5 v2.0.0. (#78) Thanks to @holmesv3
+    - Support mdspan. (#95)
+
 ## Version 3.2.0 - 2025-09-23
 ### New Feature
     - Support check if an integer is signed. (#78)
