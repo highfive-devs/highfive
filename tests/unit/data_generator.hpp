@@ -692,16 +692,7 @@ struct ContainerTraits<std::mdspan<ElementType, Extents, LayoutPolicy, AccessorP
         auto local_dims = std::vector<size_t>(dims.begin(), dims.begin() + rank);
         size_t n_elements = container_size(local_dims);
 
-        size_t size = n_elements * sizeof(value_type);
-        size_t alignment = accessor_alignment<accessor_type>;
-        // aligned_alloc requires size to be a multiple of alignment
-        size_t aligned_size = ((size + alignment - 1) / alignment) * alignment;
-        void* aligned_ptr = std::aligned_alloc(alignment, aligned_size);
-        if (!aligned_ptr) {
-            throw std::bad_alloc();
-        }
-        value_type* ptr = static_cast<value_type*>(aligned_ptr);
-
+        value_type* ptr = allocate_aligned_memory(n_elements);
         container_type array = make_container(ptr, local_dims);
 
         for (size_t i = 0; i < flat_size(local_dims); ++i) {
@@ -735,6 +726,26 @@ struct ContainerTraits<std::mdspan<ElementType, Extents, LayoutPolicy, AccessorP
     }
 
   private:
+    static value_type* allocate_aligned_memory(size_t n_elements) {
+        // Return nullptr if size is zero - no allocation needed
+        if (n_elements == 0) {
+            return nullptr;
+        }
+
+        size_t size = n_elements * sizeof(value_type);
+        size_t alignment = accessor_alignment<accessor_type>;
+        // aligned_alloc requires size to be a multiple of alignment
+        size_t aligned_size = ((size + alignment - 1) / alignment) * alignment;
+        void* aligned_ptr = std::aligned_alloc(alignment, aligned_size);
+        if (!aligned_ptr) {
+            throw std::runtime_error("Failed to allocate aligned memory: alignment=" +
+                                     std::to_string(alignment) + ", size=" +
+                                     std::to_string(size) + ", aligned_size=" +
+                                     std::to_string(aligned_size));
+        }
+        return static_cast<value_type*>(aligned_ptr);
+    }
+
     static std::array<index_type, rank> extract_local_indices(const std::vector<size_t>& indices) {
         std::array<index_type, rank> local_indices;
         for (size_t i = 0; i < rank; ++i) {
