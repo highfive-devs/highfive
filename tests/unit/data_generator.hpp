@@ -739,9 +739,8 @@ struct ContainerTraits<std::mdspan<ElementType, Extents, LayoutPolicy, AccessorP
         void* aligned_ptr = std::aligned_alloc(alignment, aligned_size);
         if (!aligned_ptr) {
             throw std::runtime_error("Failed to allocate aligned memory: alignment=" +
-                                     std::to_string(alignment) + ", size=" +
-                                     std::to_string(size) + ", aligned_size=" +
-                                     std::to_string(aligned_size));
+                                     std::to_string(alignment) + ", size=" + std::to_string(size) +
+                                     ", aligned_size=" + std::to_string(aligned_size));
         }
         return static_cast<value_type*>(aligned_ptr);
     }
