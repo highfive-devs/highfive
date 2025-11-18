@@ -285,12 +285,12 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os: [ "macOS-14" ]
-        cxxstd: ["14", "17", "20"]
+        os: [ "macOS-15" ]
+        cxxstd: ["14", "17", "20", "23"]
 
         include:
-          - os: "macOS-13"
-            cxxstd: "20"
+          - os: "macOS-14"
+            cxxstd: "14"
 
     steps:
     - uses: actions/checkout@v5
@@ -309,16 +309,9 @@ jobs:
           TEST_XTENSOR=Off
         fi
 
-        if (( ${{ matrix.os }} == "macOS-13" ))
-        then
-          HAS_WERROR=Off
-        else
-          HAS_WERROR=On
-        fi
-
         CMAKE_OPTIONS=(
           -GNinja
-          -DHIGHFIVE_HAS_WERROR:BOOL=${HAS_WERROR}
+          -DHIGHFIVE_HAS_WERROR:BOOL=ON
           -DHIGHFIVE_TEST_BOOST:BOOL=ON
           -DHIGHFIVE_TEST_EIGEN:BOOL=ON
           -DHIGHFIVE_TEST_XTENSOR:BOOL=${TEST_XTENSOR}
