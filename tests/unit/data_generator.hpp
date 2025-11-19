@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 #include <array>
+#include <cstdint>
 #include <cstdlib>
 #include <new>
 
@@ -712,7 +713,7 @@ struct ContainerTraits<std::mdspan<ElementType, Extents, LayoutPolicy, AccessorP
             ContainerTraits<value_type>::deallocate(array[local_indices], lstrip(dims, rank));
         }
 
-        std::free(array.data_handle());
+        free_aligned_memory(array.data_handle());
     }
 
     static void sanitize_dims(std::vector<size_t>& dims, size_t axis) {
@@ -727,22 +728,48 @@ struct ContainerTraits<std::mdspan<ElementType, Extents, LayoutPolicy, AccessorP
 
   private:
     static value_type* allocate_aligned_memory(size_t n_elements) {
-        // Return nullptr if size is zero - no allocation needed
         if (n_elements == 0) {
             return nullptr;
         }
 
+        // Memory layout:
+        //   raw_ptr
+        //    │
+        //    v
+        //   ┌─────────┬──────────│──────────┬──────────┬──────────┐
+        //   │ padding │ raw_ptr  │   data   │   data   │   ...    │
+        //   └─────────┴──────────│──────────┴──────────┴──────────┘
+        //              ^          ^
+        //              │          │
+        //  stored_ptr ─┘          └──   aligned_ptr
+
         size_t size = n_elements * sizeof(value_type);
         size_t alignment = accessor_alignment<accessor_type>;
-        // aligned_alloc requires size to be a multiple of alignment
-        size_t aligned_size = ((size + alignment - 1) / alignment) * alignment;
-        void* aligned_ptr = std::aligned_alloc(alignment, aligned_size);
-        if (!aligned_ptr) {
-            throw std::runtime_error("Failed to allocate aligned memory: alignment=" +
-                                     std::to_string(alignment) + ", size=" + std::to_string(size) +
-                                     ", aligned_size=" + std::to_string(aligned_size));
+
+        // Overallocate to ensure we can find an aligned address
+        size_t total_size = size + alignment - 1 + sizeof(void*);
+        char* raw_ptr = new char[total_size];
+
+        // Find the aligned address within the allocation
+        uintptr_t raw_addr = reinterpret_cast<uintptr_t>(raw_ptr);
+        uintptr_t aligned_addr = (raw_addr + sizeof(void*) + alignment - 1) & ~(alignment - 1);
+        char* aligned_char_ptr = reinterpret_cast<char*>(aligned_addr);
+
+        // Store the original pointer just before the aligned address
+        void** stored_ptr = reinterpret_cast<void**>(aligned_char_ptr - sizeof(void*));
+        *stored_ptr = raw_ptr;
+
+        return reinterpret_cast<value_type*>(aligned_char_ptr);
+    }
+
+    static void free_aligned_memory(value_type* aligned_ptr) {
+        if (aligned_ptr != nullptr) {
+            return;
         }
-        return static_cast<value_type*>(aligned_ptr);
+        char* aligned_char_ptr = reinterpret_cast<char*>(aligned_ptr);
+        void** stored_ptr = reinterpret_cast<void**>(aligned_char_ptr - sizeof(void*));
+        char* original_ptr = static_cast<char*>(*stored_ptr);
+        delete[] original_ptr;
     }
 
     static std::array<index_type, rank> extract_local_indices(const std::vector<size_t>& indices) {
