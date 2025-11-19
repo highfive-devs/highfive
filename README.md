@@ -46,7 +46,7 @@ target_link_libraries(foo HighFive::HighFive)
 - ... and popular third-party array types: Boost, Eigen and XTensor
 - automatic conversion of `std::string` to/from variable- or fixed-length string dataset
 - simplified APIs for common selections and full support of (irregular) HyperSlabs
-- all HDF5 versions from 1.8 to 2.x.
+- all HDF5 versions from 1.8 to 2.x
 - ... including parallel HDF5 using MPI
 - Singe Writer, Multiple Reader (SMWR) mode
 - Advanced types: Compound, Enum, Arrays of Fixed-length strings, References
