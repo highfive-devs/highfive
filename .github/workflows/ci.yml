@@ -194,6 +194,53 @@ jobs:
       working-directory: ${{github.workspace}}/build/src/examples
       run: $GITHUB_WORKSPACE/.github/run_examples.sh
 
+  # Job testing clang with C++23, libc++ and MDSPAN
+  # ================================================
+  Linux_Clang_CXX23_MDSPAN:
+    runs-on: ubuntu-24.04
+    env:
+      CC: clang-21
+      CXX: clang++-21
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        submodules: true
+
+    - name: "Add LLVM repository"
+      run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo gpg --dearmor -o /usr/share/keyrings/llvm-snapshot.gpg
+        echo "deb [signed-by=/usr/share/keyrings/llvm-snapshot.gpg] http://apt.llvm.org/noble/ llvm-toolchain-noble-21 main" | sudo tee /etc/apt/sources.list.d/llvm.list
+
+    - name: "Install libraries"
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get -qq install clang-21 libc++-21-dev libc++abi-21-dev libhdf5-dev libsz2 ninja-build
+
+    - name: Build
+      run: |
+        CMAKE_OPTIONS=(
+          -GNinja
+          -DCMAKE_CXX_STANDARD=23
+          -DHIGHFIVE_USE_LIBCXX:BOOL=ON
+          -DHIGHFIVE_TEST_MDSPAN:BOOL=ON
+        )
+        source $GITHUB_WORKSPACE/.github/build.sh
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: |
+        ctest -j2 --output-on-failure -C $BUILD_TYPE
+
+    - name: Test No HDF5 Diagnositics
+      working-directory: ${{github.workspace}}/build
+      run: |
+        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+
+    - name: Examples
+      working-directory: ${{github.workspace}}/build/src/examples
+      run: $GITHUB_WORKSPACE/.github/run_examples.sh
+
   # Job running unit-test with sanitizers
   # =====================================
   Linux_Sanitizers:

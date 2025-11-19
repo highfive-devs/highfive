@@ -77,6 +77,10 @@ foreach(PUBLIC_HEADER ${public_headers})
       continue()
     endif()
 
+    if(PUBLIC_HEADER STREQUAL "highfive/mdspan.hpp" AND NOT HIGHFIVE_TEST_MDSPAN)
+      continue()
+    endif()
+
     get_filename_component(CLASS_NAME ${PUBLIC_HEADER} NAME_WE)
     configure_file(tests_import_public_headers.cpp "tests_${CLASS_NAME}.cpp" @ONLY)
     add_executable("tests_include_${CLASS_NAME}" "${CMAKE_CURRENT_BINARY_DIR}/tests_${CLASS_NAME}.cpp")

@@ -23,6 +23,10 @@ set(span_examples
   ${CMAKE_CURRENT_SOURCE_DIR}/read_write_std_span.cpp
 )
 
+set(mdspan_examples
+  ${CMAKE_CURRENT_SOURCE_DIR}/read_write_std_mdspan.cpp
+)
+
 set(easy_examples
   ${CMAKE_CURRENT_SOURCE_DIR}/easy_attribute.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/easy_dumpoptions.cpp
@@ -81,6 +85,12 @@ endforeach()
 
 if(HIGHFIVE_TEST_SPAN)
   foreach(example_source ${span_examples})
+    compile_example(${example_source} HighFiveFlags)
+  endforeach()
+endif()
+
+if(HIGHFIVE_TEST_MDSPAN)
+  foreach(example_source ${mdspan_examples})
     compile_example(${example_source} HighFiveFlags)
   endforeach()
 endif()
