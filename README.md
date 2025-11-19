@@ -41,11 +41,13 @@ target_link_libraries(foo HighFive::HighFive)
 
 ### Feature support
 - create/read/write files, datasets, attributes, groups, dataspaces.
-- automatic memory management / ref counting
-- automatic conversion (serialization) of STL, Boost, Eigen and XTensor containers from/to any dataset
+- automatic closing of files, groups, etc.
+- effortless serialization of STL containers (array, vector, span and mdspan)
+- ... and popular third-party array types: Boost, Eigen and XTensor
 - automatic conversion of `std::string` to/from variable- or fixed-length string dataset
 - simplified APIs for common selections and full support of (irregular) HyperSlabs
-- parallel HDF5 using MPI
+- all HDF5 versions from 1.8 to 2.x
+- ... including parallel HDF5 using MPI
 - Singe Writer, Multiple Reader (SMWR) mode
 - Advanced types: Compound, Enum, Arrays of Fixed-length strings, References
 - half-precision (16-bit) floating-point datasets
