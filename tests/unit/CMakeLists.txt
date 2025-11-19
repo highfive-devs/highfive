@@ -46,6 +46,8 @@ endif()
 # creating a file for each header, that only includes the header. The
 # test succeeds if it compiles.
 file(GLOB public_headers LIST_DIRECTORIES false RELATIVE ${PROJECT_SOURCE_DIR}/include CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/include/highfive/*.hpp)
+file(GLOB experimental_headers LIST_DIRECTORIES false RELATIVE ${PROJECT_SOURCE_DIR}/include CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/include/highfive/experimental/*.hpp)
+list(APPEND public_headers ${experimental_headers})
 foreach(PUBLIC_HEADER ${public_headers})
     if(PUBLIC_HEADER STREQUAL "highfive/span.hpp" AND NOT HIGHFIVE_TEST_SPAN)
       continue()
@@ -67,7 +69,7 @@ foreach(PUBLIC_HEADER ${public_headers})
       continue()
     endif()
 
-    if(PUBLIC_HEADER STREQUAL "highfive/opencv.hpp" AND NOT HIGHFIVE_TEST_OPENCV)
+    if(PUBLIC_HEADER STREQUAL "highfive/experimental/opencv.hpp" AND NOT HIGHFIVE_TEST_OPENCV)
       continue()
     endif()
 
