@@ -40,7 +40,7 @@ jobs:
         sudo apt-get install libhdf5-dev libsz2 libboost-all-dev libeigen3-dev libopencv-dev
         sudo apt-get install libxtensor-dev
 
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 1
         submodules: true
