@@ -10,6 +10,9 @@
 
 #include <cstdlib>
 #include <vector>
+#if __cplusplus >= 201703L
+#include <optional>
+#endif
 
 #include "H5_definitions.hpp"
 #include "H5Utils.hpp"
@@ -107,6 +110,45 @@ struct RegularHyperSlab {
     std::vector<hsize_t> stride;
     std::vector<hsize_t> block;
 };
+
+#if __cplusplus >= 201703L
+template <size_t Rank>
+struct RegularHyperSlabNoMalloc {
+    constexpr size_t rank() const {
+        return Rank;
+    }
+
+    /// Dimensions when all gaps are removed.
+    constexpr std::array<size_t, Rank> packedDims() const {
+        auto dims = std::array<size_t, Rank>{};
+
+        for (size_t i = 0; i < Rank; ++i) {
+            dims[i] = count[i] * (block ? (*block)[i] : 1);
+        }
+
+        return dims;
+    }
+
+    DataSpace apply(const DataSpace& space_) const {
+        auto space = space_.clone();
+        const auto error_code = H5Sselect_hyperslab(space.getId(),
+                                                    H5S_SELECT_SET,
+                                                    offset.data(),
+                                                    stride ? stride->data() : nullptr,
+                                                    count.data(),
+                                                    block ? block->data() : nullptr);
+
+        if (error_code < 0) {
+            HDF5ErrMapper::ToException<DataSpaceException>("Unable to select hyperslab");
+        }
+        return space;
+    }
+    std::array<hsize_t, Rank> offset{};
+    std::array<hsize_t, Rank> count{};
+    std::optional<std::array<hsize_t, Rank>> stride{std::nullopt};
+    std::optional<std::array<hsize_t, Rank>> block{std::nullopt};
+};
+#endif
 
 class HyperSlab {
   public:
@@ -416,7 +458,6 @@ class ProductSet {
     friend class SliceTraits;
 };
 
-
 template <typename Derivate>
 class SliceTraits {
   public:
@@ -429,6 +470,9 @@ class SliceTraits {
     ///
     /// Therefore, the only memspaces supported for general hyperslabs are one-dimensional arrays.
     Selection select(const HyperSlab& hyper_slab) const;
+
+    template <size_t Rank>
+    Selection select(const RegularHyperSlabNoMalloc<Rank>& hyper_slab) const;
 
     ///
     /// \brief Select an \p hyper_slab in the current Slice/Dataset.

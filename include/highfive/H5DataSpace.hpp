@@ -82,7 +82,7 @@ class DataSpace: public Object {
     /// \endcode
     /// \since 2.3
     template <size_t N>
-    explicit DataSpace(const std::array<size_t, N>& dims);
+    constexpr explicit DataSpace(const std::array<size_t, N>& dims);
 
     /// \brief Create a DataSpace of N-dimensions from an initializer list.
     /// \param dims Dimensions of the new DataSpace
