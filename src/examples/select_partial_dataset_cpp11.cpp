@@ -34,11 +34,6 @@ int main(void) {
     dataset.write(values);
 
     // now we read back 2x2 values after an offset of 0x2
-    {
-        std::vector<double> result;
-        dataset.select(RegularHyperSlabNoMalloc<2>{{0, 2}, {2, 2}}).read(result);
-    }
-
     std::vector<std::vector<double>> result;
     dataset.select({0, 2}, {2, 2}).read(result);
 

@@ -229,32 +229,14 @@ inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab,
 }
 
 template <typename Derivate>
-inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab) const {
+template <class HyperSlabInterface>
+inline Selection SliceTraits<Derivate>::select(const HyperSlabInterface& hyper_slab) const {
     const auto& slice = static_cast<const Derivate&>(*this);
     auto filespace = slice.getSpace();
     filespace = hyper_slab.apply(filespace);
 
-    auto n_elements = detail::h5s_get_select_npoints(filespace.getId());
-    auto memspace = DataSpace(std::array<size_t, 1>{size_t(n_elements)});
-
-    return detail::make_selection(memspace, filespace, details::get_dataset(slice));
-}
-
-template <typename Derivate>
-template <size_t Rank>
-inline Selection SliceTraits<Derivate>::select(
-    const RegularHyperSlabNoMalloc<Rank>& hyper_slab) const {
-    const auto& slice = static_cast<const Derivate&>(*this);
-    auto filespace = slice.getSpace();
-    filespace = hyper_slab.apply(filespace);
-
-    const auto packed_dims = hyper_slab.packedDims();
-    const auto n_elements =
-        std::accumulate(packed_dims.begin(),
-                        packed_dims.end(),
-                        size_t{1},
-                        [](const size_t& a, const hsize_t& b) { return a * b; });
-    auto memspace = DataSpace(std::array<size_t, 1>{n_elements});
+    const auto n_elements = detail::h5s_get_select_npoints(filespace.getId());
+    auto memspace = DataSpace{static_cast<size_t>(n_elements)};
 
     return detail::make_selection(memspace, filespace, details::get_dataset(slice));
 }
