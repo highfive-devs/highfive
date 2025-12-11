@@ -10,9 +10,6 @@
 
 #include <cstdlib>
 #include <vector>
-#if __cplusplus >= 201703L
-#include <optional>
-#endif
 
 #include "H5_definitions.hpp"
 #include "H5Utils.hpp"

@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <highfive/highfive.hpp>
 
