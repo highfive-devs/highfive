@@ -23,22 +23,26 @@ on:
       - 'doc/**'
 
 env:
-  BUILD_TYPE: RelWithDebInfo
+  BUILD_TYPE: Debug
   INSTALL_DIR: install
 
 jobs:
   # Job producing code coverage report
   # ==================================
   Code_coverage:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: "Install libraries"
       run: |
         sudo apt-get update
-        sudo apt-get install ninja-build lcov
+        sudo apt-get install ninja-build gcc-11 g++-11
         sudo apt-get install libhdf5-dev libsz2 libboost-all-dev libeigen3-dev libopencv-dev
         sudo apt-get install libxtensor-dev
+        # Install lcov 1.15-1 from Ubuntu 22.04 to avoid geninfo template mismatch errors
+        wget http://archive.ubuntu.com/ubuntu/pool/universe/l/lcov/lcov_1.15-1_all.deb
+        sudo dpkg -i lcov_1.15-1_all.deb || sudo apt-get install -f -y
+        sudo apt-mark hold lcov
 
     - uses: actions/checkout@v6
       with:
@@ -49,11 +53,14 @@ jobs:
       run: |
         CMAKE_OPTIONS=(
           -GNinja
+          -DCMAKE_C_COMPILER=gcc-11
+          -DCMAKE_CXX_COMPILER=g++-11
           -DHIGHFIVE_TEST_BOOST:BOOL=ON
           -DHIGHFIVE_TEST_EIGEN:BOOL=ON
           -DHIGHFIVE_TEST_OPENCV:BOOL=ON
           -DHIGHFIVE_TEST_XTENSOR:BOOL=ON
           -DHIGHFIVE_TEST_SINGLE_INCLUDES=ON
+          -DHIGHFIVE_HAS_WERROR:BOOL=OFF
           -DHIGHFIVE_BUILD_DOCS:BOOL=FALSE
           -DCMAKE_CXX_FLAGS="-coverage -O0"
         )
@@ -61,9 +68,9 @@ jobs:
 
     - name: Test for code coverage
       run: |
-        lcov --capture  --initial --directory . --no-external --output-file build/coverage-base.info
+        lcov --gcov-tool gcov-11 --capture --initial --directory . --no-external --output-file build/coverage-base.info
         (cd build; cmake --build . --target test)
-        lcov --capture  --directory . --no-external --output-file build/coverage-run.info
+        lcov --gcov-tool gcov-11 --capture --directory . --no-external --output-file build/coverage-run.info
         (cd build; lcov --add-tracefile coverage-base.info --add-tracefile coverage-run.info --output-file coverage-combined.info)
 
     - uses: codecov/codecov-action@v5
