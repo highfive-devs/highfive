@@ -42,7 +42,7 @@ inline DataSpace::DataSpace(const std::initializer_list<size_t>& items)
 
 template <typename... Args>
 inline DataSpace::DataSpace(size_t dim1, Args... dims)
-    : DataSpace(std::array{dim1, static_cast<size_t>(dims)...}) {}
+    : DataSpace(std::array<size_t, 1 + sizeof...(dims)>{dim1, static_cast<size_t>(dims)...}) {}
 
 template <class IT, typename>
 inline DataSpace::DataSpace(const IT begin, const IT end) {

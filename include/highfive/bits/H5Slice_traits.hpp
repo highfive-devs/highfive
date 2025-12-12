@@ -60,6 +60,17 @@ inline std::vector<size_t> toSTLSizeVector(const std::vector<hsize_t>& from) {
     return detail::convertSizeVector<size_t>(from);
 }
 
+///
+/// \brief A CRTP base class for hyper slab-like objects.
+///
+template <typename Impl>
+class HyperSlabInterface {
+  public:
+    DataSpace apply(const DataSpace& space) const {
+        return static_cast<const Impl&>(*this).apply(space);
+    }
+};
+
 struct RegularHyperSlab {
     RegularHyperSlab() = default;
 
@@ -108,7 +119,7 @@ struct RegularHyperSlab {
     std::vector<hsize_t> block;
 };
 
-class HyperSlab {
+class HyperSlab: public HyperSlabInterface<HyperSlab> {
   public:
     HyperSlab() {
         selects.emplace_back(RegularHyperSlab{}, Op::None);
@@ -427,8 +438,8 @@ class SliceTraits {
     /// nicely into a multi-dimensional array, but only a subset of such an array.
     ///
     /// Therefore, the only memspaces supported for general hyperslabs are one-dimensional arrays.
-    template <class HyperSlabInterface>
-    Selection select(const HyperSlabInterface& hyper_slab) const;
+    template <class Impl>
+    Selection select(const HyperSlabInterface<Impl>& hyper_slab) const;
 
     ///
     /// \brief Select an \p hyper_slab in the current Slice/Dataset.

@@ -229,8 +229,8 @@ inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab,
 }
 
 template <typename Derivate>
-template <class HyperSlabInterface>
-inline Selection SliceTraits<Derivate>::select(const HyperSlabInterface& hyper_slab) const {
+template <typename Impl>
+inline Selection SliceTraits<Derivate>::select(const HyperSlabInterface<Impl>& hyper_slab) const {
     const auto& slice = static_cast<const Derivate&>(*this);
     auto filespace = slice.getSpace();
     filespace = hyper_slab.apply(filespace);

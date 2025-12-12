@@ -17,6 +17,7 @@ set(core_examples
   ${CMAKE_CURRENT_SOURCE_DIR}/renaming_objects.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/select_by_id_dataset_cpp11.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/select_partial_dataset_cpp11.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/select_partial_dataset_no_alloc.cpp
 )
 
 set(span_examples
