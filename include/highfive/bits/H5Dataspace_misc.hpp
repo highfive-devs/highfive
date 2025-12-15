@@ -31,15 +31,18 @@ inline DataSpace::DataSpace(const std::vector<size_t>& dims)
     : DataSpace(dims.begin(), dims.end()) {}
 
 template <size_t N>
-inline DataSpace::DataSpace(const std::array<size_t, N>& dims)
-    : DataSpace(dims.begin(), dims.end()) {}
+constexpr DataSpace::DataSpace(const std::array<size_t, N>& dims) {
+    std::array<hsize_t, N> real_dims;
+    std::copy(dims.begin(), dims.end(), real_dims.begin());
+    _hid = detail::h5s_create_simple(static_cast<int>(N), real_dims.data(), nullptr);
+}
 
 inline DataSpace::DataSpace(const std::initializer_list<size_t>& items)
     : DataSpace(std::vector<size_t>(items)) {}
 
 template <typename... Args>
 inline DataSpace::DataSpace(size_t dim1, Args... dims)
-    : DataSpace(std::vector<size_t>{dim1, static_cast<size_t>(dims)...}) {}
+    : DataSpace(std::array<size_t, 1 + sizeof...(dims)>{dim1, static_cast<size_t>(dims)...}) {}
 
 template <class IT, typename>
 inline DataSpace::DataSpace(const IT begin, const IT end) {

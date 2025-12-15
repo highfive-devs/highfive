@@ -229,17 +229,17 @@ inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab,
 }
 
 template <typename Derivate>
-inline Selection SliceTraits<Derivate>::select(const HyperSlab& hyper_slab) const {
+template <typename Impl>
+inline Selection SliceTraits<Derivate>::select(const HyperSlabInterface<Impl>& hyper_slab) const {
     const auto& slice = static_cast<const Derivate&>(*this);
     auto filespace = slice.getSpace();
     filespace = hyper_slab.apply(filespace);
 
-    auto n_elements = detail::h5s_get_select_npoints(filespace.getId());
-    auto memspace = DataSpace(std::array<size_t, 1>{size_t(n_elements)});
+    const auto n_elements = detail::h5s_get_select_npoints(filespace.getId());
+    auto memspace = DataSpace{static_cast<size_t>(n_elements)};
 
     return detail::make_selection(memspace, filespace, details::get_dataset(slice));
 }
-
 
 template <typename Derivate>
 inline Selection SliceTraits<Derivate>::select(const std::vector<size_t>& offset,
