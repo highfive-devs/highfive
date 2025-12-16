@@ -86,7 +86,7 @@ jobs:
       run: |
         ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
+    - name: Test No HDF5 Diagnostics
       working-directory: ${{github.workspace}}/build
       run: |
         ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
@@ -133,7 +133,7 @@ jobs:
       run: |
         ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
+    - name: Test No HDF5 Diagnostics
       working-directory: ${{github.workspace}}/build
       run: |
         ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
@@ -185,7 +185,7 @@ jobs:
       run: |
         ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
+    - name: Test No HDF5 Diagnostics
       working-directory: ${{github.workspace}}/build
       run: |
         ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
@@ -232,7 +232,7 @@ jobs:
       run: |
         ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
+    - name: Test No HDF5 Diagnostics
       working-directory: ${{github.workspace}}/build
       run: |
         ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
@@ -281,7 +281,7 @@ jobs:
       run: |
         ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
+    - name: Test No HDF5 Diagnostics
       working-directory: ${{github.workspace}}/build
       run: |
         ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
@@ -372,7 +372,7 @@ jobs:
       run: |
         ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
+    - name: Test No HDF5 Diagnostics
       working-directory: ${{github.workspace}}/build
       run: |
         ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
@@ -428,7 +428,7 @@ jobs:
       run: |
         ctest -j2 --output-on-failure -C $BUILD_TYPE
 
-    - name: Test No HDF5 Diagnositics
+    - name: Test No HDF5 Diagnostics
       working-directory: ${{github.workspace}}/build
       shell: bash -l {0}
       run: |

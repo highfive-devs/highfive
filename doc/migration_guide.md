@@ -52,7 +52,7 @@ dset.read(x);
 ```
 continues to be correct in `v3` and can check that the dimensions match. The
 inspector recognizes `double[n][m]` as a contiguous array of doubles.
-Therefore, it'll use the shallow-copy buffer and avoid the any additional
+Therefore, it'll use the shallow-copy buffer and avoid any additional
 allocations or copies.
 
 ### Intentional Raw Read
@@ -110,7 +110,7 @@ header only library, it needs to perform two tasks:
 2. Export a target that sets `-I ${HIGHFIVE_DIR}` and links with HDF5.
 
 We've removed all flags for optional dependencies, such as
-`-DHIGHFIVE_USE_BOOST`. Instead user that want to read/write into/from
+`-DHIGHFIVE_USE_BOOST`. Instead users that want to read/write into/from
 optionally supported containers, include a header with the corresponding name
 and make sure to adjust their CMake code to link with the dependency.
 
@@ -177,7 +177,7 @@ The feature is prone to accidentally not failing. Consider an array that shape
 `[n, m]` and in general both `n, m > 0`. Hence, one should always be reading
 into a two-dimensional array, even if `n == 1` or `m == 1`. However, due to
 broadcasting, if one of the dimensions (accidentally) happens to be one, then
-the checks wont fails. This isn't a bug, however, it can hide a bug. For
+the checks won't fail. This isn't a bug, however, it can hide a bug. For
 example if the test happen to use `[n, 1]` datasets and a one-dimensional
 array.
 
@@ -254,8 +254,8 @@ HighFive::File open(std::string name, HighFive::File::AccessMode mode) {
 }
 ```
 
-Note: There's a caveat, the short-hand notation `File::ReadOnly` doesn't have
-an address. Meaning one can't take it's address or const-references of it
+Note: There's a caveat, the shorthand notation `File::ReadOnly` doesn't have
+an address. Meaning one can't take its address or const-references of it
 (results in a linker error about missing symbol `File::ReadOnly`). Use
 `File::AccessMode::ReadOnly` instead.
 

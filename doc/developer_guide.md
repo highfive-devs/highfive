@@ -1,7 +1,7 @@
 # Developer Guide
 First clone the repository and remember the `--recursive`:
 ```bash
-git clone --recursive git@github.com:BlueBrain/HighFive.git
+git clone --recursive git@github.com:highfive-devs/HighFive.git
 ```
 The instructions to recover if you forgot are:
 ```bash
@@ -149,7 +149,7 @@ arrays and mismatching sizes; and checking non-reallocation.
 
 Read/Write cycles are implemented in two distinct checks. One for writing and
 another for reading. When checking writing we read with a "trusted"
-multi-dimensional array (a nested `std::vector`), and vice-versa when checking
+multi-dimensional array (a nested `std::vector`), and vice versa when checking
 reading. This matters because certain bugs, like writing a column major array
 as if it were row-major can't be caught if one reads it back into a
 column-major array.
@@ -227,7 +227,7 @@ brings their own copy of HighFive and uses it. The different vendoring
 strategies are:
 
 - **find_package**: the standard way for finding dependencies in CMake. Usually
-  the assumption is that HighFive was install properly, either systemwide or in
+  the assumption is that HighFive was installed properly, either systemwide or in
   a specific subdirectory. HighFive is then found with `find_package` (or
   `find_dependency` when called from `*Config.cmake`).
 
@@ -242,12 +242,12 @@ strategies are:
   works.
 
 #### Integration Strategies
-These refer to downstream projects picking different HighFive targerts to
+These refer to downstream projects picking different HighFive targets to
 "link" with HighFive. There's four: two regular targets, a target that only
 adds `-I <dir>` and one that skips all HighFive CMake code.
 
 #### Location Hints
-There are serveral ways of indicating where to find a package:
+There are several ways of indicating where to find a package:
 
 - **CMAKE_PREFIX_PATH**: which adds a list of directories to the list of
   directories that are used as prefixes when searching for `HighFiveConfig.`
@@ -274,7 +274,7 @@ then their build breaks, complaining about missing HighFive targets (and it
 seems they can't "fix it up" on their end because then CMake complains that
 there's duplicate exported HighFive related targets).
 
-The second way ommiting the missing `export()` can break downstream projects is
+The second way omitting the missing `export()` can break downstream projects is
 if they attempt to use HighFive's build directory (not install directory) as
 `HighFive_ROOT` (or `CMAKE_PREFIX_PATH`).
 
@@ -297,7 +297,7 @@ symbols will exist, and they linker will pick one (arbitrarily); which is only
 safe if all definitions are identical.
 
 ### Test "Organization"
-The script to check everything is unwieldy. Here's a summary of what it attemps
+The script to check everything is unwieldy. Here's a summary of what it attempts
 to do.
 
 There's three downstream project in play: `dependent_library` is a library that
@@ -314,7 +314,7 @@ The conceptually easy choices are:
 
 - Libraries and applications that have dependencies that use HighFive should
   use `find_package` since it's the easiest way of injecting a common version
-  of HighFive everwhere.
+  of HighFive everywhere.
 
 Since we can't (and don't want to) force our consumers to use `find_package`
 and ban vendoring, we have to test what happens when libraries vendor

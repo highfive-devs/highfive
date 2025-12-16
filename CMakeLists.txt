@@ -19,7 +19,7 @@ option(HIGHFIVE_VERBOSE "Set logging level to verbose." OFF)
 # protected constructor, e.g., `HighFive::Object::Object`.
 #
 # Starting with `2.7.0` these friend declarations don't matter
-# anymore. It's mearly a means of appeasing a compiler.
+# anymore. It's merely a means of appeasing a compiler.
 #
 # The values of `HIGHFIVE_HAS_FRIEND_DECLARATIONS` are:
 #   - that the macro is undefined.

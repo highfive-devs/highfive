@@ -11,7 +11,7 @@ assignees: ''
 Unfortunately, build failures tend to be highly specific and there's many
 things that could go wrong on both our and your side. Therefore, a reproducer
 is essential. You could try the minimal setup found here:
-https://github.com/BlueBrain/HighFive/blob/master/doc/installation.md#manually-install-highfive
+https://github.com/highfive-devs/HighFive/blob/main/doc/installation.md#manually-install-highfive
 
 from there you can work upwards by adding complexity until you reproduce the
 issue.
@@ -35,7 +35,7 @@ than less output.)
   - HDF5:
 
 **Style Guide**
-1. Please paste text as text and not as a screen shot.
+1. Please paste text as text and not as a screenshot.
 2. If in doubt paste too much output rather than too little, i.e. don't be too
    scared of a large wall of text. Especially, if it's a compiler error.
    (Anything past the first error is largely uninformative and can be safely
