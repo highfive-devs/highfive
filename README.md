@@ -1,5 +1,5 @@
 > [!NOTE]
-> HighFive was orignally developed and maintained at
+> HighFive was originally developed and maintained at
 > https://github.com/BlueBrain/HighFive. To continue maintenance of HighFive as
 > an independent open-source code without support from BBP or EPFL, some (one)
 > of the developers decided to create this repository.
@@ -37,7 +37,7 @@ target_link_libraries(foo HighFive::HighFive)
 - RAII for opening/closing files, groups, datasets, etc.
 - Compatible with the HDF5 C API.
 - A second API layer `H5Easy` provides a oneliner API for common, simple
-  usecases.
+  use cases.
 
 ### Feature support
 - create/read/write files, datasets, attributes, groups, dataspaces.
@@ -52,7 +52,7 @@ target_link_libraries(foo HighFive::HighFive)
 - etc... (see [ChangeLog](./CHANGELOG.md))
 
 ### Known flaws
-- HighFive is not thread-safe. At best it has the same limitations as the HDF5 library. However, HighFive objects modify their members without protecting these writes. Users have reported that HighFive is not thread-safe even when using the threadsafe HDF5 library, e.g., https://github.com/BlueBrain/HighFive/discussions/675.
+- HighFive is not thread-safe. At best, it has the same limitations as the HDF5 library. However, HighFive objects modify their members without protecting these writes. Users have reported that HighFive is not thread-safe even when using the threadsafe HDF5 library, e.g., https://github.com/BlueBrain/HighFive/discussions/675.
 - Eigen support in core HighFive was broken until v3.0. See https://github.com/BlueBrain/HighFive/issues/532. H5Easy was not
   affected.
 - The support of fixed length strings isn't ideal.
@@ -68,7 +68,7 @@ using namespace HighFive;
 std::string filename = "/tmp/new_file.h5";
 
 {
-    // We create an empty HDF55 file, by truncating an existing
+    // We create an empty HDF5 file, by truncating an existing
     // file if required:
     File file(filename, File::Truncate);
 
@@ -93,12 +93,12 @@ std::string filename = "/tmp/new_file.h5";
 **Note:** As of 2.8.0, one can use `highfive/highfive.hpp` to include
 everything HighFive. Prior to 2.8.0 one would include `highfive/H5File.hpp`.
 
-**Note:** For advanced usecases the dataset can be created without immediately
+**Note:** For advanced use cases the dataset can be created without immediately
 writing to it. This is common in MPI-IO related patterns, or when growing a
 dataset over the course of a simulation.
 
 ### H5Easy
-For simple, common usecases the [highfive/H5Easy.hpp](include/highfive/H5Easy.hpp)
+For simple, common use cases the [highfive/H5Easy.hpp](include/highfive/H5Easy.hpp)
 interface provides single line solution. Here's the example from the
 introduction again:
 ```cpp
@@ -123,8 +123,8 @@ See [easy_load_dump.cpp](src/examples/easy_load_dump.cpp) for more details.
 interchangeably.
 
 ### And Many More Examples!
-We strive to have one example per usecase or feature of HighFive,
-see [src/examples/](https://github.com/highfive-devs/highfive/blob/master/src/examples/)
+We strive to have one example per use case or feature of HighFive,
+see [src/examples/](https://github.com/highfive-devs/highfive/blob/main/src/examples/)
 for more examples.
 
 
@@ -155,7 +155,7 @@ target_link_libraries(foo HighFive::HighFive)
 ```
 
 **Note:** `add_subdirectory(third_party/HighFive)` will search and "link" HDF5
-but wont search or link any optional dependencies such as Boost.
+but won't search or link any optional dependencies such as Boost.
 
 **Note:** The two targets `HighFive` and `HighFive::HighFive` are aliases. The
 former is older and works with v2, while the latter was introduced in v3,
@@ -163,7 +163,7 @@ because CMake targets work more nicely if they contain `::`.
 
 ### Regular Installation of HighFive
 
-Alternatively, HighFive can be install and "found" like regular software.
+Alternatively, HighFive can be installed and "found" like regular software.
 The project's `CMakeLists.txt` should add the following:
 ```cmake
 find_package(HighFive REQUIRED)
@@ -217,7 +217,7 @@ HighFive integrates with the following libraries:
 
 #### XTensor Header Location
 XTensor reorganized their headers in version 0.26. HighFive attempts to guess
-where the headers can be found. The guessing can be overridded by setting
+where the headers can be found. The guessing can be overridden by setting
 `HIGHFIVE_XTENSOR_HEADER_VERSION` to: `1` for finding `xtensor.hpp` in
 `<xtensor/xtensor.hpp>` and `2` for `<xtensor/containers/xtensor.hpp>`.
 
@@ -269,7 +269,7 @@ Please consult its README for funding information by the Blue Brain Project or E
 One of the main contributors to
 [BlueBrain/HighFive](https://github.com/BlueBrain/HighFive) wanted to keep the
 project alive past the end of BBP. This repository was created to provide a
-seemless continuation of HighFive; and prevent fracturing or capturing of the
+seamless continuation of HighFive; and prevent fracturing or capturing of the
 project.
 
 This repository is not supported by the Blue Brain Project or EPFL.

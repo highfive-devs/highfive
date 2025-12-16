@@ -124,7 +124,7 @@ Now, fingers crossed it'll compile and install:
 
 Note that here we picked the installation path (or more precisely prefix) to be
 `../hdf5-v1.14.0`. You might want to install HDF5 somewhere else. This
-installation prefix is the also the path you need to give CMake so it's able to
+installation prefix is also the path you need to give CMake so it's able to
 find HDF5 later on.
 
 ### Confirming HDF5 Has Been Installed
@@ -200,7 +200,7 @@ enough.
 Just like before the steps are, clone, configure, compile (kinda a no-op),
 install. The detailed instructions would be
 
-    git clone --recursive https://github.com/BlueBrain/HighFive.git
+    git clone --recursive https://github.com/highfive-devs/HighFive.git
     cd HighFive
     git checkout v2.8.0
 
@@ -251,7 +251,7 @@ The required CMake commands are:
     [100%] Linking CXX executable dummy
     /usr/bin/c++ ... -o dummy -Wl,-rpath,${HDF5_ROOT}/lib ${HDF5_ROOT}/lib/libhdf5.so.310.0.0 ...
 
-Pay attention to the semi-colon (not colon like the rest of Linux) used to
+Pay attention to the semicolon (not colon like the rest of Linux) used to
 separate directories in `CMAKE_PREFIX_PATH`. If this worked you should be set
 to either copy the instruction to your "real" project, or start developing the
 rest of your project.
