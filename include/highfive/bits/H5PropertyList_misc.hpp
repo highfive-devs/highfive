@@ -501,5 +501,12 @@ inline void AttributePhaseChange::apply(hid_t hid) const {
     detail::h5p_set_attr_phase_change(hid, _max_compact, _min_dense);
 }
 
+inline FileLocking::FileLocking(bool use_file_locking, bool ignore_when_disabled)
+    : _use_file_locking(use_file_locking)
+    , _ignore_when_disabled(ignore_when_disabled) { }
+
+inline void FileLocking::apply(hid_t hid) const {
+    detail::h5p_set_file_locking(hid, _use_file_locking, _ignore_when_disabled);
+}
 
 }  // namespace HighFive

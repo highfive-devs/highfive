@@ -1273,6 +1273,17 @@ TEST_CASE("AttributePhaseChange") {
     }
 }
 
+TEST_CASE("Locking") {
+    auto fapl = HighFive::FileAccessProps::Default();
+    fapl.add(HighFive::FileLocking(true, false));
+    std::string path = "openmodes.h5";
+    HighFive::File file(path, HighFive::File::ReadOnly, fapl);
+
+    // can't open the same file twice with different locking
+    CHECK_THROWS_AS(HighFive::File(path), FileException);
+}
+
+
 TEST_CASE("datasetOffset") {
     std::string filename = "datasetOffset.h5";
     std::string dsetname = "dset";

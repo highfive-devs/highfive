@@ -371,6 +371,14 @@ inline herr_t h5p_set_attr_phase_change(hid_t plist_id, unsigned max_compact, un
     return err;
 }
 
+inline herr_t h5p_set_file_locking(hid_t plist_id, bool use_file_locking, bool ignore_when_disabled) {
+    herr_t err = H5Pset_file_locking(plist_id, use_file_locking, ignore_when_disabled);
+    if (err < 0) {
+        HDF5ErrMapper::ToException<PropertyException>("Unable to set locking");
+    }
+    return err;
+}
+
 
 }  // namespace detail
 }  // namespace HighFive

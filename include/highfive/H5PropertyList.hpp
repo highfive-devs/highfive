@@ -714,6 +714,27 @@ class AttributePhaseChange {
     unsigned _min_dense;
 };
 
+///
+/// \brief Set locking FileAccessProps
+///
+/// Since HDF5 in version 1.10.0, `single-writer / multiple-readers` support was added.
+/// To achieve this, locks were added when accessing the file.
+/// They can be disabled with the `HDF5_USE_FILE_LOCKING` environment variable.
+/// However, if it's known at access time that one will never have another process writing the file,
+/// the locks can be avoided.
+///
+/// See more in https://support.hdfgroup.org/documentation/hdf5/latest/_file_lock.html
+///
+class FileLocking {
+  public:
+    explicit FileLocking(bool use_file_locking, bool ignore_when_disabled);
+    void apply(const hid_t list) const;
+  private:
+    friend FileAccessProps;
+    bool _use_file_locking;
+    bool _ignore_when_disabled;
+};
+
 /// @}
 
 }  // namespace HighFive
