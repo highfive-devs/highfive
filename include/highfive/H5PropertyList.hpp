@@ -729,6 +729,7 @@ class FileLocking {
   public:
     explicit FileLocking(bool use_file_locking, bool ignore_when_disabled);
     void apply(const hid_t list) const;
+
   private:
     friend FileAccessProps;
     bool _use_file_locking;
