@@ -1274,13 +1274,15 @@ TEST_CASE("AttributePhaseChange") {
 }
 
 TEST_CASE("Locking") {
-    auto fapl = HighFive::FileAccessProps::Default();
-    fapl.add(HighFive::FileLocking(true, false));
+    auto fapl0 = HighFive::FileAccessProps::Default();
+    fapl0.add(HighFive::FileLocking(true, false));
     std::string path = "openmodes.h5";
-    HighFive::File file(path, HighFive::File::ReadOnly, fapl);
+    HighFive::File file(path, HighFive::File::ReadOnly, fapl0);
 
     // can't open the same file twice with different locking
-    CHECK_THROWS_AS(HighFive::File(path), FileException);
+    auto fapl1 = HighFive::FileAccessProps::Default();
+    fapl1.add(HighFive::FileLocking(false, false));
+    CHECK_THROWS_AS(HighFive::File(path, HighFive::File::ReadOnly, fapl1), FileException);
 }
 
 
