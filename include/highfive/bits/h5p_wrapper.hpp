@@ -371,6 +371,7 @@ inline herr_t h5p_set_attr_phase_change(hid_t plist_id, unsigned max_compact, un
     return err;
 }
 
+#if H5_VERSION_GE(1, 10, 0)
 inline herr_t h5p_set_file_locking(hid_t plist_id,
                                    bool use_file_locking,
                                    bool ignore_when_disabled) {
@@ -380,6 +381,7 @@ inline herr_t h5p_set_file_locking(hid_t plist_id,
     }
     return err;
 }
+#endif
 
 
 }  // namespace detail

@@ -714,6 +714,7 @@ class AttributePhaseChange {
     unsigned _min_dense;
 };
 
+#if H5_VERSION_GE(1, 10, 0)
 ///
 /// \brief Set locking FileAccessProps
 ///
@@ -735,6 +736,7 @@ class FileLocking {
     bool _use_file_locking;
     bool _ignore_when_disabled;
 };
+#endif
 
 /// @}
 
