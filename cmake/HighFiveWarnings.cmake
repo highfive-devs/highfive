@@ -13,7 +13,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang"
 
     target_compile_options(HighFiveWarnings
         INTERFACE
-            -Wall
             -Wextra
             -Wshadow
             -Wnon-virtual-dtor
@@ -23,6 +22,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang"
             -Wconversion
             -Wsign-conversion
     )
+
+    # Clang-Cl frontend for Microsoft Compiler does not digest -Wall because it
+    # enables some obscure warnings about missing c++98 compatibility. Better is
+    # to use Microsoft-style /W4 flag:
+    if(NOT CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+        target_compile_options(HighFiveWarnings
+            INTERFACE
+                -Wall
+        )
+    else()
+        target_compile_options(HighFiveWarnings
+            INTERFACE
+                /W4
+        )
+    endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -46,4 +60,3 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         )
     endif()
 endif()
-
