@@ -416,7 +416,7 @@ inline void SliceTraits<Derivate>::write(const T& buffer, const DataTransferProp
     if (!details::checkDimensions(mem_space, buffer_info.getMinRank(), buffer_info.getMaxRank())) {
         std::ostringstream ss;
         ss << "Impossible to write buffer with dimensions n = " << buffer_info.getRank(buffer)
-           << "into dataset with dimensions " << details::format_vector(mem_space.getDimensions())
+           << " into dataset with dimensions " << details::format_vector(mem_space.getDimensions())
            << ".";
         throw DataSpaceException(ss.str());
     }
