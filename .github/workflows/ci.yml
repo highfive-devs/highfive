@@ -396,7 +396,7 @@ jobs:
       with:
         submodules: true
 
-    - uses: mamba-org/setup-micromamba@v2
+    - uses: mamba-org/setup-micromamba@v3
       with:
         environment-file: .github/mamba_env_cxx${{matrix.cxxstd}}.yaml
         environment-name: win-test
