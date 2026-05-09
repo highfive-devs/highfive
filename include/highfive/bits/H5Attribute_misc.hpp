@@ -68,6 +68,13 @@ inline T Attribute::read() const {
 template <typename T>
 inline void Attribute::read(T& array) const {
     const DataSpace& mem_space = getMemSpace();
+    auto dims = mem_space.getDimensions();
+
+    if (mem_space.getElementCount() == 0) {
+        details::inspector<T>::prepare(array, dims);
+        return;
+    }
+
     auto file_datatype = getDataType();
     const details::BufferInfo<T> buffer_info(
         file_datatype,
@@ -80,12 +87,6 @@ inline void Attribute::read(T& array) const {
            << " into arrays of dimensions: " << buffer_info.getMinRank() << "(min) to "
            << buffer_info.getMaxRank() << "(max)";
         throw DataSpaceException(ss.str());
-    }
-    auto dims = mem_space.getDimensions();
-
-    if (mem_space.getElementCount() == 0) {
-        details::inspector<T>::prepare(array, dims);
-        return;
     }
 
     auto r = details::data_converter::get_reader<T>(dims, array, file_datatype);
@@ -133,7 +134,6 @@ inline void Attribute::write(const T& buffer) {
     }
 
     auto file_datatype = getDataType();
-
     const details::BufferInfo<T> buffer_info(
         file_datatype,
         [this]() -> std::string { return this->getName(); },
