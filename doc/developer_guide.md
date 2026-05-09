@@ -206,7 +206,7 @@ is a sensible thing to do. We assume similar about `bool` and
 Anything `H5Easy` related goes in files with the appropriate name.
 
 #### Everything Else
-What's left goes in `tests/unit/test_high_five_base.cpp`. This covers opening
+What's left goes in `tests/unit/tests_high_five_base.cpp`. This covers opening
 files, groups, dataset or attributes; checking certain pathological edge cases;
 etc.
 

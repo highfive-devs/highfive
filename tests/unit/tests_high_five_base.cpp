@@ -1273,6 +1273,15 @@ TEST_CASE("AttributePhaseChange") {
     }
 }
 
+#if H5_VERSION_GE(1, 10, 1)
+TEST_CASE("FileAccessProps-FileLocking") {
+    auto fapl = HighFive::FileAccessProps::Default();
+    fapl.add(HighFive::FileLocking(false, false));
+    HighFive::File file("openmodes.h5", HighFive::File::ReadOnly, fapl);
+}
+#endif
+
+
 TEST_CASE("datasetOffset") {
     std::string filename = "datasetOffset.h5";
     std::string dsetname = "dset";
