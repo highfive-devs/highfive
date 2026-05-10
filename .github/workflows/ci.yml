@@ -382,6 +382,46 @@ jobs:
       run: $GITHUB_WORKSPACE/.github/run_examples.sh
 
 
+  # Job testing ClangCl on Windows
+  # ==============================
+  Windows_ClangCl:
+    runs-on: windows-2025
+
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        submodules: true
+
+    - uses: mamba-org/setup-micromamba@v2
+      with:
+        environment-file: .github/mamba_env_cxx20.yaml
+        environment-name: win-test
+
+    - name: Build
+      shell: bash -l {0}
+      run: |
+        CMAKE_OPTIONS=(
+          -T ClangCl
+          -DCMAKE_CXX_STANDARD=20
+          -DHIGHFIVE_UNIT_TESTS=ON
+          -DHIGHFIVE_TEST_BOOST:BOOL=ON
+          -DHIGHFIVE_TEST_EIGEN:BOOL=ON
+          -DHIGHFIVE_TEST_XTENSOR:BOOL=ON
+        )
+        source $GITHUB_WORKSPACE/.github/build.sh
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      shell: bash -l {0}
+      run: |
+        ctest -j2 --output-on-failure -C $BUILD_TYPE
+
+    - name: Test No HDF5 Diagnostics
+      working-directory: ${{github.workspace}}/build
+      shell: bash -l {0}
+      run: |
+        ! ctest --verbose -C $BUILD_TYPE | grep HDF5-DIAG
+
   # Job testing in Windows
   # ======================
   Windows:
