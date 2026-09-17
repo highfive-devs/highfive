@@ -47,13 +47,13 @@ inline unsigned convert_open_flag(File::AccessMode openFlags) {
 }
 }  // namespace
 
-inline File::File(const std::string& filename,
+inline File::File(const H5Label& filename,
                   AccessMode openFlags,
                   const FileAccessProps& fileAccessProps)
     : File(filename, openFlags, FileCreateProps::Default(), fileAccessProps) {}
 
 
-inline File::File(const std::string& filename,
+inline File::File(const H5Label& filename,
                   AccessMode access_mode,
                   const FileCreateProps& fileCreateProps,
                   const FileAccessProps& fileAccessProps) {
@@ -76,7 +76,7 @@ inline File::File(const std::string& filename,
             silencer = std::make_unique<SilenceHDF5>();
         }
 
-        _hid = detail::nothrow::h5f_open(filename.c_str(), openMode, fileAccessProps.getId());
+        _hid = detail::nothrow::h5f_open(std::string{filename}.c_str(), openMode, fileAccessProps.getId());
 
         if (isValid()) {
             return;  // Done
@@ -87,13 +87,13 @@ inline File::File(const std::string& filename,
             createMode = H5F_ACC_EXCL;
         } else {
             HDF5ErrMapper::ToException<FileException>(
-                std::string("Unable to open file " + filename));
+                std::string("Unable to open file " + std::string{filename}));
         }
     }
 
     auto fcpl = fileCreateProps.getId();
     auto fapl = fileAccessProps.getId();
-    _hid = detail::h5f_create(filename.c_str(), createMode, fcpl, fapl);
+    _hid = detail::h5f_create(std::string{filename}.c_str(), createMode, fcpl, fapl);
 }
 
 inline const std::string& File::getName() const {

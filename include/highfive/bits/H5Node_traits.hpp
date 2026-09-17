@@ -9,7 +9,7 @@
 #pragma once
 
 #include <string>
-
+#include "../H5Label.hpp"
 #include "../H5PropertyList.hpp"
 #include "H5_definitions.hpp"
 #include "H5Converter_misc.hpp"
@@ -37,7 +37,7 @@ class NodeTraits {
     /// \param accessProps A property list with data set access properties
     /// \param parents Create intermediate groups if needed. Default: true.
     /// \return DataSet Object
-    DataSet createDataSet(const std::string& dataset_name,
+    DataSet createDataSet(const H5Label& dataset_name,
                           const DataSpace& space,
                           const DataType& type,
                           const DataSetCreateProps& createProps = DataSetCreateProps::Default(),
@@ -54,7 +54,7 @@ class NodeTraits {
     /// \param parents Create intermediate groups if needed. Default: true.
     /// \return DataSet Object
     template <typename T>
-    DataSet createDataSet(const std::string& dataset_name,
+    DataSet createDataSet(const H5Label& dataset_name,
                           const DataSpace& space,
                           const DataSetCreateProps& createProps = DataSetCreateProps::Default(),
                           const DataSetAccessProps& accessProps = DataSetAccessProps::Default(),
@@ -71,7 +71,7 @@ class NodeTraits {
     /// \param parents Create intermediate groups if needed. Default: true.
     /// \return DataSet Object
     template <typename T>
-    DataSet createDataSet(const std::string& dataset_name,
+    DataSet createDataSet(const H5Label& dataset_name,
                           const T& data,
                           const DataSetCreateProps& createProps = DataSetCreateProps::Default(),
                           const DataSetAccessProps& accessProps = DataSetAccessProps::Default(),
@@ -83,7 +83,7 @@ class NodeTraits {
     /// \param dataset_name
     /// \param accessProps property list to configure dataset chunk cache
     /// \return return the named dataset, or throw exception if not found
-    DataSet getDataSet(const std::string& dataset_name,
+    DataSet getDataSet(const H5Label& dataset_name,
                        const DataSetAccessProps& accessProps = DataSetAccessProps::Default()) const;
 
     ///
@@ -91,7 +91,7 @@ class NodeTraits {
     /// \param group_name
     /// \param parents Create intermediate groups if needed. Default: true.
     /// \return the group object
-    Group createGroup(const std::string& group_name, bool parents = true);
+    Group createGroup(const H5Label& group_name, bool parents = true);
 
     ///
     /// \brief create a new group, and eventually intermediate groups
@@ -99,7 +99,7 @@ class NodeTraits {
     /// \param createProps A property list with group creation properties
     /// \param parents Create intermediate groups if needed. Default: true.
     /// \return the group object
-    Group createGroup(const std::string& group_name,
+    Group createGroup(const H5Label& group_name,
                       const GroupCreateProps& createProps,
                       bool parents = true);
 
@@ -107,14 +107,14 @@ class NodeTraits {
     /// \brief open an existing group with the name group_name
     /// \param group_name
     /// \return the group object
-    Group getGroup(const std::string& group_name) const;
+    Group getGroup(const H5Label& group_name) const;
 
     ///
     /// \brief open a commited datatype with the name type_name
     /// \param type_name
     /// \return the datatype object
     DataType getDataType(
-        const std::string& type_name,
+        const H5Label& type_name,
         const DataTypeAccessProps& accessProps = DataTypeAccessProps::Default()) const;
 
     ///
@@ -133,8 +133,8 @@ class NodeTraits {
     /// \param dst_path new relative path of the object to current File/Group
     /// \param parents Create intermediate groups if needed. Default: true.
     /// \return boolean that is true if the move was successful
-    bool rename(const std::string& src_path,
-                const std::string& dst_path,
+    bool rename(const H5Label& src_path,
+                const H5Label& dst_path,
                 bool parents = true) const;
 
     ///
@@ -149,28 +149,28 @@ class NodeTraits {
     /// \brief check a dataset or group exists in the current node / group
     /// \param node_path dataset/group name to check
     /// \return true if a dataset/group with the associated name exists, or false
-    bool exist(const std::string& node_path) const;
+    bool exist(const H5Label& node_path) const;
 
     ///
     /// \brief unlink the given dataset or group
     /// \param node_path dataset/group name to unlink
-    void unlink(const std::string& node_path) const;
+    void unlink(const H5Label& node_path) const;
 
     ///
     /// \brief Returns the kind of link of the given name (soft, hard...)
     /// \param node_path The entry to check, path relative to the current group
-    LinkType getLinkType(const std::string& node_path) const;
+    LinkType getLinkType(const H5Label& node_path) const;
 
     ///
     /// \brief A shorthand to get the kind of object pointed to (group, dataset, type...)
     /// \param node_path The entry to check, path relative to the current group
-    ObjectType getObjectType(const std::string& node_path) const;
+    ObjectType getObjectType(const H5Label& node_path) const;
 
     ///
     /// \brief A shorthand to create softlink to any object which provides `getPath`
     /// The link will be created with default properties along with required parent groups
     template <typename T, typename = decltype(&T::getPath)>
-    void createSoftLink(const std::string& linkName, const T& obj) {
+    void createSoftLink(const H5Label& linkName, const T& obj) {
         static_assert(!std::is_same<T, Attribute>::value,
                       "hdf5 doesn't support soft links to Attributes");
         createSoftLink(linkName, obj.getPath());
@@ -183,15 +183,15 @@ class NodeTraits {
     /// \param linkCreateProps A Link_Create property list. Notice "parents=true" overrides
     /// \param linkAccessProps The Link_Access property list
     /// \param parents Whether parent groups should be created: Default: true
-    void createSoftLink(const std::string& link_name,
-                        const std::string& obj_path,
+    void createSoftLink(const H5Label& link_name,
+                        const H5Label& obj_path,
                         LinkCreateProps linkCreateProps = LinkCreateProps(),
                         const LinkAccessProps& linkAccessProps = LinkAccessProps(),
                         bool parents = true);
 
-    void createExternalLink(const std::string& link_name,
-                            const std::string& h5_file,
-                            const std::string& obj_path,
+    void createExternalLink(const H5Label& link_name,
+                            const H5Label& h5_file,
+                            const H5Label& obj_path,
                             LinkCreateProps linkCreateProps = LinkCreateProps(),
                             const LinkAccessProps& linkAccessProps = LinkAccessProps(),
                             bool parents = true);
@@ -204,7 +204,7 @@ class NodeTraits {
     /// \param linkAccessProps The Link_Access property list
     /// \param parents Whether parent groups should be created: Default: true
     template <typename T, typename = decltype(&T::getPath)>
-    void createHardLink(const std::string& link_name,
+    void createHardLink(const H5Label& link_name,
                         const T& target_obj,
                         LinkCreateProps linkCreateProps = LinkCreateProps(),
                         const LinkAccessProps& linkAccessProps = LinkAccessProps(),
@@ -216,7 +216,7 @@ class NodeTraits {
     // A wrapper over the low-level H5Lexist
     // It makes behavior consistent among versions and by default transforms
     // errors to exceptions
-    bool _exist(const std::string& node_path, bool raise_errors = true) const;
+    bool _exist(const H5Label& node_path, bool raise_errors = true) const;
 };
 
 

@@ -13,11 +13,11 @@
 
 #include "H5Object.hpp"
 #include "H5PropertyList.hpp"
+#include "H5Label.hpp"
 #include "bits/H5Annotate_traits.hpp"
 #include "bits/H5Node_traits.hpp"
 
 namespace HighFive {
-
 
 ///
 /// \brief File class
@@ -68,7 +68,7 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
     /// \param fileAccessProps: the file access properties
     ///
     /// Open or create a new HDF5 file
-    explicit File(const std::string& filename,
+    explicit File(const H5Label& filename,
                   AccessMode openFlags = ReadOnly,
                   const FileAccessProps& fileAccessProps = FileAccessProps::Default());
 
@@ -80,7 +80,7 @@ class File: public Object, public NodeTraits<File>, public AnnotateTraits<File> 
     /// \param fileAccessProps: the file access properties
     ///
     /// Open or create a new HDF5 file
-    File(const std::string& filename,
+    File(const H5Label& filename,
          AccessMode access_mode,
          const FileCreateProps& fileCreateProps,
          const FileAccessProps& fileAccessProps = FileAccessProps::Default());

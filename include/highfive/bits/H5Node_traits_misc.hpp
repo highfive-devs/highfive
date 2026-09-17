@@ -34,7 +34,7 @@ namespace HighFive {
 
 
 template <typename Derivate>
-inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
+inline DataSet NodeTraits<Derivate>::createDataSet(const H5Label& dataset_name,
                                                    const DataSpace& space,
                                                    const DataType& dtype,
                                                    const DataSetCreateProps& createProps,
@@ -43,7 +43,7 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
     return DataSet(detail::h5d_create2(static_cast<Derivate*>(this)->getId(),
-                                       dataset_name.c_str(),
+                                       std::string{dataset_name}.c_str(),
                                        dtype.getId(),
                                        space.getId(),
                                        lcpl.getId(),
@@ -53,7 +53,7 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
 
 template <typename Derivate>
 template <typename T>
-inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
+inline DataSet NodeTraits<Derivate>::createDataSet(const H5Label& dataset_name,
                                                    const DataSpace& space,
                                                    const DataSetCreateProps& createProps,
                                                    const DataSetAccessProps& accessProps,
@@ -64,7 +64,7 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
 
 template <typename Derivate>
 template <typename T>
-inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_name,
+inline DataSet NodeTraits<Derivate>::createDataSet(const H5Label& dataset_name,
                                                    const T& data,
                                                    const DataSetCreateProps& createProps,
                                                    const DataSetAccessProps& accessProps,
@@ -81,49 +81,49 @@ inline DataSet NodeTraits<Derivate>::createDataSet(const std::string& dataset_na
 }
 
 template <typename Derivate>
-inline DataSet NodeTraits<Derivate>::getDataSet(const std::string& dataset_name,
+inline DataSet NodeTraits<Derivate>::getDataSet(const H5Label& dataset_name,
                                                 const DataSetAccessProps& accessProps) const {
     return DataSet(detail::h5d_open2(static_cast<const Derivate*>(this)->getId(),
-                                     dataset_name.c_str(),
+                                     std::string{dataset_name}.c_str(),
                                      accessProps.getId()));
 }
 
 template <typename Derivate>
-inline Group NodeTraits<Derivate>::createGroup(const std::string& group_name, bool parents) {
+inline Group NodeTraits<Derivate>::createGroup(const H5Label& group_name, bool parents) {
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
     return detail::make_group(detail::h5g_create2(static_cast<Derivate*>(this)->getId(),
-                                                  group_name.c_str(),
+                                                  std::string{group_name}.c_str(),
                                                   lcpl.getId(),
                                                   H5P_DEFAULT,
                                                   H5P_DEFAULT));
 }
 
 template <typename Derivate>
-inline Group NodeTraits<Derivate>::createGroup(const std::string& group_name,
+inline Group NodeTraits<Derivate>::createGroup(const H5Label& group_name,
                                                const GroupCreateProps& createProps,
                                                bool parents) {
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
     return detail::make_group(detail::h5g_create2(static_cast<Derivate*>(this)->getId(),
-                                                  group_name.c_str(),
+                                                  std::string{group_name}.c_str(),
                                                   lcpl.getId(),
                                                   createProps.getId(),
                                                   H5P_DEFAULT));
 }
 
 template <typename Derivate>
-inline Group NodeTraits<Derivate>::getGroup(const std::string& group_name) const {
+inline Group NodeTraits<Derivate>::getGroup(const H5Label& group_name) const {
     return detail::make_group(detail::h5g_open2(static_cast<const Derivate*>(this)->getId(),
-                                                group_name.c_str(),
+                                                std::string{group_name}.c_str(),
                                                 H5P_DEFAULT));
 }
 
 template <typename Derivate>
-inline DataType NodeTraits<Derivate>::getDataType(const std::string& type_name,
+inline DataType NodeTraits<Derivate>::getDataType(const H5Label& type_name,
                                                   const DataTypeAccessProps& accessProps) const {
     return DataType(detail::h5t_open2(static_cast<const Derivate*>(this)->getId(),
-                                      type_name.c_str(),
+                                      std::string{type_name}.c_str(),
                                       accessProps.getId()));
 }
 
@@ -149,15 +149,15 @@ inline std::string NodeTraits<Derivate>::getObjectName(size_t index) const {
 }
 
 template <typename Derivate>
-inline bool NodeTraits<Derivate>::rename(const std::string& src_path,
-                                         const std::string& dst_path,
+inline bool NodeTraits<Derivate>::rename(const H5Label& src_path,
+                                         const H5Label& dst_path,
                                          bool parents) const {
     LinkCreateProps lcpl;
     lcpl.add(CreateIntermediateGroup(parents));
     herr_t err = detail::h5l_move(static_cast<const Derivate*>(this)->getId(),
-                                  src_path.c_str(),
+                                  std::string{src_path}.c_str(),
                                   static_cast<const Derivate*>(this)->getId(),
-                                  dst_path.c_str(),
+                                  std::string{dst_path}.c_str(),
                                   lcpl.getId(),
                                   H5P_DEFAULT);
 
@@ -182,10 +182,10 @@ inline std::vector<std::string> NodeTraits<Derivate>::listObjectNames(IndexType 
 }
 
 template <typename Derivate>
-inline bool NodeTraits<Derivate>::_exist(const std::string& node_path, bool raise_errors) const {
+inline bool NodeTraits<Derivate>::_exist(const H5Label& node_path, bool raise_errors) const {
     SilenceHDF5 silencer{};
     const auto val = detail::nothrow::h5l_exists(static_cast<const Derivate*>(this)->getId(),
-                                                 node_path.c_str(),
+                                                 std::string{node_path}.c_str(),
                                                  H5P_DEFAULT);
     if (val < 0) {
         if (raise_errors) {
@@ -202,7 +202,7 @@ inline bool NodeTraits<Derivate>::_exist(const std::string& node_path, bool rais
 }
 
 template <typename Derivate>
-inline bool NodeTraits<Derivate>::exist(const std::string& node_path) const {
+inline bool NodeTraits<Derivate>::exist(const H5Label& node_path) const {
     // When there are slashes, first check everything is fine
     // so that subsequent errors are only due to missing intermediate groups
     if (node_path.find('/') != std::string::npos) {
@@ -215,8 +215,8 @@ inline bool NodeTraits<Derivate>::exist(const std::string& node_path) const {
 
 
 template <typename Derivate>
-inline void NodeTraits<Derivate>::unlink(const std::string& node_path) const {
-    detail::h5l_delete(static_cast<const Derivate*>(this)->getId(), node_path.c_str(), H5P_DEFAULT);
+inline void NodeTraits<Derivate>::unlink(const H5Label& node_path) const {
+    detail::h5l_delete(static_cast<const Derivate*>(this)->getId(), std::string{node_path}.c_str(), H5P_DEFAULT);
 }
 
 
@@ -238,24 +238,24 @@ static inline LinkType _convert_link_type(const H5L_type_t& ltype) noexcept {
 }
 
 template <typename Derivate>
-inline LinkType NodeTraits<Derivate>::getLinkType(const std::string& node_path) const {
+inline LinkType NodeTraits<Derivate>::getLinkType(const H5Label& node_path) const {
     H5L_info_t linkinfo;
     detail::h5l_get_info(static_cast<const Derivate*>(this)->getId(),
-                         node_path.c_str(),
+                         std::string{node_path}.c_str(),
                          &linkinfo,
                          H5P_DEFAULT);
 
     if (linkinfo.type == H5L_TYPE_ERROR) {
-        HDF5ErrMapper::ToException<GroupException>(std::string("Link type of \"") + node_path +
+        HDF5ErrMapper::ToException<GroupException>("Link type of \"" + std::string{node_path} +
                                                    "\" is H5L_TYPE_ERROR");
     }
     return _convert_link_type(linkinfo.type);
 }
 
 template <typename Derivate>
-inline ObjectType NodeTraits<Derivate>::getObjectType(const std::string& node_path) const {
+inline ObjectType NodeTraits<Derivate>::getObjectType(const H5Label& node_path) const {
     const auto id = detail::h5o_open(static_cast<const Derivate*>(this)->getId(),
-                                     node_path.c_str(),
+                                     std::string{node_path}.c_str(),
                                      H5P_DEFAULT);
     auto object_type = _convert_object_type(detail::h5i_get_type(id));
     detail::h5o_close(id);
@@ -264,43 +264,43 @@ inline ObjectType NodeTraits<Derivate>::getObjectType(const std::string& node_pa
 
 
 template <typename Derivate>
-inline void NodeTraits<Derivate>::createSoftLink(const std::string& link_name,
-                                                 const std::string& obj_path,
+inline void NodeTraits<Derivate>::createSoftLink(const H5Label& link_name,
+                                                 const H5Label& obj_path,
                                                  LinkCreateProps linkCreateProps,
                                                  const LinkAccessProps& linkAccessProps,
                                                  const bool parents) {
     if (parents) {
         linkCreateProps.add(CreateIntermediateGroup{});
     }
-    detail::h5l_create_soft(obj_path.c_str(),
+    detail::h5l_create_soft(std::string{obj_path}.c_str(),
                             static_cast<const Derivate*>(this)->getId(),
-                            link_name.c_str(),
+                            std::string{link_name}.c_str(),
                             linkCreateProps.getId(),
                             linkAccessProps.getId());
 }
 
 
 template <typename Derivate>
-inline void NodeTraits<Derivate>::createExternalLink(const std::string& link_name,
-                                                     const std::string& h5_file,
-                                                     const std::string& obj_path,
+inline void NodeTraits<Derivate>::createExternalLink(const H5Label& link_name,
+                                                     const H5Label& h5_file,
+                                                     const H5Label& obj_path,
                                                      LinkCreateProps linkCreateProps,
                                                      const LinkAccessProps& linkAccessProps,
                                                      const bool parents) {
     if (parents) {
         linkCreateProps.add(CreateIntermediateGroup{});
     }
-    detail::h5l_create_external(h5_file.c_str(),
-                                obj_path.c_str(),
+    detail::h5l_create_external(std::string{h5_file}.c_str(),
+                                std::string{obj_path}.c_str(),
                                 static_cast<const Derivate*>(this)->getId(),
-                                link_name.c_str(),
+                                std::string{link_name}.c_str(),
                                 linkCreateProps.getId(),
                                 linkAccessProps.getId());
 }
 
 template <typename Derivate>
 template <typename T, typename>
-inline void NodeTraits<Derivate>::createHardLink(const std::string& link_name,
+inline void NodeTraits<Derivate>::createHardLink(const H5Label& link_name,
                                                  const T& target_obj,
                                                  LinkCreateProps linkCreateProps,
                                                  const LinkAccessProps& linkAccessProps,
@@ -313,7 +313,7 @@ inline void NodeTraits<Derivate>::createHardLink(const std::string& link_name,
     detail::h5l_create_hard(target_obj.getId(),
                             ".",
                             static_cast<const Derivate*>(this)->getId(),
-                            link_name.c_str(),
+                            std::string{link_name}.c_str(),
                             linkCreateProps.getId(),
                             linkAccessProps.getId());
 }

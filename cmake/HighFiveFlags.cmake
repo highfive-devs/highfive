@@ -24,6 +24,10 @@ if(HIGHFIVE_HAS_FRIEND_DECLARATIONS)
     target_compile_definitions(HighFiveFlags INTERFACE -DHIGHFIVE_HAS_FRIEND_DECLARATIONS=1)
 endif()
 
+if(HIGHFIVE_USE_STRING_VIEW)
+    target_compile_definitions(HighFiveFlags INTERFACE -DHIGHFIVE_USE_STRING_VIEW=1)
+endif()
+
 if(HIGHFIVE_SANITIZER)
     target_compile_options(HighFiveFlags INTERFACE -fsanitize=${HIGHFIVE_SANITIZER})
     target_link_options(HighFiveFlags INTERFACE -fsanitize=${HIGHFIVE_SANITIZER})

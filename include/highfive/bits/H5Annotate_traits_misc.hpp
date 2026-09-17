@@ -21,11 +21,11 @@
 namespace HighFive {
 
 template <typename Derivate>
-inline Attribute AnnotateTraits<Derivate>::createAttribute(const std::string& attribute_name,
+inline Attribute AnnotateTraits<Derivate>::createAttribute(const H5Label& attribute_name,
                                                            const DataSpace& space,
                                                            const DataType& dtype) {
     auto attr_id = detail::h5a_create2(static_cast<Derivate*>(this)->getId(),
-                                       attribute_name.c_str(),
+                                       std::string{attribute_name}.c_str(),
                                        dtype.getId(),
                                        space.getId(),
                                        H5P_DEFAULT,
@@ -35,14 +35,14 @@ inline Attribute AnnotateTraits<Derivate>::createAttribute(const std::string& at
 
 template <typename Derivate>
 template <typename Type>
-inline Attribute AnnotateTraits<Derivate>::createAttribute(const std::string& attribute_name,
+inline Attribute AnnotateTraits<Derivate>::createAttribute(const H5Label& attribute_name,
                                                            const DataSpace& space) {
     return createAttribute(attribute_name, space, create_and_check_datatype<Type>());
 }
 
 template <typename Derivate>
 template <typename T>
-inline Attribute AnnotateTraits<Derivate>::createAttribute(const std::string& attribute_name,
+inline Attribute AnnotateTraits<Derivate>::createAttribute(const H5Label& attribute_name,
                                                            const T& data) {
     Attribute att =
         createAttribute(attribute_name,
@@ -53,14 +53,14 @@ inline Attribute AnnotateTraits<Derivate>::createAttribute(const std::string& at
 }
 
 template <typename Derivate>
-inline void AnnotateTraits<Derivate>::deleteAttribute(const std::string& attribute_name) {
-    detail::h5a_delete(static_cast<const Derivate*>(this)->getId(), attribute_name.c_str());
+inline void AnnotateTraits<Derivate>::deleteAttribute(const H5Label& attribute_name) {
+    detail::h5a_delete(static_cast<const Derivate*>(this)->getId(), std::string{attribute_name}.c_str());
 }
 
 template <typename Derivate>
-inline Attribute AnnotateTraits<Derivate>::getAttribute(const std::string& attribute_name) const {
+inline Attribute AnnotateTraits<Derivate>::getAttribute(const H5Label& attribute_name) const {
     const auto attr_id = detail::h5a_open(static_cast<const Derivate*>(this)->getId(),
-                                          attribute_name.c_str(),
+                                          std::string{attribute_name}.c_str(),
                                           H5P_DEFAULT);
     return detail::make_attribute(attr_id);
 }
@@ -90,8 +90,8 @@ inline std::vector<std::string> AnnotateTraits<Derivate>::listAttributeNames() c
 }
 
 template <typename Derivate>
-inline bool AnnotateTraits<Derivate>::hasAttribute(const std::string& attr_name) const {
-    return detail::h5a_exists(static_cast<const Derivate*>(this)->getId(), attr_name.c_str()) > 0;
+inline bool AnnotateTraits<Derivate>::hasAttribute(const H5Label& attr_name) const {
+    return detail::h5a_exists(static_cast<const Derivate*>(this)->getId(), std::string{attr_name}.c_str()) > 0;
 }
 
 }  // namespace HighFive

@@ -10,6 +10,7 @@
 
 #include <string>
 
+#include "../H5Label.hpp"
 #include "../H5Attribute.hpp"
 
 namespace HighFive {
@@ -24,7 +25,7 @@ class AnnotateTraits {
     /// \param type
     /// \return the attribute object
     ///
-    Attribute createAttribute(const std::string& attribute_name,
+    Attribute createAttribute(const H5Label& attribute_name,
                               const DataSpace& space,
                               const DataType& type);
 
@@ -36,7 +37,7 @@ class AnnotateTraits {
     /// informations
     /// \return Attribute Object
     template <typename Type>
-    Attribute createAttribute(const std::string& attribute_name, const DataSpace& space);
+    Attribute createAttribute(const H5Label& attribute_name, const DataSpace& space);
 
     ///
     /// \brief createAttribute create a new attribute on the current dataset and
@@ -47,18 +48,18 @@ class AnnotateTraits {
     /// \return Attribute Object
     ///
     template <typename T>
-    Attribute createAttribute(const std::string& attribute_name, const T& data);
+    Attribute createAttribute(const H5Label& attribute_name, const T& data);
 
     ///
     /// \brief deleteAttribute let you delete an attribute by its name.
     /// \param attribute_name identifier of the attribute
-    void deleteAttribute(const std::string& attribute_name);
+    void deleteAttribute(const H5Label& attribute_name);
 
     ///
     /// \brief open an existing attribute with the name attribute_name
     /// \param attribute_name identifier of the attribute
     /// \return the attribute object
-    Attribute getAttribute(const std::string& attribute_name) const;
+    Attribute getAttribute(const H5Label& attribute_name) const;
 
     ///
     /// \brief return the number of attributes of the node / group
@@ -73,7 +74,7 @@ class AnnotateTraits {
     ///
     /// \brief checks an attribute exists
     /// \return number of attributes
-    bool hasAttribute(const std::string& attr_name) const;
+    bool hasAttribute(const H5Label& attr_name) const;
 
   private:
     using derivate_type = Derivate;

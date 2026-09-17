@@ -34,6 +34,9 @@ option(HIGHFIVE_VERBOSE "Set logging level to verbose." OFF)
 option(HIGHFIVE_HAS_FRIEND_DECLARATIONS "Enable additional friend declarations. Certain compiler require this On, others Off." OFF)
 mark_as_advanced(HIGHFIVE_HAS_FRIEND_DECLARATIONS)
 
+option(HIGHFIVE_USE_STRING_VIEW "Use std::string_view instead of std::string has H5 objects keys." OFF)
+mark_as_advanced(HIGHFIVE_HAS_STRING_VIEW_NAMES)
+
 option(HIGHFIVE_FIND_HDF5 "Find and link with HDF5." On)
 
 set(HIGHFIVE_CMAKE_INSTALL_DIR "lib/cmake/HighFive" CACHE STRING
@@ -98,6 +101,12 @@ endif()
 
 if(CMAKE_CXX_STANDARD EQUAL 98 OR CMAKE_CXX_STANDARD LESS ${HIGHFIVE_CXX_STANDARD_DEFAULT})
   message(FATAL_ERROR "HighFive needs to be compiled with at least C++${HIGHFIVE_CXX_STANDARD_DEFAULT}")
+endif()
+
+if(HIGHFIVE_USE_STRING_VIEW)
+  if(CMAKE_CXX_STANDARD LESS 17)
+    message(FATAL_ERROR "HighFive needs to be compiled with at least C++17 to use std::string_view as keys")
+  endif()
 endif()
 
 if(HIGHFIVE_TEST_MDSPAN AND CMAKE_CXX_STANDARD LESS 23)
